@@ -73,7 +73,7 @@ CS.registerTool({
       let i = 0;
       const peek = (o) => toks[i + (o || 0)];
       const isOp = (t, v) => t && t.k === "op" && t.v === v;
-      const isBin = (t) => t && t.k === "op" && OPS[t.v] && t.v !== "$" ? true : t && t.k === "op" && t.v === "$";
+      const isBin = (t) => !!(t && t.k === "op" && OPS[t.v]);
       const expect = (v) => {
         if (!isOp(peek(), v)) fail("Expected '" + v + "'" + (peek() ? " but found '" + peek().v + "'" : " but the expression ended") + ".");
         i++;
