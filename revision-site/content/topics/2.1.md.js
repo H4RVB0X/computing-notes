@@ -676,7 +676,8 @@ Spec point 4.2.1.4 asks you to know the **concept and uses** of all of these. Ea
 :::related
 - [2.2 Queues](#/topic/2.2) and [2.3 Stacks](#/topic/2.3) — linear ADTs built on arrays or linked lists
 - [2.6 Hash tables](#/topic/2.6) and [2.7 Dictionaries](#/topic/2.7) — key-based access
-- [1.1 Programming](#/topic/1.1) — data types, arrays and records in code
+- [1.1 Data types, variables and constants](#/topic/1.1) — primitive vs composite types
+- [1.8 Object-oriented programming](#/topic/1.8) — classes as records with methods
 - [3.4 Searching algorithms](#/topic/3.4) — why direct access matters for binary search
 :::
 

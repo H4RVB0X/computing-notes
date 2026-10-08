@@ -1,0 +1,22 @@
+CS.registerTrace({
+  id: "5.2-1",
+  topic: "5.2",
+  title: "Denary to binary by repeated division: ToBinary(77)",
+  lang: "pseudocode",
+  code: "SUBROUTINE ToBinary(n)\n    bits ← \"\"\n    WHILE n > 0\n        bits ← INT_TO_STRING(n MOD 2) + bits\n        n ← n DIV 2\n    ENDWHILE\n    RETURN bits\nENDSUBROUTINE\n\nOUTPUT ToBinary(77)",
+  intro: "Trace one row per pass of the WHILE loop. The last row shows the value returned.",
+  columns: ["n at start of pass", "n MOD 2", "bits after the pass", "n after the pass"],
+  prefill: [["77", "", "", ""], ["", "", "", ""], ["", "", "", ""], ["", "", "", ""], ["", "", "", ""], ["", "", "", ""], ["", "", "", ""]],
+  rows: [
+    ["77", "1", "1", "38"],
+    ["38", "0", "01", "19"],
+    ["19", "1", "101", "9"],
+    ["9", "1", "1101", "4"],
+    ["4", "0", "01101", "2"],
+    ["2", "0", "001101", "1"],
+    ["1", "1", "1001101", "0"],
+  ],
+  instructions: "Fill in every cell. Write bits exactly as the string would hold them (keep leading zeros).",
+  hint: "Each remainder is placed on the **left** of the string, so the first remainder ends up as the least significant bit.",
+  note: "Result: 1001101₂. Check: 64 + 8 + 4 + 1 = 77 ✓",
+});

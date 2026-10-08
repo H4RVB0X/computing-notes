@@ -252,6 +252,7 @@ CS.registerTool({
 
     // ---------- drawing ----------
     const SVG = "http://www.w3.org/2000/svg";
+    const MID = "ll-arrow-" + Math.random().toString(36).slice(2, 8);
     function sv(tag, attrs, text) {
       const e = document.createElementNS(SVG, tag);
       for (const k in attrs) e.setAttribute(k, attrs[k]);
@@ -282,7 +283,7 @@ CS.registerTool({
       const W = X0 + cols * (BW + GX), H = Y0 + rows.length * RY;
       const svg = sv("svg", { width: W, height: H, viewBox: "0 0 " + W + " " + H, style: "display:block;font-family:var(--font-mono);font-size:12px", role: "img", "aria-label": "Linked list diagram" });
       const defs = sv("defs", {});
-      defs.innerHTML = '<marker id="ll-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker>';
+      defs.innerHTML = '<marker id="' + MID + '" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker>';
       svg.appendChild(defs);
       svg.style.color = "var(--text-2)";
       const labelRow = (txt, ri, ptr, target) => {
@@ -291,7 +292,7 @@ CS.registerTool({
         g.appendChild(sv("text", { x: 4, y: y - 4 }, txt));
         g.appendChild(sv("text", { x: 4, y: y + 12, "font-size": "11px" }, "= " + P(target)));
         svg.appendChild(g);
-        if (target !== NULL && pos[target]) svg.appendChild(sv("line", { x1: 56, y1: y, x2: pos[target].x - 2, y2: y, stroke: "currentColor", "stroke-width": 1.5, "marker-end": "url(#ll-arrow)" }));
+        if (target !== NULL && pos[target]) svg.appendChild(sv("line", { x1: 56, y1: y, x2: pos[target].x - 2, y2: y, stroke: "currentColor", "stroke-width": 1.5, "marker-end": "url(#" + MID + ")" }));
       };
       labelRow("start", 0, "start", start);
       if (loose.length) svg.appendChild(sv("text", { x: 4, y: Y0 + RY + BH / 2 + 4, fill: "var(--text-3)", "font-size": "11px" }, "unlinked"));
@@ -315,7 +316,7 @@ CS.registerTool({
           const q = pos[t];
           const x1 = p.x + BW - 15, y1 = p.y + BH / 2, x2 = q.x - 2, y2 = q.y + BH / 2;
           const d = q.y === p.y && q.x > p.x ? "M" + x1 + " " + y1 + "L" + x2 + " " + y2 : "M" + x1 + " " + y1 + " C" + (x1 + 40) + " " + (y1 + 30) + "," + (x2 - 40) + " " + (y2 - 30) + "," + x2 + " " + y2;
-          svg.appendChild(sv("path", { d, fill: "none", stroke: hl.node === i && hl.field === "next" ? "var(--bad)" : "currentColor", "stroke-width": 1.5, "marker-end": "url(#ll-arrow)", opacity: isFree ? 0.5 : 1 }));
+          svg.appendChild(sv("path", { d, fill: "none", stroke: hl.node === i && hl.field === "next" ? "var(--bad)" : "currentColor", "stroke-width": 1.5, "marker-end": "url(#" + MID + ")", opacity: isFree ? 0.5 : 1 }));
         }
       }
       svgWrap.innerHTML = "";
