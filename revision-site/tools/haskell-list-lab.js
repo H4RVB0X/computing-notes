@@ -207,6 +207,7 @@ CS.registerTool({
     }
     function child(parent, c, side) {
       if (c.t === "lam") return "(" + show(c) + ")";
+      if (c.t === "app" && TIGHT.has(parent.op)) return "(" + show(c) + ")";
       if (c.t !== "bin") return show(c, "op");
       let paren;
       if (ARITH.has(parent.op) && ARITH.has(c.op) && TIGHT.has(parent.op)) paren = true; // always bracket nested arithmetic
@@ -291,7 +292,7 @@ CS.registerTool({
             note = note || s.note;
             return s.e;
           });
-          return changed ? { e: List(items), note: e.items.length > 1 ? "evaluate the elements" : note } : null;
+          return changed ? { e: List(items), note: note && note !== "arithmetic" ? note : "evaluate each element" } : null;
         }
         case "bin": {
           if (e.op === ".") return null;

@@ -237,9 +237,9 @@ Do **not** claim "a database always saves storage space". Indexes, keys and meta
 :::
 
 :::example Identifying keys in an exam-board database
-Student(<u>StudentID</u>, Forename, Surname, School, Gender, DateOfBirth)
-Exam(<u>ExamID</u>, ExamName, Subject, Level)
-Result(<u>ExamID</u>, <u>StudentID</u>, RawMark, Grade)
+- Student(<u>StudentID</u>, Forename, Surname, School, Gender, DateOfBirth)
+- Exam(<u>ExamID</u>, ExamName, Subject, Level)
+- Result(<u>ExamID</u>, <u>StudentID</u>, RawMark, Grade)
 
 1. **Primary keys:** StudentID; ExamID; and the composite (ExamID, StudentID) in Result, since a student sits each exam once.
 2. **Foreign keys:** in Result, ExamID (links to Exam) and StudentID (links to Student). They are both part of the composite key **and** foreign keys.

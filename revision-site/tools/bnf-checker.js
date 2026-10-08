@@ -349,7 +349,7 @@
             why = (k === 0 ? "No <" + r.start + "> can start with “" + r.s[0] + "”." : "“" + r.s.slice(0, k) + "” can begin a <" + r.start + ">, but no rule allows “" + r.s[k] + "” at position " + (k + 1) + ".") + (exp.length ? " Allowed there: " + exp.map((c) => "“" + c + "”").join(" ") + (k > 0 && r.M && r.M[r.start + "@0"].has(k) ? " — or the string could stop just before it." : ".") : "");
           }
           const marked = k < n ? esc(r.s.slice(0, k)) + '<mark style="background:var(--bad-soft);color:var(--bad);font-weight:700">' + esc(r.s.slice(k, k + 1)) + "</mark>" + esc(r.s.slice(k + 1)) : esc(r.s) + '<span style="color:var(--bad)">▮</span>';
-          detail.append(h("h4", { style: "margin:14px 0 4px", html: '<span class="err">✗ ' + esc(shown) + " is NOT a valid &lt;" + esc(r.start) + "&gt;</span>" }), h("div", { class: "output", html: "Point of failure: " + marked + "\n" + esc(why) }));
+          detail.append(h("h4", { style: "margin:14px 0 4px", html: '<span style="color:var(--bad);font-weight:600">✗ ' + esc(shown) + " is NOT a valid &lt;" + esc(r.start) + "&gt;</span>" }), h("div", { class: "output", html: "Point of failure: " + marked + "\n" + esc(why) }));
         }
       }
 
@@ -366,7 +366,7 @@
           const r = test(line);
           const btn = h("button", { class: "btn sm ghost", type: "button", text: "Show working" });
           btn.addEventListener("click", () => showDetail(r));
-          const tr = h("tr", { "data-valid": r.ok ? "1" : "0" }, [h("td", { style: "font-family:var(--font-mono)", html: r.s === "" ? '<span class="muted">ε</span>' : esc(r.s) }), h("td", { html: r.ok ? '<span class="ok-text">✓ valid</span>' : '<span class="err">✗ invalid</span>' }), h("td", {}, btn)]);
+          const tr = h("tr", { "data-valid": r.ok ? "1" : "0" }, [h("td", { style: "font-family:var(--font-mono)", html: r.s === "" ? '<span class="muted">ε</span>' : esc(r.s) }), h("td", { html: r.ok ? '<span class="ok-text">✓ valid</span>' : '<span style="color:var(--bad);font-weight:600">✗ invalid</span>' }), h("td", {}, btn)]);
           tb.appendChild(tr);
           if (!first) first = r;
         });

@@ -35,9 +35,11 @@ CS.registerTool({
     const row1 = h("div", { class: "controls" }, [opSel, valIn, afterIn, startBtn]);
     const row2 = h("div", { class: "controls" }, [stepBtn, runBtn, finishBtn, h("label", { text: "speed " }, speed), resetBtn]);
     const errBox = h("div", { class: "err", style: "min-height:1.2em;margin-bottom:4px" });
-    const svgWrap = h("div", { style: "overflow-x:auto;border:1px solid var(--border);border-radius:10px;background:var(--bg-2)" });
+    const svgWrap = h("div", { style: "min-width:0;max-width:100%;overflow-x:auto;border:1px solid var(--border);border-radius:10px;background:var(--bg-2)" });
     const tableWrap = h("div");
-    const diag = h("div", { class: "two-col" }, [svgWrap, tableWrap]);
+    svgWrap.style.flex = "1 1 420px";
+    tableWrap.style.flex = "1 1 230px";
+    const diag = h("div", { style: "display:flex;flex-wrap:wrap;gap:14px;align-items:flex-start" }, [svgWrap, tableWrap]);
     const current = h("div", { class: "output", style: "margin-top:10px;min-height:2.6em;border-color:var(--accent)" });
     const log = h("div", { class: "output", style: "margin-top:10px;min-height:120px;max-height:260px;overflow:auto" });
     el.append(row1, row2, errBox, diag, current, log);
@@ -276,12 +278,12 @@ CS.registerTool({
       const loose = [];
       for (let i = 0; i < N; i++) if (!placed.has(i)) loose.push(i);
       const rows = [live, loose, free];
-      const BW = 96, BH = 38, GX = 40, X0 = 70, Y0 = 34, RY = 78;
+      const BW = 84, BH = 36, GX = 26, X0 = 70, Y0 = 30, RY = 70;
       const pos = {};
       rows.forEach((r, ri) => r.forEach((i, k) => (pos[i] = { x: X0 + k * (BW + GX), y: Y0 + ri * RY })));
       const cols = Math.max(1, ...rows.map((r) => r.length));
       const W = X0 + cols * (BW + GX), H = Y0 + rows.length * RY;
-      const svg = sv("svg", { width: W, height: H, viewBox: "0 0 " + W + " " + H, style: "display:block;font-family:var(--font-mono);font-size:12px", role: "img", "aria-label": "Linked list diagram" });
+      const svg = sv("svg", { width: W, height: H, viewBox: "0 0 " + W + " " + H, style: "display:block;max-width:none;font-family:var(--font-mono);font-size:12px", role: "img", "aria-label": "Linked list diagram" });
       const defs = sv("defs", {});
       defs.innerHTML = '<marker id="' + MID + '" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker>';
       svg.appendChild(defs);
@@ -308,7 +310,7 @@ CS.registerTool({
         g.appendChild(sv("text", { x: p.x + 4, y: p.y - 5, fill: "var(--text-3)", "font-size": "10px" }, "[" + i + "]"));
         const tn = Object.keys(temps).filter((k) => temps[k] === i);
         if (tn.length) g.appendChild(sv("text", { x: p.x + 24, y: p.y - 5, fill: "var(--bad)", "font-size": "10px", "font-weight": "700" }, tn.join(", ") + " ▼"));
-        g.appendChild(sv("text", { x: p.x + 6, y: p.y + 24, fill: "var(--text)", "font-weight": hl.node === i && hl.field === "data" ? "700" : "400" }, isFree && data[i] === "" ? "" : String(data[i]).slice(0, 7)));
+        g.appendChild(sv("text", { x: p.x + 6, y: p.y + 24, fill: "var(--text)", "font-weight": hl.node === i && hl.field === "data" ? "700" : "400" }, isFree && data[i] === "" ? "" : String(data[i]).slice(0, 6)));
         g.appendChild(sv("text", { x: p.x + BW - 25, y: p.y + 24, fill: hl.node === i && hl.field === "next" ? "var(--bad)" : "var(--text-2)", "font-weight": "700", "font-size": "11px" }, next[i] === NULL ? "∅" : String(next[i])));
         svg.appendChild(g);
         const t = next[i];

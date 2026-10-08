@@ -1,0 +1,25 @@
+CS.registerTrace({
+  id: "2.4-1",
+  topic: "2.4",
+  title: "Degrees and edge count from an adjacency matrix",
+  lang: "pseudocode",
+  code: "m ← [[0, 1, 1, 0],\n     [1, 0, 1, 1],\n     [1, 1, 0, 0],\n     [0, 1, 0, 0]]\ntotal ← 0\nFOR i ← 0 TO 3\n    deg ← 0\n    FOR j ← 0 TO 3\n        deg ← deg + m[i][j]\n    ENDFOR\n    total ← total + deg\n    OUTPUT deg\nENDFOR\nOUTPUT total DIV 2",
+  intro: "`m` is the adjacency matrix of an **undirected** graph with vertices 0–3. Fill in one row per pass of the **outer** loop (after its inner loop has finished), then a final row for the last OUTPUT.",
+  columns: ["i", "deg", "total", "OUTPUT"],
+  prefill: [
+    ["0", "", "", ""],
+    ["1", "", "", ""],
+    ["2", "", "", ""],
+    ["3", "", "", ""],
+    ["", "", "", ""],
+  ],
+  rows: [
+    ["0", "2", "2", "2"],
+    ["1", "3", "5", "3"],
+    ["2", "2", "7", "2"],
+    ["3", "1", "8", "1"],
+    ["", "", "8", "4"],
+  ],
+  hint: "Each row sum is the degree of that vertex. In an undirected graph every edge is counted twice (once in each direction), so the number of edges is total ÷ 2.",
+  note: "The graph has 4 edges: 0–1, 0–2, 1–2, 1–3. Sum of degrees = 2 × edges is the handshake lemma.",
+});

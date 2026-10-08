@@ -300,7 +300,7 @@
           let shown = showStr(s);
           if (!full && m && m.e > m.s) shown = esc(s.slice(0, m.s)).replace(/ /g, "␣") + '<mark style="background:var(--warn-soft);color:var(--warn);font-weight:700">' + esc(s.slice(m.s, m.e)).replace(/ /g, "␣") + "</mark>" + esc(s.slice(m.e)).replace(/ /g, "␣");
           if (full && s !== "") shown = '<mark style="background:var(--ok-soft);color:var(--ok);font-weight:700">' + shown + "</mark>";
-          const verdict = full ? '<span class="ok-text">✓ full match</span>' : m && m.e > m.s ? '<span style="color:var(--warn);font-weight:600">contains a match (not full)</span>' : '<span class="err">✗ no match</span>';
+          const verdict = full ? '<span class="ok-text">✓ full match</span>' : m && m.e > m.s ? '<span style="color:var(--warn);font-weight:600">contains a match (not full)</span>' : '<span style="color:var(--bad);font-weight:600">✗ no match</span>';
           const tr = h("tr", {});
           tr.innerHTML = '<td style="font-family:var(--font-mono)">' + shown + "</td><td>" + verdict + "</td>";
           tr.setAttribute("data-full", full ? "1" : "0");
@@ -364,7 +364,7 @@
         });
         if (allRight) score++;
         rHead.textContent = "Round " + (round + 1) + " of " + ROUNDS.length + "   score: " + score;
-        rFb.innerHTML = (allRight ? '<span class="ok-text">All correct.</span> ' : '<span class="err">Not quite — red boxes were wrong.</span> ') + "Breakdown:<br><code>" + describe(parse(ROUNDS[round].re), 0, []).map(esc).join("<br>").replace(/ {2}/g, "&nbsp;&nbsp;") + "</code>";
+        rFb.innerHTML = (allRight ? '<span class="ok-text">All correct.</span> ' : '<span style="color:var(--bad);font-weight:600">Not quite — red boxes were wrong.</span> ') + "Breakdown:<br><code>" + describe(parse(ROUNDS[round].re), 0, []).map(esc).join("<br>").replace(/ {2}/g, "&nbsp;&nbsp;") + "</code>";
       });
       rNext.addEventListener("click", () => {
         if (round === ROUNDS.length - 1) {

@@ -114,7 +114,7 @@ Every non-key attribute must depend on **the key** (1NF: there is a key, no repe
 :::example From UNF to 3NF, every stage shown
 **UNF.** The table above. Entity description, with the repeating group in an inner bracket:
 
-Student(<u>StudentNo</u>, StudentName, DOB, (CourseNo, CourseName, LecturerNo, LecturerName, TargetGrade))
+- Student(<u>StudentNo</u>, StudentName, DOB, (CourseNo, CourseName, LecturerNo, LecturerName, TargetGrade))
 
 **Step 1 → 1NF.**
 
@@ -214,7 +214,25 @@ Move `LecturerName` to a Lecturer table keyed on `LecturerNo`; leave `LecturerNo
 | SEW | S. Westwood |
 | JLB | J. Brown |
 
-@@SVG:enrol3nf@@
+<svg class="diagram" viewBox="0 0 640 200" role="img" aria-label="ER diagram of the 3NF college design: Student and Course linked by Enrolment, Lecturer one-to-many Course">
+  <g font-size="14" font-family="inherit" stroke-width="1.6">
+    <rect x="20" y="30" width="130" height="44" rx="4" fill="#7c9aff" fill-opacity="0.18" stroke="currentColor"/>
+    <text x="85" y="57" text-anchor="middle" fill="currentColor" stroke="none" font-weight="600">Student</text>
+    <rect x="250" y="30" width="130" height="44" rx="4" fill="#7c9aff" fill-opacity="0.18" stroke="currentColor"/>
+    <text x="315" y="57" text-anchor="middle" fill="currentColor" stroke="none" font-weight="600">Enrolment</text>
+    <rect x="480" y="30" width="130" height="44" rx="4" fill="#7c9aff" fill-opacity="0.18" stroke="currentColor"/>
+    <text x="545" y="57" text-anchor="middle" fill="currentColor" stroke="none" font-weight="600">Course</text>
+    <rect x="480" y="140" width="130" height="44" rx="4" fill="#7c9aff" fill-opacity="0.18" stroke="currentColor"/>
+    <text x="545" y="167" text-anchor="middle" fill="currentColor" stroke="none" font-weight="600">Lecturer</text>
+    <line x1="150" y1="52" x2="250" y2="52" stroke="currentColor"/>
+    <line x1="234" y1="52" x2="250" y2="43" stroke="currentColor"/><line x1="234" y1="52" x2="250" y2="52" stroke="currentColor"/><line x1="234" y1="52" x2="250" y2="61" stroke="currentColor"/>
+    <line x1="480" y1="52" x2="380" y2="52" stroke="currentColor"/>
+    <line x1="396" y1="52" x2="380" y2="61" stroke="currentColor"/><line x1="396" y1="52" x2="380" y2="52" stroke="currentColor"/><line x1="396" y1="52" x2="380" y2="43" stroke="currentColor"/>
+    <line x1="545" y1="140" x2="545" y2="74" stroke="currentColor"/>
+    <line x1="545" y1="90" x2="536" y2="74" stroke="currentColor"/><line x1="545" y1="90" x2="545" y2="74" stroke="currentColor"/><line x1="545" y1="90" x2="554" y2="74" stroke="currentColor"/>
+    <text x="553" y="111" text-anchor="start" font-size="12" fill="currentColor" stroke="none">teaches</text>
+  </g>
+</svg>
 
 **Check the anomalies have gone:** Music can be added to Course before anyone enrols (no insertion anomaly); Cameron can be deleted without losing Art or J. Brown (no deletion anomaly); J. Adey's name is stored once (no update anomaly).
 :::
@@ -236,13 +254,13 @@ This time 1NF is reached by **flattening**: one row per item, repeating the orde
 | 002 | 29/07/2024 | C23 | Sam Iqbal | 0134 | Laser printer | 124.00 | 1 |
 | 003 | 30/07/2024 | C17 | Jo Hart | 4692, 5723, 9834 | Keyboard, Mouse, External hard drive | 9.99, 4.99, 59.99 | 1, 1, 1 |
 
-CustOrder(<u>OrderNo</u>, OrderDate, CustomerID, CustomerName, (StockID, Description, Price, Qty))
+- CustOrder(<u>OrderNo</u>, OrderDate, CustomerID, CustomerName, (StockID, Description, Price, Qty))
 
 A line total (Price × Qty) is **not** stored: it is **derived** and can be calculated.
 
 **Step 1 → 1NF.** Give each item its own row. `OrderNo` now repeats, so the key becomes the composite (OrderNo, StockID): an item appears once per order.
 
-OrderLine(<u>OrderNo</u>, <u>StockID</u>, OrderDate, CustomerID, CustomerName, Description, Price, Qty)
+- OrderLine(<u>OrderNo</u>, <u>StockID</u>, OrderDate, CustomerID, CustomerName, Description, Price, Qty)
 
 | <u>OrderNo</u> | <u>StockID</u> | OrderDate | CustomerID | CustomerName | Description | Price | Qty |
 |---|---|---|---|---|---|---|---|
@@ -314,7 +332,27 @@ Atomic, no repeating groups, has a key: **1NF**. But the redundancy is now obvio
 | 002 | 29/07/2024 | C23 |
 | 003 | 30/07/2024 | C17 |
 
-@@SVG:shop3nf@@
+<svg class="diagram" viewBox="0 0 640 200" role="img" aria-label="ER diagram of the 3NF shop design: Customer one-to-many CustOrder, CustOrder one-to-many OrderLine, Stock one-to-many OrderLine">
+  <g font-size="14" font-family="inherit" stroke-width="1.6">
+    <rect x="20" y="30" width="130" height="44" rx="4" fill="#7c9aff" fill-opacity="0.18" stroke="currentColor"/>
+    <text x="85" y="57" text-anchor="middle" fill="currentColor" stroke="none" font-weight="600">Customer</text>
+    <rect x="250" y="30" width="130" height="44" rx="4" fill="#7c9aff" fill-opacity="0.18" stroke="currentColor"/>
+    <text x="315" y="57" text-anchor="middle" fill="currentColor" stroke="none" font-weight="600">CustOrder</text>
+    <rect x="250" y="140" width="130" height="44" rx="4" fill="#7c9aff" fill-opacity="0.18" stroke="currentColor"/>
+    <text x="315" y="167" text-anchor="middle" fill="currentColor" stroke="none" font-weight="600">OrderLine</text>
+    <rect x="480" y="140" width="130" height="44" rx="4" fill="#7c9aff" fill-opacity="0.18" stroke="currentColor"/>
+    <text x="545" y="167" text-anchor="middle" fill="currentColor" stroke="none" font-weight="600">Stock</text>
+    <line x1="150" y1="52" x2="250" y2="52" stroke="currentColor"/>
+    <line x1="234" y1="52" x2="250" y2="43" stroke="currentColor"/><line x1="234" y1="52" x2="250" y2="52" stroke="currentColor"/><line x1="234" y1="52" x2="250" y2="61" stroke="currentColor"/>
+    <text x="200" y="44" text-anchor="middle" font-size="12" fill="currentColor" stroke="none">places</text>
+    <line x1="315" y1="74" x2="315" y2="140" stroke="currentColor"/>
+    <line x1="315" y1="124" x2="324" y2="140" stroke="currentColor"/><line x1="315" y1="124" x2="315" y2="140" stroke="currentColor"/><line x1="315" y1="124" x2="306" y2="140" stroke="currentColor"/>
+    <text x="323" y="111" text-anchor="start" font-size="12" fill="currentColor" stroke="none">contains</text>
+    <line x1="480" y1="162" x2="380" y2="162" stroke="currentColor"/>
+    <line x1="396" y1="162" x2="380" y2="171" stroke="currentColor"/><line x1="396" y1="162" x2="380" y2="162" stroke="currentColor"/><line x1="396" y1="162" x2="380" y2="153" stroke="currentColor"/>
+    <text x="430" y="154" text-anchor="middle" font-size="12" fill="currentColor" stroke="none">appears on</text>
+  </g>
+</svg>
 
 The table is called `CustOrder` because **ORDER is an SQL keyword**; a table named `Order` causes errors in many DBMSs.
 :::

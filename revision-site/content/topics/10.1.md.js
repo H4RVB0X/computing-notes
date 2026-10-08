@@ -86,7 +86,31 @@ AQA ER diagrams use **rectangles** for entities and **plain lines** for relation
 - **Crow's foot** (the line splays into three prongs) = many.
 
 :::figure The three degrees of relationship in AQA notation
-@@SVG:degrees@@
+<svg class="diagram" viewBox="0 0 640 250" role="img" aria-label="Three ER diagrams showing one-to-one, one-to-many and many-to-many relationships with crow's feet on the many ends">
+  <g font-size="14" font-family="inherit" stroke-width="1.6">
+    <rect x="40" y="20" width="150" height="40" rx="4" fill="#7c9aff" fill-opacity="0.18" stroke="currentColor"/>
+    <text x="115" y="45" text-anchor="middle" fill="currentColor" stroke="none" font-weight="600">Headteacher</text>
+    <rect x="450" y="20" width="150" height="40" rx="4" fill="#7c9aff" fill-opacity="0.18" stroke="currentColor"/>
+    <text x="525" y="45" text-anchor="middle" fill="currentColor" stroke="none" font-weight="600">School</text>
+    <rect x="40" y="100" width="150" height="40" rx="4" fill="#7c9aff" fill-opacity="0.18" stroke="currentColor"/>
+    <text x="115" y="125" text-anchor="middle" fill="currentColor" stroke="none" font-weight="600">Form</text>
+    <rect x="450" y="100" width="150" height="40" rx="4" fill="#7c9aff" fill-opacity="0.18" stroke="currentColor"/>
+    <text x="525" y="125" text-anchor="middle" fill="currentColor" stroke="none" font-weight="600">Student</text>
+    <rect x="40" y="180" width="150" height="40" rx="4" fill="#7c9aff" fill-opacity="0.18" stroke="currentColor"/>
+    <text x="115" y="205" text-anchor="middle" fill="currentColor" stroke="none" font-weight="600">Teacher</text>
+    <rect x="450" y="180" width="150" height="40" rx="4" fill="#7c9aff" fill-opacity="0.18" stroke="currentColor"/>
+    <text x="525" y="205" text-anchor="middle" fill="currentColor" stroke="none" font-weight="600">Pupil</text>
+    <line x1="190" y1="40" x2="450" y2="40" stroke="currentColor"/>
+    <text x="320" y="32" text-anchor="middle" font-size="12" fill="currentColor" stroke="none">one-to-one (1:1)</text>
+    <line x1="190" y1="120" x2="450" y2="120" stroke="currentColor"/>
+    <line x1="434" y1="120" x2="450" y2="111" stroke="currentColor"/><line x1="434" y1="120" x2="450" y2="120" stroke="currentColor"/><line x1="434" y1="120" x2="450" y2="129" stroke="currentColor"/>
+    <text x="320" y="112" text-anchor="middle" font-size="12" fill="currentColor" stroke="none">one-to-many (1:M)</text>
+    <line x1="190" y1="200" x2="450" y2="200" stroke="currentColor"/>
+    <line x1="206" y1="200" x2="190" y2="209" stroke="currentColor"/><line x1="206" y1="200" x2="190" y2="200" stroke="currentColor"/><line x1="206" y1="200" x2="190" y2="191" stroke="currentColor"/>
+    <line x1="434" y1="200" x2="450" y2="191" stroke="currentColor"/><line x1="434" y1="200" x2="450" y2="200" stroke="currentColor"/><line x1="434" y1="200" x2="450" y2="209" stroke="currentColor"/>
+    <text x="320" y="192" text-anchor="middle" font-size="12" fill="currentColor" stroke="none">many-to-many (M:N)</text>
+  </g>
+</svg>
 :::
 
 Read each diagram from the far side: in the middle row, *one* form is linked to *many* students, so the crow's foot touches **Student**.
@@ -113,10 +137,31 @@ The fix is always the same:
 :::
 
 :::figure Student M:N Course becomes Student 1:M Enrolment M:1 Course
-@@SVG:resolve@@
+<svg class="diagram" viewBox="0 0 640 170" role="img" aria-label="A many-to-many relationship between Student and Course resolved into two one-to-many relationships through a link entity called Enrolment">
+  <g font-size="14" font-family="inherit" stroke-width="1.6">
+    <rect x="20" y="20" width="130" height="40" rx="4" fill="#7c9aff" fill-opacity="0.18" stroke="currentColor"/>
+    <text x="85" y="45" text-anchor="middle" fill="currentColor" stroke="none" font-weight="600">Student</text>
+    <rect x="490" y="20" width="130" height="40" rx="4" fill="#7c9aff" fill-opacity="0.18" stroke="currentColor"/>
+    <text x="555" y="45" text-anchor="middle" fill="currentColor" stroke="none" font-weight="600">Course</text>
+    <rect x="20" y="110" width="130" height="40" rx="4" fill="#7c9aff" fill-opacity="0.18" stroke="currentColor"/>
+    <text x="85" y="135" text-anchor="middle" fill="currentColor" stroke="none" font-weight="600">Student </text>
+    <rect x="255" y="110" width="130" height="40" rx="4" fill="#7c9aff" fill-opacity="0.18" stroke="currentColor"/>
+    <text x="320" y="135" text-anchor="middle" fill="currentColor" stroke="none" font-weight="600">Enrolment</text>
+    <rect x="490" y="110" width="130" height="40" rx="4" fill="#7c9aff" fill-opacity="0.18" stroke="currentColor"/>
+    <text x="555" y="135" text-anchor="middle" fill="currentColor" stroke="none" font-weight="600">Course </text>
+    <line x1="150" y1="40" x2="490" y2="40" stroke="currentColor"/>
+    <line x1="166" y1="40" x2="150" y2="49" stroke="currentColor"/><line x1="166" y1="40" x2="150" y2="40" stroke="currentColor"/><line x1="166" y1="40" x2="150" y2="31" stroke="currentColor"/>
+    <line x1="474" y1="40" x2="490" y2="31" stroke="currentColor"/><line x1="474" y1="40" x2="490" y2="40" stroke="currentColor"/><line x1="474" y1="40" x2="490" y2="49" stroke="currentColor"/>
+    <text x="320" y="32" text-anchor="middle" font-size="12" fill="currentColor" stroke="none">before: M:N cannot be implemented</text>
+    <line x1="150" y1="130" x2="255" y2="130" stroke="currentColor"/>
+    <line x1="239" y1="130" x2="255" y2="121" stroke="currentColor"/><line x1="239" y1="130" x2="255" y2="130" stroke="currentColor"/><line x1="239" y1="130" x2="255" y2="139" stroke="currentColor"/>
+    <line x1="490" y1="130" x2="385" y2="130" stroke="currentColor"/>
+    <line x1="401" y1="130" x2="385" y2="139" stroke="currentColor"/><line x1="401" y1="130" x2="385" y2="130" stroke="currentColor"/><line x1="401" y1="130" x2="385" y2="121" stroke="currentColor"/>
+  </g>
+</svg>
 :::
 
-Enrolment(<u>StudentID</u>, <u>CourseID</u>, DateEnrolled, TargetGrade)
+- Enrolment(<u>StudentID</u>, <u>CourseID</u>, DateEnrolled, TargetGrade)
 
 The composite key works because a student enrols on a particular course **once**. Each half of the key is also a foreign key.
 
@@ -137,13 +182,13 @@ Conventions to follow every time:
 - **Primary key underlined** and normally written first. A **composite** key has **every** part underlined.
 - Foreign keys are included as ordinary attributes. On this site they are tagged <sup>FK</sup> so you can spot them; in the exam, underline only the primary key unless the question asks you to identify foreign keys (some mark schemes accept an asterisk or dashed underline for them).
 
-Owner(<u>OwnerID</u>, Surname, Forename, Town, Phone)
+- Owner(<u>OwnerID</u>, Surname, Forename, Town, Phone)
 
-Pet(<u>PetID</u>, Name, Species, DateOfBirth, OwnerID<sup>FK</sup>)
+- Pet(<u>PetID</u>, Name, Species, DateOfBirth, OwnerID<sup>FK</sup>)
 
-Vet(<u>VetID</u>, VetName, Specialism)
+- Vet(<u>VetID</u>, VetName, Specialism)
 
-Appointment(<u>ApptID</u>, PetID<sup>FK</sup>, VetID<sup>FK</sup>, ApptDate, Reason, Fee)
+- Appointment(<u>ApptID</u>, PetID<sup>FK</sup>, VetID<sup>FK</sup>, ApptDate, Reason, Fee)
 
 :::trap
 - **Underline** the key. Bold, capitals or "(PK)" do not get the mark if the question says underline.
@@ -178,14 +223,34 @@ Appointment(<u>ApptID</u>, PetID<sup>FK</sup>, VetID<sup>FK</sup>, ApptDate, Rea
 
 **Step 5 — draw the diagram** (crow's feet at the many ends):
 
-@@SVG:vet@@
+<svg class="diagram" viewBox="0 0 640 230" role="img" aria-label="ER diagram for the vet practice: Owner one-to-many Pet, Pet one-to-many Appointment, Vet one-to-many Appointment">
+  <g font-size="14" font-family="inherit" stroke-width="1.6">
+    <rect x="30" y="30" width="130" height="44" rx="4" fill="#7c9aff" fill-opacity="0.18" stroke="currentColor"/>
+    <text x="95" y="57" text-anchor="middle" fill="currentColor" stroke="none" font-weight="600">Owner</text>
+    <rect x="255" y="30" width="130" height="44" rx="4" fill="#7c9aff" fill-opacity="0.18" stroke="currentColor"/>
+    <text x="320" y="57" text-anchor="middle" fill="currentColor" stroke="none" font-weight="600">Pet</text>
+    <rect x="255" y="150" width="130" height="44" rx="4" fill="#7c9aff" fill-opacity="0.18" stroke="currentColor"/>
+    <text x="320" y="177" text-anchor="middle" fill="currentColor" stroke="none" font-weight="600">Appointment</text>
+    <rect x="480" y="150" width="130" height="44" rx="4" fill="#7c9aff" fill-opacity="0.18" stroke="currentColor"/>
+    <text x="545" y="177" text-anchor="middle" fill="currentColor" stroke="none" font-weight="600">Vet</text>
+    <line x1="160" y1="52" x2="255" y2="52" stroke="currentColor"/>
+    <line x1="239" y1="52" x2="255" y2="43" stroke="currentColor"/><line x1="239" y1="52" x2="255" y2="52" stroke="currentColor"/><line x1="239" y1="52" x2="255" y2="61" stroke="currentColor"/>
+    <text x="207.5" y="44" text-anchor="middle" font-size="12" fill="currentColor" stroke="none">owns</text>
+    <line x1="320" y1="74" x2="320" y2="150" stroke="currentColor"/>
+    <line x1="320" y1="134" x2="329" y2="150" stroke="currentColor"/><line x1="320" y1="134" x2="320" y2="150" stroke="currentColor"/><line x1="320" y1="134" x2="311" y2="150" stroke="currentColor"/>
+    <text x="328" y="116" text-anchor="start" font-size="12" fill="currentColor" stroke="none">has</text>
+    <line x1="480" y1="172" x2="385" y2="172" stroke="currentColor"/>
+    <line x1="401" y1="172" x2="385" y2="181" stroke="currentColor"/><line x1="401" y1="172" x2="385" y2="172" stroke="currentColor"/><line x1="401" y1="172" x2="385" y2="163" stroke="currentColor"/>
+    <text x="432.5" y="164" text-anchor="middle" font-size="12" fill="currentColor" stroke="none">takes</text>
+  </g>
+</svg>
 
 **Step 6 — write the entity descriptions** (foreign key on the many side of each 1:M):
 
-Owner(<u>OwnerID</u>, Surname, Forename, Town, Phone)
-Pet(<u>PetID</u>, Name, Species, DateOfBirth, OwnerID<sup>FK</sup>)
-Vet(<u>VetID</u>, VetName, Specialism)
-Appointment(<u>ApptID</u>, PetID<sup>FK</sup>, VetID<sup>FK</sup>, ApptDate, Reason, Fee)
+- Owner(<u>OwnerID</u>, Surname, Forename, Town, Phone)
+- Pet(<u>PetID</u>, Name, Species, DateOfBirth, OwnerID<sup>FK</sup>)
+- Vet(<u>VetID</u>, VetName, Specialism)
+- Appointment(<u>ApptID</u>, PetID<sup>FK</sup>, VetID<sup>FK</sup>, ApptDate, Reason, Fee)
 
 These four tables are used for every SQL example in [10.4 SQL](#/topic/10.4).
 :::
@@ -216,16 +281,46 @@ These four tables are used for every SQL example in [10.4 SQL](#/topic/10.4).
 
 **ER diagram:**
 
-@@SVG:library@@
+<svg class="diagram" viewBox="0 0 660 250" role="img" aria-label="ER diagram for the library: Author and Book linked through BookAuthor, Book one-to-many Copy, Copy one-to-many Loan, Member one-to-many Loan">
+  <g font-size="14" font-family="inherit" stroke-width="1.6">
+    <rect x="20" y="30" width="120" height="44" rx="4" fill="#7c9aff" fill-opacity="0.18" stroke="currentColor"/>
+    <text x="80" y="57" text-anchor="middle" fill="currentColor" stroke="none" font-weight="600">Author</text>
+    <rect x="260" y="30" width="130" height="44" rx="4" fill="#7c9aff" fill-opacity="0.18" stroke="currentColor"/>
+    <text x="325" y="57" text-anchor="middle" fill="currentColor" stroke="none" font-weight="600">BookAuthor</text>
+    <rect x="510" y="30" width="120" height="44" rx="4" fill="#7c9aff" fill-opacity="0.18" stroke="currentColor"/>
+    <text x="570" y="57" text-anchor="middle" fill="currentColor" stroke="none" font-weight="600">Book</text>
+    <rect x="20" y="160" width="120" height="44" rx="4" fill="#7c9aff" fill-opacity="0.18" stroke="currentColor"/>
+    <text x="80" y="187" text-anchor="middle" fill="currentColor" stroke="none" font-weight="600">Member</text>
+    <rect x="260" y="160" width="130" height="44" rx="4" fill="#7c9aff" fill-opacity="0.18" stroke="currentColor"/>
+    <text x="325" y="187" text-anchor="middle" fill="currentColor" stroke="none" font-weight="600">Loan</text>
+    <rect x="510" y="160" width="120" height="44" rx="4" fill="#7c9aff" fill-opacity="0.18" stroke="currentColor"/>
+    <text x="570" y="187" text-anchor="middle" fill="currentColor" stroke="none" font-weight="600">Copy</text>
+    <line x1="140" y1="52" x2="260" y2="52" stroke="currentColor"/>
+    <line x1="244" y1="52" x2="260" y2="43" stroke="currentColor"/><line x1="244" y1="52" x2="260" y2="52" stroke="currentColor"/><line x1="244" y1="52" x2="260" y2="61" stroke="currentColor"/>
+    <text x="200" y="44" text-anchor="middle" font-size="12" fill="currentColor" stroke="none">writes</text>
+    <line x1="510" y1="52" x2="390" y2="52" stroke="currentColor"/>
+    <line x1="406" y1="52" x2="390" y2="61" stroke="currentColor"/><line x1="406" y1="52" x2="390" y2="52" stroke="currentColor"/><line x1="406" y1="52" x2="390" y2="43" stroke="currentColor"/>
+    <text x="450" y="44" text-anchor="middle" font-size="12" fill="currentColor" stroke="none">is written by</text>
+    <line x1="570" y1="74" x2="570" y2="160" stroke="currentColor"/>
+    <line x1="570" y1="144" x2="579" y2="160" stroke="currentColor"/><line x1="570" y1="144" x2="570" y2="160" stroke="currentColor"/><line x1="570" y1="144" x2="561" y2="160" stroke="currentColor"/>
+    <text x="578" y="121" text-anchor="start" font-size="12" fill="currentColor" stroke="none">has</text>
+    <line x1="140" y1="182" x2="260" y2="182" stroke="currentColor"/>
+    <line x1="244" y1="182" x2="260" y2="173" stroke="currentColor"/><line x1="244" y1="182" x2="260" y2="182" stroke="currentColor"/><line x1="244" y1="182" x2="260" y2="191" stroke="currentColor"/>
+    <text x="200" y="174" text-anchor="middle" font-size="12" fill="currentColor" stroke="none">makes</text>
+    <line x1="510" y1="182" x2="390" y2="182" stroke="currentColor"/>
+    <line x1="406" y1="182" x2="390" y2="191" stroke="currentColor"/><line x1="406" y1="182" x2="390" y2="182" stroke="currentColor"/><line x1="406" y1="182" x2="390" y2="173" stroke="currentColor"/>
+    <text x="450" y="174" text-anchor="middle" font-size="12" fill="currentColor" stroke="none">is lent in</text>
+  </g>
+</svg>
 
 **Entity descriptions:**
 
-Author(<u>AuthorID</u>, Forename, Surname)
-Book(<u>ISBN</u>, Title, YearPublished)
-BookAuthor(<u>ISBN</u>, <u>AuthorID</u>)
-Copy(<u>CopyID</u>, ISBN<sup>FK</sup>, Shelf)
-Member(<u>MemberID</u>, Forename, Surname, TutorGroup)
-Loan(<u>CopyID</u>, <u>DateOut</u>, MemberID<sup>FK</sup>, DateDue)
+- Author(<u>AuthorID</u>, Forename, Surname)
+- Book(<u>ISBN</u>, Title, YearPublished)
+- BookAuthor(<u>ISBN</u>, <u>AuthorID</u>)
+- Copy(<u>CopyID</u>, ISBN<sup>FK</sup>, Shelf)
+- Member(<u>MemberID</u>, Forename, Surname, TutorGroup)
+- Loan(<u>CopyID</u>, <u>DateOut</u>, MemberID<sup>FK</sup>, DateDue)
 
 **Choosing Loan's key.** CopyID alone repeats (a copy is lent many times). CopyID + MemberID could repeat (the same member borrows the same copy twice). A copy can only go out once on a given day, so **(CopyID, DateOut)** is unique. A new `LoanID` would also be acceptable; say why your key is unique.
 :::
@@ -241,16 +336,34 @@ Exams often give you the entity descriptions and ask for the diagram. Use the **
 | Two entities share an attribute that is the primary key of **neither** | an unresolved **M:N** (needs a link entity) |
 
 :::example Hospital (adapted from the textbook question)
-Ward(<u>WardName</u>, NurseInCharge, NumberOfBeds)
-Patient(<u>PatientNumber</u>, Surname, Forename, Address, DateOfBirth, WardName<sup>FK</sup>)
-Condition(<u>ConditionNumber</u>, ConditionName, StandardTreatment)
-PatientCondition(<u>PatientNumber</u>, <u>ConditionNumber</u>)
+- Ward(<u>WardName</u>, NurseInCharge, NumberOfBeds)
+- Patient(<u>PatientNumber</u>, Surname, Forename, Address, DateOfBirth, WardName<sup>FK</sup>)
+- Condition(<u>ConditionNumber</u>, ConditionName, StandardTreatment)
+- PatientCondition(<u>PatientNumber</u>, <u>ConditionNumber</u>)
 
 - `WardName` is Ward's key and appears in Patient → Ward 1:M Patient.
 - `PatientNumber` is Patient's key and is part of PatientCondition's composite key → Patient 1:M PatientCondition.
 - `ConditionNumber` likewise → Condition 1:M PatientCondition.
 
-@@SVG:hospital@@
+<svg class="diagram" viewBox="0 0 640 220" role="img" aria-label="ER diagram for the hospital: Ward one-to-many Patient, Patient one-to-many PatientCondition, Condition one-to-many PatientCondition">
+  <g font-size="14" font-family="inherit" stroke-width="1.6">
+    <rect x="30" y="30" width="150" height="44" rx="4" fill="#7c9aff" fill-opacity="0.18" stroke="currentColor"/>
+    <text x="105" y="57" text-anchor="middle" fill="currentColor" stroke="none" font-weight="600">Ward</text>
+    <rect x="30" y="150" width="150" height="44" rx="4" fill="#7c9aff" fill-opacity="0.18" stroke="currentColor"/>
+    <text x="105" y="177" text-anchor="middle" fill="currentColor" stroke="none" font-weight="600">Patient</text>
+    <rect x="245" y="150" width="160" height="44" rx="4" fill="#7c9aff" fill-opacity="0.18" stroke="currentColor"/>
+    <text x="325" y="177" text-anchor="middle" fill="currentColor" stroke="none" font-weight="600">PatientCondition</text>
+    <rect x="470" y="150" width="150" height="44" rx="4" fill="#7c9aff" fill-opacity="0.18" stroke="currentColor"/>
+    <text x="545" y="177" text-anchor="middle" fill="currentColor" stroke="none" font-weight="600">Condition</text>
+    <line x1="105" y1="74" x2="105" y2="150" stroke="currentColor"/>
+    <line x1="105" y1="134" x2="114" y2="150" stroke="currentColor"/><line x1="105" y1="134" x2="105" y2="150" stroke="currentColor"/><line x1="105" y1="134" x2="96" y2="150" stroke="currentColor"/>
+    <text x="113" y="116" text-anchor="start" font-size="12" fill="currentColor" stroke="none">holds</text>
+    <line x1="180" y1="172" x2="245" y2="172" stroke="currentColor"/>
+    <line x1="229" y1="172" x2="245" y2="163" stroke="currentColor"/><line x1="229" y1="172" x2="245" y2="172" stroke="currentColor"/><line x1="229" y1="172" x2="245" y2="181" stroke="currentColor"/>
+    <line x1="470" y1="172" x2="405" y2="172" stroke="currentColor"/>
+    <line x1="421" y1="172" x2="405" y2="181" stroke="currentColor"/><line x1="421" y1="172" x2="405" y2="172" stroke="currentColor"/><line x1="421" y1="172" x2="405" y2="163" stroke="currentColor"/>
+  </g>
+</svg>
 
 Note that the textbook answer puts `WardName` into PatientMedicalCondition. Because "a patient can be assigned to only one ward", the ward belongs with the **patient**, not with each condition the patient has.
 :::

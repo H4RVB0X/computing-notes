@@ -226,7 +226,8 @@
       function renderStatus() {
         if (!tm) return;
         status.textContent = "State: " + tm.state + "   head: " + tm.head + "   reads: " + readAt(tm.head) + "   steps: " + tm.steps + (tm.halted ? "   ⇒ " + tm.reason : "");
-        status.className = "stat-line" + (tm.halted ? (/accept/i.test(tm.state) ? " ok-text" : /reject/i.test(tm.state) ? " err" : "") : "");
+        status.className = "stat-line" + (tm.halted && /accept/i.test(tm.state) ? " ok-text" : "");
+        status.style.color = tm.halted && /reject/i.test(tm.state) ? "var(--bad)" : "";
       }
       function renderRules() {
         ruleBox.innerHTML = "";

@@ -199,7 +199,9 @@
         if (m.type === "mealy") s += "   output so far: “" + run.output + "”";
         if (run.done) s += "   ⇒ " + run.result;
         status.textContent = s;
-        status.className = "stat-line" + (run.done ? run.result.startsWith("ACCEPTED") ? " ok-text" : run.result.startsWith("REJECTED") ? " err" : "" : "");
+        status.className = "stat-line" + (run.done && run.result.startsWith("ACCEPTED") ? " ok-text" : "");
+        status.style.color = run.done && run.result.startsWith("REJECTED") ? "var(--bad)" : "";
+        status.style.fontWeight = run.done && run.result.startsWith("REJECTED") ? "600" : "";
       }
       function showErr(errs) {
         errBox.style.display = errs.length ? "" : "none";
