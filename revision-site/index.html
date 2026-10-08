@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CS Revision · AQA A-Level Computer Science (7517)</title>
+<meta name="description" content="Complete revision site for AQA A-Level Computer Science 7517: notes, worked examples, quizzes, flashcards and interactive tools. Works offline from a single folder.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%233b5bdb'/%3E%3Ctext x='32' y='42' font-size='30' font-family='monospace' font-weight='700' text-anchor='middle' fill='white'%3ECS%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="css/style.css">
+<script>
+  // apply saved theme before first paint to avoid a flash
+  try { var p = JSON.parse(localStorage.getItem("cs-revision-v1") || "{}").prefs || {}; if (p.theme) document.documentElement.setAttribute("data-theme", p.theme); if (p.fontScale) document.documentElement.style.setProperty("--font-scale", p.fontScale); } catch (e) {}
+</script>
+</head>
+<body>
+<a class="skip-link" href="#content">Skip to content</a>
+<div class="page-progress" id="page-progress" aria-hidden="true"></div>
+<div class="app">
+  <aside class="sidebar" id="sidebar" aria-label="Site navigation">
+    <a class="brand" href="#/">
+      <div class="logo">CS</div>
+      <div><div class="title">A-Level Computer Science</div><div class="sub">AQA 7517 · revision site</div></div>
+    </a>
+    <ul class="nav-links">
+      <li><a href="#/" data-page="home"><span class="ico">🏠</span>Dashboard</a></li>
+      <li><a href="#/tools" data-page="tools"><span class="ico">🧰</span>Interactive tools</a></li>
+      <li><a href="#/flashcards" data-page="flashcards"><span class="ico">🃏</span>Flashcards</a></li>
+      <li><a href="#/mock" data-page="mock"><span class="ico">🎲</span>Mixed mock</a></li>
+      <li><a href="#/checklist" data-page="checklist"><span class="ico">✅</span>Spec checklist</a></li>
+      <li><a href="#/glossary" data-page="glossary"><span class="ico">📖</span>Glossary</a></li>
+      <li><a href="#/progress" data-page="progress"><span class="ico">📈</span>Progress &amp; settings</a></li>
+    </ul>
+    <nav id="nav" aria-label="Topics"></nav>
+  </aside>
+  <div class="sidebar-backdrop" id="sidebar-backdrop"></div>
+  <div class="main">
+    <header class="header">
+      <button class="icon-btn menu-btn" id="menu-btn" type="button" aria-label="Open navigation">☰</button>
+      <form id="search-form" class="grow" role="search" style="max-width:520px">
+        <label class="sr-only" for="search-input">Search</label>
+        <input id="search-input" type="search" placeholder="Search notes, key terms, tools…  ( / )" autocomplete="off">
+      </form>
+      <span class="grow"></span>
+      <button class="icon-btn" id="font-down" type="button" title="Smaller text" aria-label="Smaller text">A−</button>
+      <button class="icon-btn" id="font-up" type="button" title="Larger text" aria-label="Larger text">A+</button>
+      <button class="icon-btn" id="theme-btn" type="button" title="Toggle dark / light" aria-label="Toggle dark or light mode">◐</button>
+    </header>
+    <main class="content" id="content" tabindex="-1"></main>
+  </div>
+</div>
+<script src="js/core.js"></script>
+<script src="js/highlight.js"></script>
+<script src="js/markdown.js"></script>
+<script src="js/quiz.js"></script>
+<script src="js/flashcards.js"></script>
+<script src="js/trace.js"></script>
+<script src="js/search.js"></script>
+<script src="content/sections.js"></script>
+<script src="content/manifest.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
