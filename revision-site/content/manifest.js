@@ -2,8 +2,16 @@
 window.CS = window.CS || {};
 CS.manifest = [
   // tools
+  "tools/base-converter.js",
+  "tools/fsm-simulator.js",
+  "tools/linked-list-demo.js",
+  "tools/queue-demo.js",
+  "tools/sorting-visualiser.js",
   "tools/stack-demo.js",
+  "tools/turing-machine.js",
   // topics
+  "content/topics/1.1.md.js",
+  "content/topics/2.1.md.js",
   "content/topics/2.3.md.js",
   // quizzes
   "content/quizzes/2.3.js",

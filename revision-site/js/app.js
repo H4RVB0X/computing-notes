@@ -206,6 +206,10 @@
     right.innerHTML = "<h3 style='margin:0 0 6px'>What should I revise next?</h3>";
     const list = h("ul", { class: "next-list" });
     nextSuggestions().forEach((s) => {
+      if (s.custom) {
+        list.appendChild(h("li", null, [h("a", { href: s.href, text: s.label }), h("span", { class: "why", text: s.why })]));
+        return;
+      }
       const m = CS.topicMeta(s.id);
       if (!m) return;
       list.appendChild(h("li", null, [h("a", { href: s.href || "#/topic/" + s.id, text: s.id + " " + m.title }), h("span", { class: "why", text: s.why })]));
@@ -245,7 +249,7 @@
     const out = [];
     const ids = CS.allTopicIds();
     const dueCount = CS.flash ? CS.flash.dueCount() : 0;
-    if (dueCount) out.push({ id: ids[0], href: "#/flashcards", why: dueCount + " flashcards are due for review", custom: true });
+    if (dueCount) out.push({ id: "flash", label: "Review flashcards", href: "#/flashcards/due", why: dueCount + " cards are due for review", custom: true });
     // weakest with attempts
     const weak = CS.progress.weakest(3).filter((w) => w.pct < 70);
     weak.forEach((w) => out.push({ id: w.id, href: "#/topic/" + w.id, why: "quiz best only " + w.pct + "% — reread then retry" }));
@@ -261,7 +265,7 @@
       const t = CS.progress.topic(id);
       if (!t.viewed && !out.some((o) => o.id === id)) out.push({ id: id, why: "not started yet" });
     });
-    return out.filter((o) => !o.custom || CS.topicMeta(o.id)).slice(0, 6).map((o) => (o.custom ? Object.assign(o, { id: o.id }) : o));
+    return out.slice(0, 6);
   }
 
   /* ---------------- SECTION ---------------- */
@@ -370,7 +374,7 @@
   };
 
   function renderTopicActions(id) {
-    const wrap = h("div", { id: "topic-practice" });
+    const wrap = h("div", { id: "topic-practice", "data-quick": "1" });
     wrap.appendChild(h("h2", { text: "Practise this topic", style: "margin-top:2em" }));
     const grid = h("div", { class: "topic-actions" });
     const nq = (CS.quizzes[id] || []).length;
@@ -389,7 +393,7 @@
 
   function renderChecklist(id, meta) {
     const points = meta.specPoints || [];
-    const wrap = h("section", { class: "card", style: "margin:1.5em 0" });
+    const wrap = h("section", { class: "card", style: "margin:1.5em 0", "data-quick": "1" });
     wrap.appendChild(h("h3", { style: "margin:0 0 6px", text: "Revision checklist — tick what you can do" }));
     if (!points.length) {
       wrap.appendChild(h("p", { class: "muted small", text: "No specification points are mapped to this page yet." }));
@@ -415,7 +419,7 @@
 
   function renderPrevNext(id) {
     const pn = CS.prevNext(id);
-    const wrap = h("div", { class: "prev-next" });
+    const wrap = h("div", { class: "prev-next", "data-quick": "1" });
     if (pn.prev) {
       const m = CS.topicMeta(pn.prev);
       wrap.appendChild(h("a", { href: "#/topic/" + pn.prev, class: "prev", html: '<div class="lbl">← Previous</div><div>' + pn.prev + " " + U.esc(m.title) + "</div>" }));

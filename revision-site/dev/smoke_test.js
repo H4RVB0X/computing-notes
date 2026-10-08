@@ -24,7 +24,7 @@ const SHOT = process.argv[3] || require("os").tmpdir();
     await page.waitForTimeout(120);
     const text = await page.evaluate(() => document.getElementById("content").innerText.slice(0, 80).replace(/\s+/g, " "));
     const missing = await page.evaluate(() => Array.from(document.querySelectorAll(".tool-missing")).map((x) => x.textContent));
-    const wrongs = await page.evaluate(() => Array.from(document.querySelectorAll(".err")).map((x) => x.textContent));
+    const wrongs = await page.evaluate(() => Array.from(document.querySelectorAll(".err")).map((x) => x.textContent.trim()).filter(Boolean));
     report.push({ route: r, errors: errors.slice(before), text, missing, toolErrors: wrongs });
   }
   // interact: quiz — answer every question using DOM-type detection
