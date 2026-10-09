@@ -320,7 +320,7 @@
         }
         const want = parseInt(cnt.value, 10), LIMIT = 100000, res = [], used = [];
         let x = 0;
-        for (; x <= LIMIT && res.length < want; x++) {
+        for (; x <= LIMIT && res.length <= want; x++) { // collect one extra to tell "exactly want elements" from "more follow"
           const c = fc(x);
           if (typeof c !== "boolean") {
             compOut.innerHTML = '<span class="err">The condition must be true/false (e.g. x &lt; 10), not a number.</span>';
@@ -338,7 +338,11 @@
             used.push(x);
           }
         }
-        const finite = res.length < want;
+        const finite = res.length <= want;
+        if (!finite) {
+          res.pop();
+          used.pop();
+        }
         compOut.textContent =
           "{" + exprIn.value + " | x ∈ ℕ ∧ " + (condIn.value || "true") + "}\n= {" + res.join(", ") + (finite ? "}" : ", …}") +
           "\n\nx values used: " + used.slice(0, 12).join(", ") + (used.length > 12 ? ", …" : "") +

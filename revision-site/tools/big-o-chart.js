@@ -73,7 +73,7 @@ CS.registerTool({
       const g = canvas.getContext("2d");
       g.setTransform(dpr, 0, 0, dpr, 0, 0);
       g.clearRect(0, 0, W, H);
-      const L = 58, R = 74, T = 14, B = 34, pw = W - L - R, ph = H - T - B;
+      const L = 58, R = 92, T = 14, B = 34, pw = W - L - R, ph = H - T - B;
       const vis = F.filter((c) => on[c.k]);
       // y-range: linear → fit polynomial curves, let 2ⁿ and n! run off the top
       let yMax;
@@ -115,12 +115,16 @@ CS.registerTool({
       g.restore();
       // direct labels (text in text ink, coloured tick carries identity)
       g.textAlign = "left"; g.textBaseline = "middle"; g.font = "11px ui-monospace, monospace";
-      const placed = [];
-      vis.forEach((c) => {
-        let v = c.f(nMax), x = L + pw + 6, y = Y(v);
-        if (y < T) { let n = 1; while (n < nMax && Y(c.f(n + 1)) >= T) n++; x = Math.min(L + pw - 40, X(n) + 4); y = T + 6; }
-        while (placed.some((p) => Math.abs(p.y - y) < 12 && Math.abs(p.x - x) < 60)) y += 12;
-        placed.push({ x, y });
+      const lab = vis.map((c) => {
+        let x = L + pw + 6, y = Y(c.f(nMax));
+        if (y < T) { let n = 1; while (n < nMax && Y(c.f(n + 1)) >= T) n++; x = Math.min(L + pw - 80, X(n) + 4); y = T + 6; }
+        return { c, x, y };
+      });
+      const right = lab.filter((o) => o.x > L + pw).sort((a, b) => a.y - b.y);
+      for (let i = 1; i < right.length; i++) right[i].y = Math.max(right[i].y, right[i - 1].y + 12);
+      const bottom = T + ph;
+      for (let i = right.length - 1; i >= 0; i--) right[i].y = Math.min(right[i].y, i === right.length - 1 ? bottom : right[i + 1].y - 12);
+      lab.forEach(({ c, x, y }) => {
         g.fillStyle = col[F.indexOf(c)]; g.fillRect(x, y - 1.5, 8, 3);
         g.fillStyle = css("--text-2"); g.fillText(c.lab, x + 11, y);
       });
