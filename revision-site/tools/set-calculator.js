@@ -174,7 +174,7 @@
       const memIn = h("input", { type: "text", "aria-label": "Element to test", style: "width:90px;font-family:var(--font-mono)", placeholder: "e.g. 3" });
       const err = h("div", { class: "err", style: "display:none" });
       const notes = h("div", { class: "explain", style: "margin-top:0" });
-      const out = h("div", { class: "table-wrap" });
+      const out = h("div", { class: "table-wrap", style: "min-width:0" });
       const venn = h("div");
       const memOut = h("div", { class: "stat-line" });
       el.append(
@@ -182,7 +182,7 @@
         h("div", { class: "controls" }, [h("label", { text: "B =" }), bIn]),
         err,
         notes,
-        h("div", { class: "two-col" }, [out, h("div", {}, [h("div", { class: "controls" }, [h("label", { text: "Shade " }, opSel)]), venn])]),
+        h("div", { class: "two-col" }, [out, h("div", { style: "min-width:0" }, [h("div", { class: "controls" }, [h("label", { text: "Shade " }, opSel)]), venn])]),
         h("div", { class: "controls", style: "margin-top:10px" }, [h("label", { text: "Is x a member? x =" }, memIn), h("label", { text: "Cartesian product: " }, nSel)]),
         memOut
       );

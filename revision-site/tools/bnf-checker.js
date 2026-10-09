@@ -238,7 +238,7 @@
         gIn,
         msgs,
         h("div", { class: "controls", style: "margin-top:8px" }, [h("label", { text: "Start symbol " }, startSel), h("label", {}, [ignoreSp, document.createTextNode("ignore spaces in test strings")]), checkBtn]),
-        h("div", { class: "two-col" }, [h("div", {}, [h("div", { class: "small muted", text: "Test strings (one per line; an empty line tests ε)" }), tIn]), h("div", {}, [h("div", { class: "small muted", text: "Results" }), results])]),
+        h("div", { class: "two-col" }, [h("div", { style: "min-width:0" }, [h("div", { class: "small muted", text: "Test strings (one per line; an empty line tests ε)" }), tIn]), h("div", { style: "min-width:0" }, [h("div", { class: "small muted", text: "Results" }), results])]),
         detail
       );
       let G = null, A = null;

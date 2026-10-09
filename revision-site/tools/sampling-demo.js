@@ -81,7 +81,7 @@ CS.registerTool({
       legend.innerHTML = '<span><i style="background:' + accent + '"></i>analogue signal</span><span><i style="background:' + warnC + '"></i>stored sample (quantised)</span><span><i style="background:' + recon + '"></i>reconstruction</span><span><i style="background:' + border + '"></i>' + L + " quantisation levels</span>";
       const alias = Math.abs(f - r * Math.round(f / r));
       warn.innerHTML = r < 2 * f
-        ? '<p class="err">⚠ Nyquist: the sampling rate (' + r + " Hz) is less than 2 × " + f + " Hz = " + 2 * f + " Hz. The samples cannot capture the wave — they trace out " + (alias === 0 ? "a flat line" : "a " + alias + " Hz wave") + " instead (aliasing).</p>"
+        ? '<p class="bad-text" style="color:var(--bad);font-weight:600">⚠ Nyquist: the sampling rate (' + r + " Hz) is less than 2 × " + f + " Hz = " + 2 * f + " Hz. The samples cannot capture the wave — they trace out " + (alias === 0 ? "a flat line" : "a " + alias + " Hz wave") + " instead (aliasing).</p>"
         : '<p class="ok-text">✓ ' + r + " Hz ≥ 2 × " + f + " Hz = " + 2 * f + " Hz, so the Nyquist condition is met.</p>";
       const errMax = S.reduce((m, s) => Math.max(m, Math.abs(s.v - s.q)), 0);
       stats.innerHTML = "Samples taken in 1 s: " + S.length + " (one every " + +(1000 / r).toFixed(1) + " ms). Each stored as one of 2<sup>" + n + "</sup> = " + L + " levels, so the largest rounding (quantisation) error here is " + errMax.toFixed(3) + " of the amplitude. Data for this 1-second mono clip = " + r + " × " + n + " × 1 × 1 = <b>" + r * n + " bits</b>.";

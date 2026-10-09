@@ -269,7 +269,7 @@
         h("div", { class: "controls" }, [h("label", { text: "Preset " }, presetSel)]),
         h("div", { class: "controls" }, [h("label", { text: "Regex", style: "font-weight:600" }), reIn]),
         err,
-        h("div", { class: "two-col" }, [h("div", {}, [h("div", { class: "small muted", text: "Test strings (one per line)" }), testIn]), h("div", {}, [h("div", { class: "small muted", text: "Results" }), results])]),
+        h("div", { class: "two-col" }, [h("div", { style: "min-width:0" }, [h("div", { class: "small muted", text: "Test strings (one per line)" }), testIn]), h("div", { style: "min-width:0" }, [h("div", { class: "small muted", text: "Results" }), results])]),
         h("div", { class: "small muted", style: "margin-top:10px", text: "Plain-English breakdown" }),
         breakdown
       );

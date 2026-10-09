@@ -167,7 +167,7 @@ CS.registerTool({
       if (bits.length <= 40) html += "<p>" + b("4. Add the place values") + " — the left-most bit keeps its negative weight:</p>" + fixedTable(bits, intBits, true).html;
       const val = M * 2 ** E;
       html += "<p>Check: " + fmt(M) + " × 2<sup>" + E + "</sup> = " + b(fmt(val)) + "</p>";
-      html += isNorm(p.ms) ? '<p class="ok-text">✓ Normalised: the mantissa starts ' + p.ms.slice(0, 2) + ".</p>" : '<p class="err" style="font-weight:400">Not normalised: the mantissa starts ' + p.ms.slice(0, 2) + " (normalised starts 01 or 10). Try the Normalise tab.</p>";
+      html += isNorm(p.ms) ? '<p class="ok-text">✓ Normalised: the mantissa starts ' + p.ms.slice(0, 2) + ".</p>" : '<p class="bad-text" style="color:var(--bad)">Not normalised: the mantissa starts ' + p.ms.slice(0, 2) + " (normalised starts 01 or 10). Try the Normalise tab.</p>";
       dOut.innerHTML = html;
     }
     function doEncode() {

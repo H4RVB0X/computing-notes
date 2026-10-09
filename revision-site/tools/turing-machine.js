@@ -62,8 +62,8 @@
       const status = h("div", { class: "stat-line" });
       const log = h("div", { class: "output", style: "max-height:220px;overflow-y:auto;min-height:60px" });
       const lower = h("div", { class: "two-col", style: "margin-top:12px" });
-      const ruleBox = h("div");
-      const diagWrap = h("div", { style: "overflow-x:auto" });
+      const ruleBox = h("div", { style: "min-width:0" });
+      const diagWrap = h("div", { style: "overflow-x:auto;min-width:0" });
       lower.append(ruleBox, diagWrap);
       el.append(top, errBox, note, tapeView, runCtl, status, log, lower);
 
@@ -286,13 +286,17 @@
         diagWrap.innerHTML = "";
         const names = statesOf();
         if (!names.length) return;
-        const n = names.length, W = 420, H = n <= 2 ? 200 : 300, r = 22;
+        const n = names.length, W = 420, r = 22;
+        let H = n <= 2 ? 200 : 300;
         const cx = W / 2, cy = H / 2 + 10, R = n === 1 ? 0 : n === 2 ? 110 : Math.min(118, 26 * n + 30);
         const pos = {};
         names.forEach((s, i) => {
           const a = -Math.PI / 2 + (2 * Math.PI * i) / n + (n === 2 ? Math.PI / 2 : 0);
           pos[s] = { x: Math.round(cx + R * Math.cos(a)), y: Math.round(cy + R * Math.sin(a)) };
         });
+        const ys = Object.values(pos).map((p) => p.y), shift = 78 - Math.min(...ys);
+        Object.values(pos).forEach((p) => (p.y += shift)); // leave room above for self-loops and their labels
+        H = Math.max(...ys) + shift + 52;
         const svg = sv("svg", { viewBox: "0 0 " + W + " " + H, role: "img", "aria-label": "State transition diagram", style: "width:100%;max-width:460px;display:block;margin:0 auto;color:var(--text);font-family:inherit" });
         const defs = sv("defs", {});
         const mk = sv("marker", { id: myId + "a", viewBox: "0 0 10 10", refX: "9", refY: "5", markerWidth: "7", markerHeight: "7", orient: "auto-start-reverse" });

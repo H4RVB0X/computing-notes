@@ -160,7 +160,7 @@ CS.registerTool({
       html += "<p>Result pattern <span class=mono>" + b(r.sum) + "</span> decodes to " + b(got) + "." + (r.carryOut ? " The carry out of the MSB (shown struck through) is " + b("discarded") + " — in two's complement that alone is not an error." : "") + "</p>";
       if (truth < lo() || truth > hi()) {
         const sa = pa[0], sb = second[0];
-        html += '<p class="err">⚠ Overflow! The true answer ' + truth + " is outside the range " + lo() + " to " + hi() + ", so the " + n + "-bit result (" + got + ") is wrong." + (sa === sb && sa !== r.sum[0] ? " You can spot it because two " + (sa === "0" ? "positive" : "negative") + " numbers were added and the result's sign bit is " + r.sum[0] + " (" + (r.sum[0] === "1" ? "negative" : "positive") + ")." : "") + "</p>";
+        html += '<p class="bad-text" style="color:var(--bad);font-weight:600">⚠ Overflow! The true answer ' + truth + " is outside the range " + lo() + " to " + hi() + ", so the " + n + "-bit result (" + got + ") is wrong." + (sa === sb && sa !== r.sum[0] ? " You can spot it because two " + (sa === "0" ? "positive" : "negative") + " numbers were added and the result's sign bit is " + r.sum[0] + " (" + (r.sum[0] === "1" ? "negative" : "positive") + ")." : "") + "</p>";
       } else {
         html += '<p class="ok-text">✓ No overflow: ' + A + " " + (op === "+" ? "+" : "−") + " " + B + " = " + truth + ", which fits in the range " + lo() + " to " + hi() + ". (Overflow can only happen when the two numbers being added have the same sign.)</p>";
       }

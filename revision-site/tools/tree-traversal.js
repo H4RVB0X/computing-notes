@@ -83,7 +83,7 @@ CS.registerTool({
       svgWrap.innerHTML = "";
       const pos = layout(), n = count(root);
       const W = Math.max(300, 60 + Math.max(0, n - 1) * 48), H = 60 + Math.max(0, height(root) - 1) * 62 + 20;
-      const svg = svgEl("svg", { viewBox: "0 0 " + W + " " + H, width: W, height: H, role: "img", "aria-label": "Binary search tree diagram", style: "display:block;max-width:none;color:var(--text);font-family:inherit" });
+      const svg = svgEl("svg", { viewBox: "0 0 " + W + " " + H, role: "img", "aria-label": "Binary search tree diagram", style: "display:block;width:100%;height:auto;max-width:" + W + "px;min-width:" + Math.round(W * 0.6) + "px;margin:0 auto;color:var(--text);font-family:inherit" });
       if (!root) svg.appendChild(svgEl("text", { x: W / 2, y: H / 2 + 5, "text-anchor": "middle", fill: "currentColor", "font-size": 14 }, "Empty tree — insert some values"));
       pos.forEach((p, nd) => ["l", "r"].forEach((s) => { if (nd[s]) { const q = pos.get(nd[s]); svg.appendChild(svgEl("line", { x1: p.x, y1: p.y, x2: q.x, y2: q.y, stroke: f.path && f.path.includes(nd) && f.path.includes(nd[s]) ? "var(--accent)" : "currentColor", "stroke-width": f.path && f.path.includes(nd[s]) && f.path.includes(nd) ? 3 : 1.5, "stroke-opacity": 0.8 })); } }));
       pos.forEach((p, nd) => {

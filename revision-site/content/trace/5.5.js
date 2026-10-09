@@ -1,0 +1,51 @@
+CS.registerTrace({
+  id: "5.5-1",
+  topic: "5.5",
+  title: "Decode floating point numbers (8-bit mantissa, 4-bit exponent)",
+  lang: "text",
+  code: "Both mantissa and exponent are two's complement.\nMantissa place values:  -1 . 1/2 1/4 1/8 1/16 1/32 1/64 1/128\nExponent place values:  -8 4 2 1\nValue = mantissa × 2^exponent",
+  intro: "For each number, work out the exponent and mantissa in denary, then the value. Give decimals (e.g. -0.53125).",
+  columns: ["Mantissa", "Exponent", "Exponent (denary)", "Mantissa (denary)", "Value (denary)"],
+  prefill: [
+    ["01001110", "0100", "", "", ""],
+    ["01010000", "1111", "", "", ""],
+    ["10111100", "0011", "", "", ""],
+    ["10100000", "1110", "", "", ""],
+    ["01101000", "0011", "", "", ""],
+  ],
+  rows: [
+    ["01001110", "0100", "4", "0.609375", "9.75"],
+    ["01010000", "1111", "-1", "0.625", "0.3125"],
+    ["10111100", "0011", "3", "-0.53125", "-4.25"],
+    ["10100000", "1110", "-2", "-0.75", "-0.1875"],
+    ["01101000", "0011", "3", "0.8125", "6.5"],
+  ],
+  instructions: "Use a minus sign for negative values. Do not include units or fractions; give decimals.",
+  hint: "A mantissa starting with 1 is negative: start from −1 and add the other place values. Exponent 1111 = −8 + 4 + 2 + 1 = −1.",
+  note: "Sense check: positive mantissa + positive exponent → value ≥ 1; positive mantissa + negative exponent → between 0 and 1; negative mantissa → negative value.",
+});
+
+CS.registerTrace({
+  id: "5.5-2",
+  topic: "5.5",
+  title: "Normalise floating point numbers (8-bit mantissa, 4-bit exponent)",
+  lang: "text",
+  code: "Normalised positive mantissa starts 01\nNormalised negative mantissa starts 10\nShift the mantissa left k places (fill with 0s on the right)\nthen subtract k from the exponent.",
+  intro: "Each number is valid but not normalised. Normalise it without changing its value.",
+  columns: ["Mantissa before", "Exponent before", "Places shifted left", "Mantissa after", "Exponent after"],
+  prefill: [
+    ["00001011", "0101", "", "", ""],
+    ["11110010", "0001", "", "", ""],
+    ["00011000", "0011", "", "", ""],
+    ["11011001", "0010", "", "", ""],
+  ],
+  rows: [
+    ["00001011", "0101", "3", "01011000", "0010"],
+    ["11110010", "0001", "3", "10010000", "1110"],
+    ["00011000", "0011", "2", "01100000", "0001"],
+    ["11011001", "0010", "1", "10110010", "0001"],
+  ],
+  instructions: "Write mantissa and exponent as 8-bit and 4-bit two's complement patterns.",
+  hint: "Count how many leading bits match the sign bit after the first one: those are the wasted bits. 1 − 3 = −2 = 1110 in 4-bit two's complement.",
+  note: "Check row 2: before = (−1 + ½ + ¼ + ⅛ + 1/64) × 2¹ = −0.21875; after = (−1 + ⅛) × 2⁻² = −0.21875 ✓",
+});

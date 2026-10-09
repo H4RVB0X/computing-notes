@@ -57,8 +57,8 @@ CS.registerTool({
       pOut.innerHTML = "<p>" + b("Sender:") + " the data has " + ones + " one" + (ones === 1 ? "" : "s") + ". For " + pType.value + " parity the total number of 1s must be " + (even ? "even" : "odd") + ", so the parity bit is " + b(pb) + ". It is added as the MSB: sent byte <span class=mono>" + b(sent) + "</span>.</p><p>" + b("In transit") + " — click any bit of the received byte to corrupt it:</p>";
       pOut.appendChild(bitButtons(recv, pFlip, (i) => { pFlip[i] = !pFlip[i]; parity(); }));
       const res = h("div");
-      res.innerHTML = "<p>" + b("Receiver:") + " counts the 1s in <span class=mono>" + recv + "</span> = " + rOnes + " (" + (rOnes % 2 ? "odd" : "even") + "). " + (ok ? '<span class="ok-text">Parity is correct → byte accepted.</span>' : '<span class="err">Parity is wrong → error detected; ask for the byte to be re-sent.</span>') + "</p>" +
-        (nFlip && ok ? '<p class="err" style="font-weight:400">But ' + nFlip + " bits were flipped! An even number of errors leaves the parity unchanged, so parity cannot detect it.</p>" : "") +
+      res.innerHTML = "<p>" + b("Receiver:") + " counts the 1s in <span class=mono>" + recv + "</span> = " + rOnes + " (" + (rOnes % 2 ? "odd" : "even") + "). " + (ok ? '<span class="ok-text">Parity is correct → byte accepted.</span>' : '<span class="bad-text" style="color:var(--bad);font-weight:600">Parity is wrong → error detected; ask for the byte to be re-sent.</span>') + "</p>" +
+        (nFlip && ok ? '<p class="bad-text" style="color:var(--bad)">But ' + nFlip + " bits were flipped! An even number of errors leaves the parity unchanged, so parity cannot detect it.</p>" : "") +
         (nFlip && !ok ? "<p class=small>Parity tells us <i>that</i> an error happened, not <i>which</i> bit — so it cannot correct it.</p>" : "");
       pOut.appendChild(res);
     }
@@ -84,11 +84,11 @@ CS.registerTool({
       recv.match(/.{3}/g).forEach((t, i) => {
         const ones = (t.match(/1/g) || []).length, v = ones >= 2 ? "1" : "0";
         decoded += v;
-        const verdict = v !== d[i] ? '<span class="err">wrong — 2 or more bits flipped</span>' : t[0] === t[1] && t[1] === t[2] ? "all agree" : '<span class="ok-text">corrected</span>';
+        const verdict = v !== d[i] ? '<span class="bad-text" style="color:var(--bad);font-weight:600">wrong — 2 or more bits flipped</span>' : t[0] === t[1] && t[1] === t[2] ? "all agree" : '<span class="ok-text">corrected</span>';
         rows.push([t, ones + " one" + (ones === 1 ? "" : "s") + ", " + (3 - ones) + " zero" + (3 - ones === 1 ? "" : "s"), b(v), verdict]);
       });
       const res = h("div");
-      res.innerHTML = table(["Triplet", "Votes", "Majority", ""], rows) + "<p>Decoded data <span class=mono>" + b(decoded) + "</span> " + (decoded === d ? '<span class="ok-text">= original data</span>' : '<span class="err">≠ original ' + d + "</span>") + "</p>";
+      res.innerHTML = table(["Triplet", "Votes", "Majority", ""], rows) + "<p>Decoded data <span class=mono>" + b(decoded) + "</span> " + (decoded === d ? '<span class="ok-text">= original data</span>' : '<span class="bad-text" style="color:var(--bad);font-weight:600">≠ original ' + d + "</span>") + "</p>";
       mOut.appendChild(res);
     }
     mData.addEventListener("input", () => { mFlip = []; majority(); });
@@ -113,7 +113,7 @@ CS.registerTool({
       const bin8 = (v) => v.toString(2).padStart(8, "0");
       cOut.innerHTML = "<p>" + b("Sender:") + " add the bytes: " + a.join(" + ") + " = " + s1 + ". The checksum must fit in one byte, so take " + s1 + " MOD 256 = " + b(c1) + " (<span class=mono>" + bin8(c1) + "</span>). The checksum is sent after the data.</p>" +
         "<p>" + b("Receiver:") + " adds the received bytes: " + r.join(" + ") + " = " + s2 + "; " + s2 + " MOD 256 = " + b(c2) + ".</p>" +
-        (c1 === c2 ? (a.join() === r.join() ? '<p class="ok-text">Checksums match → data accepted.</p>' : '<p class="err">Checksums match, so the data is accepted — but it was changed! Errors that cancel out (or swap the order of bytes) are not detected by a simple sum.</p>') : '<p class="err">Checksums differ (' + c1 + " ≠ " + c2 + ") → error detected; request retransmission.</p>");
+        (c1 === c2 ? (a.join() === r.join() ? '<p class="ok-text">Checksums match → data accepted.</p>' : '<p class="bad-text" style="color:var(--bad);font-weight:600">Checksums match, so the data is accepted — but it was changed! Errors that cancel out (or swap the order of bytes) are not detected by a simple sum.</p>') : '<p class="bad-text" style="color:var(--bad);font-weight:600">Checksums differ (' + c1 + " ≠ " + c2 + ") → error detected; request retransmission.</p>");
     }
     cSent.addEventListener("input", () => { cRecv.value = cSent.value; checksum(); });
     cRecv.addEventListener("input", checksum);
@@ -143,7 +143,7 @@ CS.registerTool({
       if (d.length === 12) html += "<p>Full ISBN: <span class=mono>" + b(d + cd) + "</span></p>";
       else {
         const total = sum + digs[12];
-        html += "<p>" + b("Validate:") + " add the 13th digit (weight 1): " + sum + " + " + digs[12] + " = " + total + ". " + (total % 10 === 0 ? '<span class="ok-text">' + total + " is a multiple of 10 → valid ISBN.</span>" : '<span class="err">' + total + " is not a multiple of 10 → invalid (check digit should be " + cd + ").</span>") + "</p>";
+        html += "<p>" + b("Validate:") + " add the 13th digit (weight 1): " + sum + " + " + digs[12] + " = " + total + ". " + (total % 10 === 0 ? '<span class="ok-text">' + total + " is a multiple of 10 → valid ISBN.</span>" : '<span class="bad-text" style="color:var(--bad);font-weight:600">' + total + " is not a multiple of 10 → invalid (check digit should be " + cd + ").</span>") + "</p>";
       }
       iOut.innerHTML = html;
     }
@@ -158,7 +158,7 @@ CS.registerTool({
       if (d.length === 9) html += "<p>Full number: <span class=mono>" + b(d + cd) + "</span></p>";
       else {
         const last = d[9] === "X" ? 10 : Number(d[9]), total = sum + last;
-        html += "<p>" + b("Validate:") + " the check digit has weight 1: " + sum + " + " + last + " = " + total + ". " + (total % 11 === 0 ? '<span class="ok-text">' + total + " MOD 11 = 0 → valid.</span>" : '<span class="err">' + total + " MOD 11 = " + (total % 11) + " ≠ 0 → invalid (check digit should be " + cd + ").</span>") + "</p>";
+        html += "<p>" + b("Validate:") + " the check digit has weight 1: " + sum + " + " + last + " = " + total + ". " + (total % 11 === 0 ? '<span class="ok-text">' + total + " MOD 11 = 0 → valid.</span>" : '<span class="bad-text" style="color:var(--bad);font-weight:600">' + total + " MOD 11 = " + (total % 11) + " ≠ 0 → invalid (check digit should be " + cd + ").</span>") + "</p>";
       }
       mOut2.innerHTML = html;
     }

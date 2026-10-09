@@ -57,8 +57,8 @@
       const errBox = h("div", { class: "err", style: "margin:0 0 8px;display:none" });
       const svgWrap = h("div", { style: "overflow-x:auto" });
       const editor = h("div", { class: "two-col" });
-      const stateBox = h("div");
-      const transBox = h("div");
+      const stateBox = h("div", { style: "min-width:0" });
+      const transBox = h("div", { style: "min-width:0" });
       editor.append(stateBox, transBox);
 
       const inputField = h("input", { type: "text", "aria-label": "Input string", placeholder: "input string", style: "width:150px;font-family:var(--font-mono)" });
@@ -211,7 +211,8 @@
       /* ---------- diagram ---------- */
       function layout() {
         const n = m.states.length;
-        const W = 520, H = n <= 1 ? 160 : n <= 3 ? 240 : 300;
+        const W = 520;
+        let H = n <= 1 ? 160 : n <= 3 ? 240 : 300;
         const cx = W / 2, cy = H / 2 + 6;
         const R = n <= 1 ? 0 : n === 2 ? 110 : Math.min(120, 30 * n + 20);
         const pos = {};
@@ -219,6 +220,9 @@
           const ang = -Math.PI / 2 + (2 * Math.PI * i) / Math.max(n, 1) + (n === 2 ? Math.PI / 2 : n === 3 ? Math.PI / 6 : 0);
           pos[s.name] = { x: Math.round(cx + R * Math.cos(ang)), y: Math.round(cy + R * Math.sin(ang)) };
         });
+        const ys = Object.values(pos).map((p) => p.y), shift = 78 - Math.min(...ys);
+        Object.values(pos).forEach((p) => (p.y += shift)); // leave room above for self-loops and their labels
+        H = Math.max(...ys) + shift + 52;
         return { pos, W, H };
       }
       function sv(tag, attrs) {

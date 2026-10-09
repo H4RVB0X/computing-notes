@@ -55,7 +55,7 @@ CS.registerTool({
       rOut.innerHTML = "<p>Scan left to right, counting how many times each value repeats in a row:</p>" + table(["Run", "Value", "Count"], runs.map((r, i) => [i + 1, esc(show(r[1])), r[0]])) +
         "<p>Encoded as (count, value) pairs: <span class=mono>" + b(runs.map((r) => r[0] + esc(show(r[1]))).join(" ")) + "</span></p>" +
         "<p>Original: " + orig + " values × 1 byte = " + b(orig + " bytes") + ". RLE: " + runs.length + " pairs × 2 bytes (count + value) = " + b(comp + " bytes") + ".</p>" +
-        (comp < orig ? '<p class="ok-text">Compression ratio ' + orig + " : " + comp + " ≈ " + (orig / comp).toFixed(2) + " : 1 → saves " + pct(orig, comp) + "%.</p>" : '<p class="err">RLE made it ' + (comp === orig ? "no smaller" : "bigger (" + comp + " > " + orig + ")") + ": there are too few long runs. RLE suits data with long runs of repeated values.</p>");
+        (comp < orig ? '<p class="ok-text">Compression ratio ' + orig + " : " + comp + " ≈ " + (orig / comp).toFixed(2) + " : 1 → saves " + pct(orig, comp) + "%.</p>" : '<p class="bad-text" style="color:var(--bad);font-weight:600">RLE made it ' + (comp === orig ? "no smaller" : "bigger (" + comp + " > " + orig + ")") + ": there are too few long runs. RLE suits data with long runs of repeated values.</p>");
     }
     rIn.addEventListener("input", rle);
 
@@ -80,7 +80,7 @@ CS.registerTool({
         "<p>" + b("2. Token stream") + " (the text written as indices): <span class=mono>" + b(tokens.join(" ")) + "</span></p>" +
         "<p>" + b("3. Size") + ": original = " + words.join(" ").length + " characters × 8 bits = " + b(origBits + " bits") + ". " +
         N + " dictionary entries need ⌈log₂ " + N + "⌉ = " + bitsPer + " bits per index. Compressed = dictionary (" + dictBits + " bits: each word's characters + 1 separator, 8 bits each) + tokens (" + tokens.length + " × " + bitsPer + " = " + tokBits + " bits) = " + b(comp + " bits") + ".</p>" +
-        (comp < origBits ? '<p class="ok-text">Saves ' + (origBits - comp) + " bits (" + pct(origBits, comp) + "%).</p>" : '<p class="err">No saving: not enough repeated words to pay for storing the dictionary. Longer texts with lots of repetition compress well.</p>') +
+        (comp < origBits ? '<p class="ok-text">Saves ' + (origBits - comp) + " bits (" + pct(origBits, comp) + "%).</p>" : '<p class="bad-text" style="color:var(--bad);font-weight:600">No saving: not enough repeated words to pay for storing the dictionary. Longer texts with lots of repetition compress well.</p>') +
         "<p class=small>Decompression looks up each index in the dictionary and puts spaces between the words. Real dictionary methods (e.g. LZ77/LZW used in ZIP, PNG and GIF) build the dictionary from repeated <i>sequences of characters</i> as they go.</p>";
     }
     dIn.addEventListener("input", dict);
