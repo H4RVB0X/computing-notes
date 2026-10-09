@@ -448,7 +448,7 @@ Only 4 marks, but they depend on **evidence**. The top band asks for full consid
 - **Evidence over claims**: every "this works" needs a test reference; every "complex" needs a code reference.
 - **Explain decisions**: why a hash table, why 3NF, why this algorithm. Justification is what separates top-band design from a description.
 
-**How this links to Paper 2:** a question on test data or evaluation criteria is easier when you can picture your own test plan and evaluation table (see [13.1](#/topic/13.1)).
+**How this links to the written exams:** a question on test data or evaluation criteria is easier when you can picture your own test plan and evaluation table (see [13.1](#/topic/13.1)).
 :::
 
 :::challenge

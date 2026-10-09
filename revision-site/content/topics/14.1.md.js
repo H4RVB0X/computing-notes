@@ -275,7 +275,7 @@ For each objective, add a **one-line justification** linking it to the evidence 
 :::
 
 :::exam
-**How this links to Paper 2.** Section 4.13 questions (see [13.1](#/topic/13.1)) ask you to name requirement-gathering methods, explain acceptance testing and choose test data. Your NEA gives you real examples to quote: "in my project I used an interview because…".
+**How this links to the written exams.** Section 4.13 questions (see [13.1](#/topic/13.1)) ask you to name requirement-gathering methods, explain acceptance testing and choose test data. Your NEA gives you real examples to quote: "in my project I used an interview because…".
 
 **How the moderator reads your analysis**
 - They look for the **dialogue**: real questions, real answers, and requirements that clearly came from them.

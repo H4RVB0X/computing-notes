@@ -491,7 +491,7 @@
       return;
     }
     const frame = h("div", { class: "tool-frame" });
-    const head = h("div", { class: "tool-frame-head" }, [h("span", { text: "🧰 " + tool.title }), embedded ? h("a", { class: "btn sm ghost", href: "#/tool/" + id, text: "Open full page ↗" }) : h("span", { class: "muted small", text: tool.desc || "" })]);
+    const head = h("div", { class: "tool-frame-head" }, [h("span", { text: (tool.icon || "🧰") + " " + tool.title }), embedded ? h("a", { class: "btn sm ghost", href: "#/tool/" + id, text: "Open full page ↗" }) : null].filter(Boolean));
     const body = h("div", { class: "tool-frame-body tool" });
     frame.append(head, body);
     el.appendChild(frame);
