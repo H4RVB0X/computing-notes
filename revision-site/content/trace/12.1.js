@@ -1,0 +1,25 @@
+CS.registerTrace({
+  id: "12.1-1",
+  topic: "12.1",
+  title: "Composition and partial application",
+  lang: "haskell",
+  code: "f :: Integer -> Integer\nf x = x * 2\n\ng :: Integer -> Integer\ng x = x + 3\n\nadd :: Integer -> Integer -> Integer\nadd x y = x + y\n\n-- evaluate each expression\n(f . g) 4\n(g . f) 4\n(f . f . g) 1\n(add 10 . f) 6\n(g . add 5) 2",
+  intro: "Remember: `(f . g) x = f (g x)`, so the function on the **right** is applied **first**. `add 10` is a partially applied function that adds 10.",
+  columns: ["Expression", "Function applied first", "Value after first function", "Final result"],
+  prefill: [
+    ["(f . g) 4", "", "", ""],
+    ["(g . f) 4", "", "", ""],
+    ["(f . f . g) 1", "", "", ""],
+    ["(add 10 . f) 6", "", "", ""],
+    ["(g . add 5) 2", "", "", ""],
+  ],
+  rows: [
+    ["(f . g) 4", "g", "7", "14"],
+    ["(g . f) 4", "f", "8", "11"],
+    ["(f . f . g) 1", "g", "4", "16"],
+    ["(add 10 . f) 6", "f", "12", "22"],
+    ["(g . add 5) 2", "add 5", "7", "10"],
+  ],
+  instructions: "For each expression write the name of the function applied first, the value it produces, and the final result.",
+  hint: "`(f . f . g) 1` = `f (f (g 1))`: g 1 = 4, then f 4 = 8, then f 8 = 16.",
+});

@@ -1,0 +1,28 @@
+CS.registerTrace({
+  id: "2.6-1",
+  topic: "2.6",
+  title: "Inserting keys with linear probing (7 slots, key MOD 7)",
+  lang: "pseudocode",
+  code: "SIZE ← 7\n# table starts empty\nFOR EACH key IN [15, 22, 8, 30, 13, 20]\n    i ← key MOD SIZE\n    WHILE table[i] ≠ EMPTY\n        i ← (i + 1) MOD SIZE\n    ENDWHILE\n    table[i] ← key\nENDFOR",
+  intro: "For each key give its hash value, every slot index checked (including the one it finally goes into), and the slot it is stored in.",
+  columns: ["key", "key MOD 7", "slots checked", "stored in"],
+  prefill: [
+    ["15", "", "", ""],
+    ["22", "", "", ""],
+    ["8", "", "", ""],
+    ["30", "", "", ""],
+    ["13", "", "", ""],
+    ["20", "", "", ""],
+  ],
+  rows: [
+    ["15", "1", "1", "1"],
+    ["22", "1", "1,2", "2"],
+    ["8", "1", "1,2,3", "3"],
+    ["30", "2", "2,3,4", "4"],
+    ["13", "6", "6", "6"],
+    ["20", "6", "6,0", "0"],
+  ],
+  instructions: "Write the slots checked as a comma-separated list, e.g. 1,2.",
+  hint: "30 MOD 7 = 2, but slots 2 and 3 were filled by earlier collisions. For 20, slot 6 is full and (6 + 1) MOD 7 = 0.",
+  note: "Final table: [20, 15, 22, 8, 30, –, 13]. Slots 1–4 form a **cluster**: 30 did not collide with any key that hashed to 2, yet it still had to probe past the run. Load factor = 6 ÷ 7 ≈ 0.86 — too high for good performance.",
+});
