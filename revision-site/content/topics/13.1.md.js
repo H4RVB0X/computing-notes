@@ -51,7 +51,7 @@ A systematic approach breaks development into stages so that each question is an
 | **Evaluation** | How *well* does it meet the need, and what next? | Evaluation against requirements, user feedback, improvements |
 
 :::spec
-Section 4.13 can be examined in the written papers (this site files it under Paper 2; check the current AQA specification for which paper assesses it). The spec says "be aware" for most of it, so questions are usually short (1–4 marks): define a stage, name a requirements-gathering method, choose test data, explain acceptance testing. The same stages structure your [NEA project](#/topic/14.1).
+In AQA's scheme of assessment the skills of section 4.13 are listed under **Paper 1** (the on-screen exam, alongside sections 4.1–4.4), and they also underpin the NEA. (The site's section heading says Paper 2; if in doubt, check the current specification.) The spec says "be aware" for most of it, so questions are usually short (1–4 marks): define a stage, name a requirements-gathering method, choose test data, explain acceptance testing. The same stages structure your [NEA project](#/topic/14.1).
 :::
 
 :::figure The waterfall model: each stage feeds the next; dashed arrows show going back when a problem is found

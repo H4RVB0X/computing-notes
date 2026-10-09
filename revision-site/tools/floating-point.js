@@ -109,14 +109,14 @@ CS.registerTool({
     el.appendChild(tabs);
     const mono = "font-family:var(--font-mono);width:190px";
     const dM = h("input", { type: "text", value: "01011000", "aria-label": "Mantissa bits (or whole pattern)", style: mono });
-    const dE = h("input", { type: "text", value: "0011", "aria-label": "Exponent bits", style: mono.replace("190", "110") });
+    const dE = h("input", { type: "text", value: "0011", "aria-label": "Exponent pattern", style: mono.replace("190", "110") });
     const dOut = h("div", { class: "steps-out" });
     P.dec.append(h("div", { class: "controls" }, [h("label", {}, ["Mantissa", dM]), h("label", {}, ["Exponent", dE])]), dOut);
     const xIn = h("input", { type: "text", value: "-7.5", "aria-label": "Denary number to encode", style: "width:130px" });
     const xOut = h("div", { class: "steps-out" });
     P.enc.append(h("div", { class: "controls" }, [h("label", {}, ["Denary", xIn])]), xOut);
     const nM = h("input", { type: "text", value: "00010110", "aria-label": "Un-normalised mantissa", style: mono });
-    const nE = h("input", { type: "text", value: "0101", "aria-label": "Exponent", style: mono.replace("190", "110") });
+    const nE = h("input", { type: "text", value: "0101", "aria-label": "Exponent to normalise", style: mono.replace("190", "110") });
     const nOut = h("div", { class: "steps-out" });
     P.norm.append(h("div", { class: "controls" }, [h("label", {}, ["Mantissa", nM]), h("label", {}, ["Exponent", nE])]), nOut);
     const eIn = h("input", { type: "text", value: "0.1", "aria-label": "Denary value for error calculation", style: "width:130px" });

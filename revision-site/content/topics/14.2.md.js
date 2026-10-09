@@ -162,7 +162,7 @@ Round 3 [('Ash', 'Birch'), ('Cedar', 'Deal')]
 :::
 ::::
 
-Notice the design and the code match line for line. That is what "documented design" means: a moderator can read the pseudocode and find the same logic in your listing.
+This produces a **single** round-robin (each pair meets once). Objective 4.1 asks for a **double** round-robin, so the scheduler then appends the same rounds again with home and away swapped. Notice the design and the code match line for line. That is what "documented design" means: a moderator can read the pseudocode and find the same logic in your listing.
 
 ### User interface design
 
@@ -319,9 +319,9 @@ Map every test to an **objective**. This proves completeness and makes the evalu
 
 | Test | Objective | Purpose | Test data | Type | Expected result | Actual result | Evidence |
 |---|---|---|---|---|---|---|---|
-| 4.1a | 4.1 | Fixtures for an even number of teams | 4 teams | normal | 3 rounds, 2 fixtures each, each pair once | As expected | Video 2, 01:12 |
-| 4.1b | 4.1 | Odd number of teams | 5 teams | normal | 5 rounds, one team has a bye each round | As expected | Video 2, 02:05 |
-| 4.1c | 4.1 | Smallest league allowed | 3 teams | boundary | 3 rounds, 1 fixture each | As expected | Video 2, 02:50 |
+| 4.1a | 4.1 | Fixtures for an even number of teams | 4 teams | normal | 6 rounds (3 + the same 3 reversed), 2 fixtures each; each pair meets twice, once at each ground | As expected | Video 2, 01:12 |
+| 4.1b | 4.1 | Odd number of teams | 5 teams | normal | 10 rounds (5 + 5 reversed), one team has a bye each round | As expected | Video 2, 02:05 |
+| 4.1c | 4.1 | Smallest league allowed | 3 teams | boundary | 6 rounds (3 + 3 reversed), 1 fixture each | As expected | Video 2, 02:50 |
 | 4.1d | 4.1 | Below minimum | 1 team | boundary (invalid) | Message "A league needs at least two teams"; no fixtures created | Crashed: IndexError → fixed, re-tested ✓ | Video 2, 03:30; fix log 7 |
 | 5.2a | 5.2 | Goals entry | 3 | normal | Accepted, table updates | As expected | Video 3, 00:40 |
 | 5.2b | 5.2 | Goals entry, upper limit | 30 / 31 | boundary | 30 accepted; 31 rejected with message | As expected | Video 3, 01:05 |
@@ -387,7 +387,7 @@ Only 4 marks, but they depend on **evidence**. The top band asks for full consid
 
 | Objective | Met? | Evidence | Comment |
 |---|---|---|---|
-| 4.1 Double round-robin for 3–16 teams | Fully | Tests 4.1a–d; automated test | Bye handled correctly after fix to test 4.1d |
+| 4.1 Double round-robin for 3–16 teams | Fully | Tests 4.1a–d; automated test | Too-few-teams input now rejected cleanly after the fix found by test 4.1d |
 | 5.3 Email fixtures to team managers | Partly | Test 5.3a | Emails send, but only one recipient per team; the secretary wanted two |
 | 7.1 Pitch booking clash detection | Not met | — | Dropped after meeting on 12 Feb: the council changed its booking system (email from user, Appendix F) |
 

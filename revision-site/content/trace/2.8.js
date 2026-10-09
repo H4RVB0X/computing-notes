@@ -1,0 +1,23 @@
+CS.registerTrace({
+  id: "2.8-1",
+  topic: "2.8",
+  title: "Dot product and convex combination in one loop",
+  lang: "pseudocode",
+  code: "u ← [3, -1, 2]\nv ← [4, 5, 1]\nalpha ← 0.25\nbeta ← 0.75\ndot ← 0\nw ← [0, 0, 0]\nFOR i ← 0 TO 2\n    dot ← dot + u[i] * v[i]\n    w[i] ← alpha * u[i] + beta * v[i]\nENDFOR\nOUTPUT dot",
+  intro: "One row per pass of the loop, then the final output. Watch the signs.",
+  columns: ["i", "u[i] * v[i]", "dot", "w[i]", "OUTPUT"],
+  prefill: [
+    ["0", "", "", "", ""],
+    ["1", "", "", "", ""],
+    ["2", "", "", "", ""],
+    ["", "", "", "", ""],
+  ],
+  rows: [
+    ["0", "12", "12", "3.75", ""],
+    ["1", "-5", "7", "3.5", ""],
+    ["2", "2", "9", "1.25", ""],
+    ["", "", "9", "", "9"],
+  ],
+  hint: "i = 1: u[1] × v[1] = −1 × 5 = −5. w[1] = 0.25 × −1 + 0.75 × 5 = −0.25 + 3.75 = 3.5.",
+  note: "The dot product is the single number 9 (a scalar). w = (3.75, 3.5, 1.25) is a convex combination because 0.25 + 0.75 = 1 and both are ≥ 0, so w lies on the segment between the heads of u and v. Since u · v > 0, the angle between u and v is acute.",
+});

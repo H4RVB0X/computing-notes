@@ -350,6 +350,24 @@ A record groups **related fields of different types** under one name. Access a f
 
 ## 8. Strings
 
+:::figure Inclusive AQA SUBSTRING vs exclusive Python slice
+<svg class="diagram" viewBox="0 0 600 170" role="img" aria-label="The string COMPUTER with indices 0 to 7; characters 2 to 5 highlighted as SUBSTRING(2, 5, s) which equals Python s[2:6]">
+  <g font-family="inherit" font-size="16">
+    <rect x="40" y="40" width="60" height="44" fill="none" stroke="currentColor"/><text x="70" y="68" text-anchor="middle" fill="currentColor">C</text><text x="70" y="32" text-anchor="middle" font-size="12" fill="currentColor">0</text>
+    <rect x="100" y="40" width="60" height="44" fill="none" stroke="currentColor"/><text x="130" y="68" text-anchor="middle" fill="currentColor">O</text><text x="130" y="32" text-anchor="middle" font-size="12" fill="currentColor">1</text>
+    <rect x="160" y="40" width="60" height="44" fill="#7c9aff" fill-opacity="0.35" stroke="currentColor"/><text x="190" y="68" text-anchor="middle" fill="currentColor">M</text><text x="190" y="32" text-anchor="middle" font-size="12" fill="currentColor">2</text>
+    <rect x="220" y="40" width="60" height="44" fill="#7c9aff" fill-opacity="0.35" stroke="currentColor"/><text x="250" y="68" text-anchor="middle" fill="currentColor">P</text><text x="250" y="32" text-anchor="middle" font-size="12" fill="currentColor">3</text>
+    <rect x="280" y="40" width="60" height="44" fill="#7c9aff" fill-opacity="0.35" stroke="currentColor"/><text x="310" y="68" text-anchor="middle" fill="currentColor">U</text><text x="310" y="32" text-anchor="middle" font-size="12" fill="currentColor">4</text>
+    <rect x="340" y="40" width="60" height="44" fill="#7c9aff" fill-opacity="0.35" stroke="currentColor"/><text x="370" y="68" text-anchor="middle" fill="currentColor">T</text><text x="370" y="32" text-anchor="middle" font-size="12" fill="currentColor">5</text>
+    <rect x="400" y="40" width="60" height="44" fill="none" stroke="currentColor"/><text x="430" y="68" text-anchor="middle" fill="currentColor">E</text><text x="430" y="32" text-anchor="middle" font-size="12" fill="currentColor">6</text>
+    <rect x="460" y="40" width="60" height="44" fill="none" stroke="currentColor"/><text x="490" y="68" text-anchor="middle" fill="currentColor">R</text><text x="490" y="32" text-anchor="middle" font-size="12" fill="currentColor">7</text>
+    <path d="M160 92 V102 H400 V92" fill="none" stroke="currentColor"/>
+    <text x="280" y="124" text-anchor="middle" fill="currentColor">SUBSTRING(2, 5, s) = "MPUT"  (end index 5 included)</text>
+    <text x="280" y="150" text-anchor="middle" fill="currentColor">Python: s[2:6]  (stop index 6 excluded)</text>
+  </g>
+</svg>
+:::
+
 String `s ← "Computer Science"` (indices 0 to 15):
 
 | Operation | AQA pseudocode | Result | Python |

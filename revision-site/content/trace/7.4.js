@@ -1,0 +1,27 @@
+CS.registerTrace({
+  id: "7.4-1",
+  topic: "7.4",
+  title: "Nested interrupts and the system stack",
+  lang: "text",
+  intro: "A user program **P** is running. Three interrupt types exist, with these priorities: **H** hardware failure (high), **T** timer (medium), **D** disk transfer finished (low). Any interrupt has a higher priority than P. Interrupts are checked at the end of each fetch–execute cycle; an interrupt is serviced only if its priority is **higher** than the code currently running, otherwise it waits (pending).\n\nUse the codes P, T, D, H. Write the stack **bottom → top** with commas (e.g. `P, T`), and `-` for an empty stack or nothing pending.",
+  code: "Priorities: H (high) > T (medium) > D (low) > P (user program)\n\n1. T arrives while P runs\n2. D arrives while T's ISR runs\n3. H arrives while T's ISR runs\n4. H's ISR finishes\n5. T's ISR finishes\n6. D's ISR finishes",
+  columns: ["Event", "Now running", "Stack (bottom → top)", "Pending"],
+  prefill: [
+    ["1. T arrives", "", "", ""],
+    ["2. D arrives", "", "", ""],
+    ["3. H arrives", "", "", ""],
+    ["4. H's ISR ends", "", "", ""],
+    ["5. T's ISR ends", "", "", ""],
+    ["6. D's ISR ends", "", "", ""],
+  ],
+  rows: [
+    ["1. T arrives", "T", "P", "-"],
+    ["2. D arrives", "T", "P", "D"],
+    ["3. H arrives", "H", "P, T", "D"],
+    ["4. H's ISR ends", "T", "P", "D"],
+    ["5. T's ISR ends", "D", "P", "-"],
+    ["6. D's ISR ends", "P", "-", "-"],
+  ],
+  hint: "Each time an interrupt is serviced, the registers of whatever was running are **pushed**. Each time an ISR ends, the top snapshot is **popped** — but check the pending list first: a waiting interrupt with higher priority than the code about to resume is serviced straight away.",
+  note: "Row 5: when T's ISR finishes, the next code to resume would be P, but D is pending and D beats P, so D is serviced before P resumes. P's registers stay on the stack until D's ISR ends. This is why a **LIFO stack** is the natural structure: snapshots are restored in reverse order of saving.",
+});

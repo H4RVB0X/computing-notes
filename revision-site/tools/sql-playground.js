@@ -768,7 +768,7 @@ INSERT INTO Enrolment VALUES (1,'CS','A'),(1,'MA','B'),(2,'CS','C'),(2,'PH','A')
       schema.innerHTML = "";
       schema.appendChild(h("span", { class: "bit-label", text: "Tables:" }));
       Object.values(db).forEach((t) => {
-        const b = h("button", { class: "btn sm", type: "button", title: "SELECT * FROM " + t.name, style: "font-weight:500" });
+        const b = h("button", { class: "btn sm", type: "button", title: "SELECT * FROM " + t.name, style: "font-weight:500;white-space:normal;text-align:left;max-width:100%;display:inline-block" });
         b.innerHTML = "<b>" + CS.util.esc(t.name) + "</b>(" + t.cols.map((c) => { const fk = t.fks.some((f) => f.col.toLowerCase() === c.name.toLowerCase()); const s = CS.util.esc(c.name); return (c.pk ? "<u>" + s + "</u>" : s) + (fk ? "<sup>FK</sup>" : ""); }).join(", ") + ")";
         b.addEventListener("click", () => {
           ta.value = "SELECT * FROM " + t.name + ";";

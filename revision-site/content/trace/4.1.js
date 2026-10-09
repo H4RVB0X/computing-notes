@@ -1,0 +1,38 @@
+CS.registerTrace({
+  id: "4.1-1",
+  topic: "4.1",
+  title: "Counting passes and finding the highest mark",
+  lang: "pseudocode",
+  code: "marks ← [52, 38, 71, 40]\npasses ← 0\nhighest ← marks[0]\nFOR i ← 0 TO LEN(marks) - 1\n    IF marks[i] ≥ 40 THEN\n        passes ← passes + 1\n    ENDIF\n    IF marks[i] > highest THEN\n        highest ← marks[i]\n    ENDIF\nENDFOR\nOUTPUT passes\nOUTPUT highest",
+  columns: ["i", "marks[i]", "passes", "highest", "OUTPUT"],
+  prefill: [["", "", "0", "52", ""], ["0", "", "", "", ""], ["1", "", "", "", ""], ["2", "", "", "", ""], ["3", "", "", "", ""], ["", "", "", "", ""], ["", "", "", "", ""]],
+  rows: [
+    ["", "", "0", "52", ""],
+    ["0", "52", "1", "52", ""],
+    ["1", "38", "1", "52", ""],
+    ["2", "71", "2", "71", ""],
+    ["3", "40", "3", "71", ""],
+    ["", "", "", "", "3"],
+    ["", "", "", "", "71"],
+  ],
+  instructions: "For each value of i, write marks[i] and the values of passes and highest at the END of that iteration (write them even if unchanged). The last two rows are the two OUTPUT lines.",
+  hint: "40 is a pass: the condition is ≥ 40, not > 40.",
+});
+CS.registerTrace({
+  id: "4.1-2",
+  topic: "4.1",
+  title: "Euclid's algorithm: hcf(252, 105)",
+  lang: "pseudocode",
+  code: "a ← 252\nb ← 105\nWHILE b ≠ 0\n    r ← a MOD b\n    a ← b\n    b ← r\nENDWHILE\nOUTPUT a",
+  columns: ["Iteration", "r", "a", "b", "b ≠ 0?"],
+  prefill: [["start", "", "252", "105", ""], ["1", "", "", "", ""], ["2", "", "", "", ""], ["3", "", "", "", ""]],
+  rows: [
+    ["start", "", "252", "105", "True"],
+    ["1", "42", "105", "42", "True"],
+    ["2", "21", "42", "21", "True"],
+    ["3", "0", "21", "0", "False"],
+  ],
+  instructions: "Fill in r, a and b at the end of each iteration, then whether the loop condition b ≠ 0 is True or False when it is next tested.",
+  hint: "252 = 2 × 105 + 42, so 252 MOD 105 = 42.",
+  note: "The loop stops with **a = 21**, which is output: the highest common factor of 252 and 105.",
+});
