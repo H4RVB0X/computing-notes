@@ -9,6 +9,7 @@ CS.manifest = [
   "tools/bitmap-editor.js",
   "tools/bitwise-ops.js",
   "tools/bnf-checker.js",
+  "tools/boolean-simplifier.js",
   "tools/call-stack-visualiser.js",
   "tools/cipher-tool.js",
   "tools/compression-tool.js",
@@ -117,6 +118,7 @@ CS.manifest = [
   "content/topics/P.3.md.js",
   "content/topics/P.4.md.js",
   "content/topics/P.5.md.js",
+  "content/topics/P.6.md.js",
   "content/topics/R.1.md.js",
   "content/topics/R.2.md.js",
   "content/topics/R.3.md.js",
@@ -194,6 +196,7 @@ CS.manifest = [
   "content/quizzes/P.3.js",
   "content/quizzes/P.4.js",
   "content/quizzes/P.5.js",
+  "content/quizzes/P.6.js",
   "content/quizzes/R.1.js",
   "content/quizzes/R.2.js",
   // exam
@@ -270,6 +273,7 @@ CS.manifest = [
   "content/exam/P.3.js",
   "content/exam/P.4.js",
   "content/exam/P.5.js",
+  "content/exam/P.6.js",
   "content/exam/R.1.js",
   "content/exam/R.2.js",
   // flashcards
@@ -346,6 +350,7 @@ CS.manifest = [
   "content/flashcards/P.3.js",
   "content/flashcards/P.4.js",
   "content/flashcards/P.5.js",
+  "content/flashcards/P.6.js",
   "content/flashcards/R.1.js",
   "content/flashcards/R.2.js",
   // trace
