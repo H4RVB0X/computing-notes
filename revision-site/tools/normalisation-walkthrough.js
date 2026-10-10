@@ -196,7 +196,6 @@ CS.registerTool({
           fb.className = k === ans ? "ok-text" : "err";
           fb.textContent = (k === ans ? "✓ Correct. " : "✗ Not quite. ") + why;
           updateScore();
-          render.pills && render.pills();
           pills.querySelectorAll("button")[stage].textContent = NFS[stage] + (k === ans ? " ✓" : " ✗");
         });
         quiz.appendChild(b);

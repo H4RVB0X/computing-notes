@@ -153,6 +153,8 @@ When an exam question asks "which of these strings are valid?", give the **reaso
 
 {{trace:4.5-1}}
 
+{{trace:4.5-2}}
+
 ### Try it
 
 The checker below has the signed-integer rules loaded. Type your own strings, press **Check** and open **Show working** to see the leftmost derivation, parse tree, or the point of failure. Then try the other presets.
@@ -327,7 +329,7 @@ Each recursive call strips one `a` and one `b`. The recursion uses the call stac
 Try the **"Expressions with brackets"** preset in the checker above: `(1+2)*3` and `((4))` are accepted, `(1+2` is rejected.
 
 :::why Why does this matter for programming languages?
-Every real language nests: brackets in expressions, blocks inside blocks, quotes inside function calls. A compiler's **syntax analysis** stage needs a grammar that can describe nesting to any depth, so language designers use BNF (or EBNF). Regular expressions are still used for the **lexical analysis** stage, which splits code into tokens like identifiers and numbers. See [6.2](#/topic/6.2).
+Every real language nests: brackets in expressions, blocks inside blocks, quotes inside function calls. A compiler's **syntax analysis** stage needs a grammar that can describe nesting to any depth, so language designers use BNF (or EBNF). Regular expressions are still used for the **lexical analysis** stage, which splits code into tokens like identifiers and numbers. See [6.3](#/topic/6.3).
 :::
 
 :::exam
@@ -358,8 +360,8 @@ Every real language nests: brackets in expressions, blocks inside blocks, quotes
 :::related
 - [4.4 Regular expressions and regular languages](#/topic/4.4)
 - [4.2 Finite state machines](#/topic/4.2)
-- [1.6 Recursion](#/topic/1.6)
-- [6.2 Translators](#/topic/6.2): syntax analysis in a compiler
+- [1.6 Stack frames and recursion](#/topic/1.6)
+- [6.3 Program translators](#/topic/6.3): syntax analysis in a compiler
 :::
 
 */});

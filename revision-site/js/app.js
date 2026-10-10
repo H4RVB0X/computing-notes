@@ -50,7 +50,7 @@
     nav.innerHTML = "";
     CS.sections.forEach((s) => {
       const group = h("div", { class: "nav-group", "data-section": s.id, style: "--sc: var(--s" + s.id + ")" });
-      const btn = h("button", { class: "nav-section-btn", type: "button", "aria-expanded": "false" }, [h("span", { class: "dot" }), h("span", { class: "num", text: s.id === "R" ? "REF" : s.id }), h("span", { text: s.short || s.title }), h("span", { class: "chev", text: "▶" })]);
+      const btn = h("button", { class: "nav-section-btn", type: "button", "aria-expanded": "false" }, [h("span", { class: "dot" }), h("span", { class: "num", text: s.id === "R" ? "REF" : s.id === "P" ? "P1" : s.id }), h("span", { text: s.short || s.title }), h("span", { class: "chev", text: "▶" })]);
       btn.addEventListener("click", () => {
         group.classList.toggle("open");
         btn.setAttribute("aria-expanded", group.classList.contains("open"));
@@ -238,7 +238,7 @@
     CS.sections.forEach((s) => {
       const comp = s.topics.reduce((a, t) => a + CS.progress.completion(t.id), 0) / s.topics.length;
       const a = h("a", { class: "section-card", href: "#/section/" + s.id, style: "--sc: var(--s" + s.id + ")" });
-      a.innerHTML = '<div class="num">' + (s.spec ? "Spec " + s.spec : s.id === "R" ? "Reference" : "") + '</div><div class="t">' + U.esc(s.title) + '</div><div class="progress-bar" style="margin:6px 0"><i style="width:' + Math.round(comp * 100) + '%"></i></div><div class="meta"><span>' + s.topics.length + " pages</span><span>" + Math.round(comp * 100) + "%</span></div>";
+      a.innerHTML = '<div class="num">' + (s.spec ? "Spec " + s.spec : s.id === "R" ? "Reference" : s.id === "P" ? "Paper 1 skeleton" : "") + '</div><div class="t">' + U.esc(s.title) + '</div><div class="progress-bar" style="margin:6px 0"><i style="width:' + Math.round(comp * 100) + '%"></i></div><div class="meta"><span>' + s.topics.length + " pages</span><span>" + Math.round(comp * 100) + "%</span></div>";
       cards.appendChild(a);
     });
     main.appendChild(cards);

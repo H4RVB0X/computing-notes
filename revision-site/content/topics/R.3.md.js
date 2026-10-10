@@ -36,6 +36,35 @@ Paper structures and mark allocations below reflect the AQA 7517 specification a
 
 ## Command words
 
+:::figure The command-word ladder: each step up demands more than the one below
+<svg class="diagram" viewBox="0 0 680 260" role="img" aria-label="Staircase of command words from State, needing recall only, up to Evaluate, needing both sides and a judgement">
+  <defs><marker id="arrR3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker></defs>
+  <g font-family="inherit" fill="currentColor">
+    <rect x="20" y="185" width="125" height="65" rx="4" fill="#7c9aff" fill-opacity="0.15" stroke="currentColor"/>
+    <text x="82" y="205" text-anchor="middle" font-weight="bold" font-size="13">State / Give</text>
+    <text x="82" y="223" text-anchor="middle" font-size="11">recall a fact</text>
+    <rect x="150" y="145" width="125" height="105" rx="4" fill="#7c9aff" fill-opacity="0.25" stroke="currentColor"/>
+    <text x="212" y="165" text-anchor="middle" font-weight="bold" font-size="13">Describe</text>
+    <text x="212" y="183" text-anchor="middle" font-size="11">what it is</text>
+    <text x="212" y="197" text-anchor="middle" font-size="11">or what it does</text>
+    <rect x="280" y="105" width="125" height="145" rx="4" fill="#7c9aff" fill-opacity="0.35" stroke="currentColor"/>
+    <text x="342" y="125" text-anchor="middle" font-weight="bold" font-size="13">Explain</text>
+    <text x="342" y="143" text-anchor="middle" font-size="11">why or how,</text>
+    <text x="342" y="157" text-anchor="middle" font-size="11">with reasons</text>
+    <rect x="410" y="65" width="125" height="185" rx="4" fill="#7c9aff" fill-opacity="0.45" stroke="currentColor"/>
+    <text x="472" y="85" text-anchor="middle" font-weight="bold" font-size="13">Compare</text>
+    <text x="472" y="103" text-anchor="middle" font-size="11">paired similarities</text>
+    <text x="472" y="117" text-anchor="middle" font-size="11">and differences</text>
+    <rect x="540" y="25" width="125" height="225" rx="4" fill="#7c9aff" fill-opacity="0.55" stroke="currentColor"/>
+    <text x="602" y="45" text-anchor="middle" font-weight="bold" font-size="13">Evaluate</text>
+    <text x="602" y="63" text-anchor="middle" font-size="11">both sides</text>
+    <text x="602" y="77" text-anchor="middle" font-size="11">+ a judgement</text>
+    <line x1="30" y1="40" x2="330" y2="40" stroke="currentColor" marker-end="url(#arrR3)"/>
+    <text x="30" y="28" font-size="12">each step up: more depth, reasoning and length</text>
+  </g>
+</svg>
+:::
+
 Read the command word **first**. It decides the shape of the answer more than the topic does.
 
 | Command word | What it demands | Mini example (and a creditworthy answer) |
@@ -120,11 +149,11 @@ On **Paper 2**, the discursive questions on the **consequences of uses of comput
 **Answer B (Level 3, 9 marks)**
 
 > **Legal.** Under UK GDPR and the Data Protection Act 2018, personal data must be collected for specified purposes and processed lawfully. Customers joined the scheme for discounts, so inferring health conditions or pregnancy may be a new purpose they did not consent to. Health data is special category data, which needs explicit consent, and customers have the right to object to profiling for direct marketing. The supermarket would need clear consent and an easy opt-out.
->
+
 > **Ethical.** Even if legal, predictions can be wrong or intrusive. A mailing about baby products could reveal a pregnancy to other people in the household before the customer chose to tell them, causing real harm. Customers are unlikely to understand how much can be inferred from their shopping, so there is a power imbalance: the company benefits from knowledge the customer did not knowingly give.
->
+
 > **Moral and benefits.** Some customers would value relevant offers and lower prices, and the scheme is voluntary. However, the more sensitive the inference, the greater the duty of care, including keeping such a large dataset secure, because a breach would expose highly personal information.
->
+
 > **Conclusion.** Targeting based on everyday purchases is acceptable with informed consent, but predicting sensitive life events crosses a line unless customers explicitly opt in. The supermarket should limit profiling to non-sensitive categories, explain it clearly and offer an easy opt-out.
 
 *Examiner commentary:* **all three areas** covered with developed points (legal principle → application → consequence); accurate terminology (special category data, purpose limitation, right to object); balanced, with benefits; a **clear line of reasoning** to a justified conclusion. Level 3, top: **9**.
