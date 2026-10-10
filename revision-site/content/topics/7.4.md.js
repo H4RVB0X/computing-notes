@@ -223,7 +223,7 @@ for cores in [1, 2, 4, 8, 64]:
 2 cores: 1.67 x
 4 cores: 2.5 x
 8 cores: 3.33 x
-64 cores: 4.85 x
+64 cores: 4.71 x
 ```
 
 ### Cache memory

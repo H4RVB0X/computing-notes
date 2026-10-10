@@ -99,7 +99,7 @@ Every non-key attribute must depend on **the key** (1NF: there is a key, no repe
     <path d="M155,58 L155,40 L305,40 L305,56" fill="none" stroke="#e0533d" stroke-width="1.6" marker-end="url(#arr103)"/>
     <path d="M305,40 L380,40 L380,56" fill="none" stroke="#e0533d" stroke-width="1.6" marker-end="url(#arr103)"/>
     <text x="345" y="34" font-size="12">part of key → ✗</text>
-    <text x="440" y="22" font-weight="600">Non-key dependency (breaks 3NF)</text>
+    <text x="630" y="22" font-weight="600" text-anchor="end">Non-key dep. (breaks 3NF)</text>
     <rect x="440" y="60" width="70" height="30" fill="#ffb84d" fill-opacity="0.3" stroke="currentColor"/><text x="475" y="80" text-anchor="middle" text-decoration="underline">OrderNo</text>
     <rect x="510" y="60" width="50" height="30" fill="none" stroke="currentColor"/><text x="535" y="80" text-anchor="middle">CustID</text>
     <rect x="560" y="60" width="70" height="30" fill="none" stroke="currentColor"/><text x="595" y="80" text-anchor="middle">CustName</text>

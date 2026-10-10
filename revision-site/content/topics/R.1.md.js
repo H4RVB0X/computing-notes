@@ -230,7 +230,11 @@ print(guess)                 # 12
 :::tab AQA pseudocode
 ```pseudocode
 SUBROUTINE showLine(n)          # procedure: no RETURN value
-    OUTPUT "-" * n
+    line ← ""
+    FOR i ← 1 TO n
+        line ← line + "-"      # + concatenates strings
+    ENDFOR
+    OUTPUT line
 ENDSUBROUTINE
 
 SUBROUTINE area(width, height)  # function: returns a value

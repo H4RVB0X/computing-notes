@@ -322,7 +322,7 @@ These four tables are used for every SQL example in [10.4 SQL](#/topic/10.4).
 - Member(<u>MemberID</u>, Forename, Surname, TutorGroup)
 - Loan(<u>CopyID</u>, <u>DateOut</u>, MemberID<sup>FK</sup>, DateDue)
 
-**Choosing Loan's key.** CopyID alone repeats (a copy is lent many times). CopyID + MemberID could repeat (the same member borrows the same copy twice). A copy can only go out once on a given day, so **(CopyID, DateOut)** is unique. A new `LoanID` would also be acceptable; say why your key is unique.
+**Choosing Loan's key.** CopyID alone repeats (a copy is lent many times). CopyID + MemberID could repeat (the same member borrows the same copy twice). If we assume a copy is never lent twice on the same day, **(CopyID, DateOut)** is unique. A new `LoanID` would also be acceptable; say why your key is unique.
 :::
 
 ## Going backwards: from entity descriptions to the ER diagram
@@ -333,7 +333,7 @@ Exams often give you the entity descriptions and ask for the diagram. Use the **
 |---|---|
 | Two entities have the **same** single-attribute primary key | **1:1** |
 | A single-attribute primary key of A appears in B as a **non-key attribute or part of a composite key** | **1:M**, crow's foot at **B** |
-| Two entities share an attribute that is the primary key of **neither** | an unresolved **M:N** (needs a link entity) |
+| Two entities share an identifying attribute that is the primary key of **neither** | usually a design problem, often an unresolved **M:N** (needs a link entity) |
 
 :::example Hospital (adapted from the textbook question)
 - Ward(<u>WardName</u>, NurseInCharge, NumberOfBeds)
