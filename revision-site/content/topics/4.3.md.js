@@ -5,7 +5,7 @@ CS.registerTopic({ id: "4.3", title: "Sets and the maths for regular expressions
 - Read and write **set comprehension**, e.g. `{x | x ∈ ℕ ∧ x ≥ 1}`, and the **compact representation** `{0ⁿ1ⁿ | n ≥ 1}`.
 - Classify sets as **finite**, **infinite**, **countably infinite** or **countable**, and state the **cardinality** of a finite set.
 - Form the **Cartesian product** of two sets and give its cardinality.
-- Use **subset** (⊆), **proper subset** (⊂), **membership**, **union** (∪), **intersection** (∩) and **difference** (\\).
+- Use **subset** (⊆), **proper subset** (⊂), **membership**, **union** (∪), **intersection** (∩) and **difference** (\).
 :::
 
 :::quick At a glance
@@ -17,7 +17,7 @@ CS.registerTopic({ id: "4.3", title: "Sets and the maths for regular expressions
 - **Cardinality** `|A|` = number of elements in a finite set. **Countably infinite** = infinite but can be listed (matched one-to-one with ℕ). **Countable** = finite or countably infinite.
 - **Cartesian product** `A × B` = all **ordered pairs** (a, b); `|A × B| = |A| × |B|`.
 - **A ⊆ B**: every element of A is in B. **A ⊂ B** (proper subset): A ⊆ B **and** A ≠ B.
-- **A ∪ B**: in A or B (or both). **A ∩ B**: in both. **A \\ B**: in A **but not** in B.
+- **A ∪ B**: in A or B (or both). **A ∩ B**: in both. **A \ B**: in A **but not** in B.
 :::
 
 :::keyterms
@@ -195,13 +195,13 @@ Every set is a subset of itself, and **Ø is a subset of every set**. ℕ ⊂ �
 |---|---|---|
 | **A ∪ B** (union) | in A or B or both | {1, 2, 3, 4, 5, 6} |
 | **A ∩ B** (intersection) | in both | {3, 4} |
-| **A \\ B** (difference) | in A but not in B | **{1, 2}** |
-| **B \\ A** | in B but not in A | {5, 6} |
+| **A \ B** (difference) | in A but not in B | **{1, 2}** |
+| **B \ A** | in B but not in A | {5, 6} |
 | membership | is 5 ∈ A? | no: 5 ∉ A |
 :::
 
 :::trap Difference is not symmetric difference
-Your school slides define "difference" as "items that are in either set but not in both" and give **A Θ B = {1, 2, 5, 6}**. That operation is the **symmetric difference** (usually written A Δ B), which is **not** on the AQA spec. AQA **difference** is **A \\ B = {1, 2}**: only the elements of **A** that are not in B. Note that A \\ B ≠ B \\ A.
+Your school slides define "difference" as "items that are in either set but not in both" and give **A Θ B = {1, 2, 5, 6}**. That operation is the **symmetric difference** (usually written A Δ B), which is **not** on the AQA spec. AQA **difference** is **A \ B = {1, 2}**: only the elements of **A** that are not in B. Note that A \ B ≠ B \ A.
 :::
 
 ```python Set operations in Python

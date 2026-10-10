@@ -314,6 +314,7 @@
   const LANG_LABEL = { python: "Python", pseudocode: "AQA pseudocode", haskell: "Haskell", sql: "SQL", asm: "Assembly", assembly: "Assembly", text: "", js: "JavaScript", javascript: "JavaScript", bnf: "BNF", regex: "Regex", vb: "VB.NET", c: "C", json: "JSON", xml: "XML", bash: "Shell", output: "Output" };
   function renderCode(code, lang, title) {
     const hl = CS.highlight ? CS.highlight(code, lang) : esc(code);
+    title = (title || "").replace(/\bnocheck\b/, "").trim();
     const label = title || LANG_LABEL[lang] || lang;
     const lineCount = code.split("\n").length;
     const numbered = lineCount > 3 && lang !== "output" && lang !== "text";

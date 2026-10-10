@@ -55,7 +55,7 @@ The cost: **processing time** to compress and decompress, and (for lossy) **loss
 | What happens | redundancy is encoded more efficiently; **nothing is lost** | data judged less important is **permanently removed** |
 | After decompression | **identical** to the original | an **approximation** of the original |
 | Typical size reduction | modest (often 2:1 or less) | large (often 10:1 or more) |
-| Examples | RLE, dictionary (LZW), **ZIP**, **PNG**, GIF, **FLAC** | **JPEG**, **MP3**, AAC, **MP4**/H.264 video |
+| Examples | RLE, dictionary (LZW), **ZIP**, **PNG**, GIF, **FLAC** | **JPEG**, **MP3**, AAC, **MP4** (H.264) video |
 | Use when | every bit matters: **text, source code, executables, spreadsheets, medical images** | small file matters more than perfection: **photos on the web, streamed music and video** |
 
 :::columns
