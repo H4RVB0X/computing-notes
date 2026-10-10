@@ -115,6 +115,8 @@ CS.manifest = [
   "content/topics/P.1.md.js",
   "content/topics/P.2.md.js",
   "content/topics/P.3.md.js",
+  "content/topics/P.4.md.js",
+  "content/topics/P.5.md.js",
   "content/topics/R.1.md.js",
   "content/topics/R.2.md.js",
   "content/topics/R.3.md.js",
@@ -190,6 +192,8 @@ CS.manifest = [
   "content/quizzes/14.2.js",
   "content/quizzes/P.2.js",
   "content/quizzes/P.3.js",
+  "content/quizzes/P.4.js",
+  "content/quizzes/P.5.js",
   "content/quizzes/R.1.js",
   "content/quizzes/R.2.js",
   // exam
@@ -264,6 +268,8 @@ CS.manifest = [
   "content/exam/14.2.js",
   "content/exam/P.2.js",
   "content/exam/P.3.js",
+  "content/exam/P.4.js",
+  "content/exam/P.5.js",
   "content/exam/R.1.js",
   "content/exam/R.2.js",
   // flashcards
@@ -338,6 +344,8 @@ CS.manifest = [
   "content/flashcards/14.2.js",
   "content/flashcards/P.2.js",
   "content/flashcards/P.3.js",
+  "content/flashcards/P.4.js",
+  "content/flashcards/P.5.js",
   "content/flashcards/R.1.js",
   "content/flashcards/R.2.js",
   // trace
@@ -390,4 +398,5 @@ CS.manifest = [
   "content/trace/12.3.js",
   "content/trace/13.1.js",
   "content/trace/P.2.js",
+  "content/trace/P.4.js",
 ];

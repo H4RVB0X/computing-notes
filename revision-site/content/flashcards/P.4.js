@@ -1,0 +1,17 @@
+CS.registerFlashcards("P.4", [
+  { front: "Section C: question numbers and marks?", back: "Q08 (2), Q09 (3), Q10 (6), Q11 (2) = 13 marks, all about the skeleton." },
+  { front: "Identify vs explain on a code question?", back: "Identify: the exact identifier/line, nothing else. Explain: what the code does **and why**, tied to specific lines; one mark per distinct point." },
+  { front: "Three methods that return a Boolean?", back: "`Empty` (Pile), `__NoMoreTilesLeft` and `__MaxScoreReached` (Game)." },
+  { front: "Where is encapsulation shown?", back: "`Player`: `_Name`, `_Score` accessed only via `GetName`, `GetScore`, `ChangeScore`. (Similarly Tile and Pile getters.)" },
+  { front: "Private vs protected in the skeleton?", back: "`__Board` etc. in Game = private, name-mangled to `_Game__Board`. `_Tiles`, `_Score` etc. = protected by convention, usable by subclasses." },
+  { front: "Relationship between Game and Pile/Player?", back: "Aggregation: objects created in Main/LoadGame and passed into Game, so they exist independently." },
+  { front: "Index formula and its inverse?", back: "index = x − 1 + (y − 1) × GridSize. x = index % GridSize + 1, y = index // GridSize + 1." },
+  { front: "Why read each pile line backwards?", back: "`Add` inserts at index 0 (top), so adding the last tile first leaves the first tile in the file on top." },
+  { front: "What does `LoadGame` return?", back: "A 7-tuple: success flag (bool), Board, Players, Discard, MaxScore, WhoseTurn, TurnsSinceMatch." },
+  { front: "Typo in the filename: what happens?", back: "'File not loaded', 'Setting up default game', but MaxScore = 0 so the game ends after the first turn ('Player 1 has won!' after a match)." },
+  { front: "(0,0) on game1?", back: "Index −5 → `__Board[11]` = pile (4,3). No crash; it takes from the wrong pile (and matches A with (1,1))." },
+  { front: "Empty pile chosen: effects?", back: "'You chose an empty pile'; TurnsSinceMatch still +1; turn passes to the next player." },
+  { front: "Three players: what works and what doesn't?", back: "Turn order works (MOD). Winner check only compares Players[0] and [1], so a third player is never announced." },
+  { front: "Partial load (error after some lines): result?", back: "Lists read so far are kept and default piles/players appended, e.g. 52 piles → 7×7 board and 4 players." },
+  { front: "Discard line `A,1,B` or `A,1,`?", back: "Both load just one A tile; the range stops before the incomplete pair. No error." },
+]);

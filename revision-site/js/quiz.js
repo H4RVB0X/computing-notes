@@ -80,7 +80,7 @@
         let extra = "";
         if (!correct && q.wrong) {
           [...selected].forEach((i) => {
-            if (!answerSet.has(i) && q.wrong[i]) extra += "<p><b>" + U.esc(options[i]) + ":</b> " + CS.markdown.inline(q.wrong[i]) + "</p>";
+            if (!answerSet.has(i) && q.wrong[i]) extra += "<p><b>" + CS.markdown.inline(options[i]) + ":</b> " + CS.markdown.inline(q.wrong[i]) + "</p>";
           });
         }
         if (!correct && multi) extra += "<p>Correct answer" + (answerSet.size > 1 ? "s" : "") + ": " + [...answerSet].map((i) => "<b>" + LETTERS[order.indexOf(i)] + "</b>").join(", ") + "</p>";
