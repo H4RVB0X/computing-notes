@@ -390,7 +390,7 @@ ORDER BY Appointment.ApptDate;
 :::::
 
 :::example Query 7: who do we phone? (the class-slide style question)
-"Dr Marsh's surgery was closed on 1 March 2024. List the forename, surname and phone number of every owner with an appointment that day."
+"The practice was closed unexpectedly on 1 March 2024. List the forename, surname and phone number of every owner with an appointment that day."
 
 ```sql
 SELECT Owner.Forename, Owner.Surname, Owner.Phone

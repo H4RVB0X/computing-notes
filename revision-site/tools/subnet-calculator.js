@@ -126,7 +126,7 @@
         const a = readPair(aIn.value, mIn.value), b = readPair(bIn.value, mIn.value);
         if (a.err || b.err) { cOut.innerHTML = "<span class='err'>" + CS.util.esc(a.err || b.err) + "</span>"; return; }
         const na = (a.ip & a.mask) >>> 0, nb = (b.ip & a.mask) >>> 0, same = na === nb;
-        cOut.innerHTML = "A: " + toDot(a.ip) + " AND " + toDot(a.mask) + " = <b>" + toDot(na) + "</b><br>B: " + toDot(b.ip) + " AND " + toDot(a.mask) + " = <b>" + toDot(nb) + "</b><br>" + (same ? "<span class='ok-text same-result'>Same network identifier → same subnet. A can send to B directly, without a router.</span>" : "<span class='err same-result'>Different network identifiers → different subnets. Traffic between them must go through a router (the default gateway).</span>");
+        cOut.innerHTML = "A: " + toDot(a.ip) + " AND " + toDot(a.mask) + " = <b>" + toDot(na) + "</b><br>B: " + toDot(b.ip) + " AND " + toDot(a.mask) + " = <b>" + toDot(nb) + "</b><br>" + (same ? "<span class='ok-text same-result'>Same network identifier → same subnet. A can send to B directly, without a router.</span>" : "<span class='same-result' style='color:var(--warn);font-weight:600'>Different network identifiers → different subnets. Traffic between them must go through a router (the default gateway).</span>");
       }
       go.addEventListener("click", run);
       cBtn.addEventListener("click", check);

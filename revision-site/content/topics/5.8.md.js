@@ -145,7 +145,7 @@ For a long document, frequently repeated words such as "the" save a great deal.
 :::
 
 :::trap Don't forget the dictionary
-The dictionary is part of the cost. For a short message it can outweigh the saving. Practical methods (e.g. **LZW**, used in GIF and ZIP-style formats) **build the dictionary as they go**, so the decoder can rebuild it from the data and it need not be sent separately.
+The dictionary is part of the cost. For a short message it can outweigh the saving. Practical methods (e.g. **LZW**, used in GIF, and the LZ77-based DEFLATE used in ZIP and PNG) **build the dictionary as they go**, so the decoder can rebuild it from the data and it need not be sent separately.
 :::
 
 :::collapse Beyond the AQA specification: Huffman coding

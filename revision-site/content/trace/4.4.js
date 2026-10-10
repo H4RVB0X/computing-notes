@@ -5,8 +5,8 @@ CS.registerTrace({
   lang: "text",
   code: "a*b+c?(d|e)",
   columns: ["String", "Matches? (Yes/No)"],
-  prefill: [["bd", ""], ["abce", ""], ["aabbbe", ""], ["ad", ""], ["bcde", ""], ["bbbcd", ""], ["ace", ""], ["abcc d", ""]],
-  rows: [["bd", "Yes"], ["abce", "Yes"], ["aabbbe", "Yes"], ["ad", "No"], ["bcde", "No"], ["bbbcd", "Yes"], ["ace", "No"], ["abcc d", "No"]],
+  prefill: [["bd", ""], ["abce", ""], ["aabbbe", ""], ["ad", ""], ["bcde", ""], ["bbbcd", ""], ["ace", ""], ["abccd", ""]],
+  rows: [["bd", "Yes"], ["abce", "Yes"], ["aabbbe", "Yes"], ["ad", "No"], ["bcde", "No"], ["bbbcd", "Yes"], ["ace", "No"], ["abccd", "No"]],
   instructions: "A string matches only if the WHOLE string is in the set described by the expression. Write Yes or No.",
   hint: "Every match needs at least one b, at most one c, and must end in exactly one d or e.",
 });

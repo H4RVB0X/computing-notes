@@ -173,7 +173,7 @@ On **Paper 2**, the discursive questions on the **consequences of uses of comput
 |---|---|---|
 | Format | **On-screen** exam: answers typed into an Electronic Answer Document; you write and run code in your chosen language | **Written** exam |
 | Time / marks / weight | 2 h 30 min · 100 marks · 40% | 2 h 30 min · 100 marks · 40% |
-| Content (check) | Programming; data structures; algorithms; theory of computation (spec 4.1–4.4) | Data representation; computer systems; organisation and architecture; consequences; networking; databases; big data; functional programming (spec 4.5–4.12 per the school's course overview) |
+| Content (check) | Programming; data structures; algorithms; theory of computation (spec 4.1–4.4), plus the problem-solving skills of section 4.13 | Data representation; computer systems; organisation and architecture; consequences; networking; databases; big data; functional programming (spec 4.5–4.12 per the school's course overview) |
 | Advance material | **Preliminary material and a skeleton program** released before the exam | None |
 | Structure (typical; check) | Section A short questions and programming; Section B write a program; Section C questions on the skeleton program; Section D modify the skeleton program | Compulsory short-answer and extended-answer questions, including levels-of-response questions |
 

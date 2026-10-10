@@ -241,7 +241,7 @@ A **stack** of tiles with a maximum size and a bonus.
 - **J appears 3 times** (odd), so one J can never be matched. `__NoMoreTilesLeft()` can never be true and the game can only end through **MaxScore (15)**.
 - Same symbol, different points: U1 vs U5, H1 vs H3, K1/K3/K4/K7. Matching only checks the **symbol**.
 - Bonuses: (1,1) = 2, (3,3) = 4, (4,3) = 2. The skeleton never uses them.
-- Vowels are always 1 point. Pile (2,1) has 5 tiles; everything else has 3 or 4.
+- A, E and O tiles are always worth 1 point, but U appears as both U1 and U5. Pile (2,1) has 5 tiles; everything else has 3 or 4.
 :::
 
 :::example Trace LoadGame on one pile line

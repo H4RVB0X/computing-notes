@@ -332,7 +332,8 @@ CS.registerTool({
       const tt = table(e, vars);
       const ones = tt.map((v, r) => (v ? r : -1)).filter((r) => r >= 0);
       const Q = qm(vars.length, ones);
-      const cover = Q.cover || [];
+      const rank = (p) => [...p.bits].map((c) => (c === "1" ? 0 : c === "0" ? 1 : 2)).join("");
+      const cover = (Q.cover || []).slice().sort((x, y) => (rank(x) < rank(y) ? -1 : rank(x) > rank(y) ? 1 : 0));
       const simp = sopExpr(cover, vars);
       const ok = JSON.stringify(table(simp, vars)) === JSON.stringify(tt);
       result.innerHTML =

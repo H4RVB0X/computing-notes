@@ -313,7 +313,7 @@ The tool above applies AND/OR/XOR/NOT to **each bit** of a binary number (bitwis
 
 :::challenge
 1. Write a function that takes a number of pence and returns the minimum number of £2, £1, 50p, 20p, 10p, 5p, 2p and 1p coins using only DIV and MOD.
-2. Explain why `n MOD 2 = 1` fails to detect odd negative numbers in Python but `n MOD 2 ≠ 0` works in every language.
+2. Explain why `n MOD 2 = 1` fails to detect odd negative numbers in VB.NET (where `-7 Mod 2` is −1) although it works in Python, whereas `n MOD 2 ≠ 0` works in every language.
 3. Using only NOT, AND and OR, write an expression equivalent to `A XOR B`. Prove it with a truth table.
 4. Find a pair of strings where Python's `<` gives a different answer from alphabetical order in a dictionary. Explain why.
 :::
