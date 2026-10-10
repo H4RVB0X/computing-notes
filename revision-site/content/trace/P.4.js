@@ -36,7 +36,7 @@ CS.registerTrace({
 });
 CS.registerTrace({
   id: "P.4-3", topic: "P.4", title: "__DisplayBoard after six turns", lang: "python",
-  intro: "After the six turns of trace P.4-1 it is Boris's turn, and he chooses **B**. Write each line that `__DisplayBoard` prints, exactly (no spaces between the digits).",
+  intro: "After the six turns of trace P.4-1 it is Boris's turn, and he chooses **B**. Write each line that `__DisplayBoard` prints, exactly (no spaces between the digits). The last two lines really start with two spaces; the checker ignores spaces, so you can leave them out.",
   code: "for y in range (self.__GridSize, 0, -1):\n    print(f\"{y}|\", end=\"\")\n    for x in range(1, self.__GridSize + 1):\n        print(self.__Board[self.__GetIndex(x, y)].GetNumberOfTiles(), end=\"\")\n    print()\nprint(\"  \", end=\"\")\nfor x in range(1, self.__GridSize + 1):\n    print(\"-\", end=\"\")\nprint()\nprint(\"  \", end=\"\")\nfor x in range (1, self.__GridSize + 1):\n    print(x, end=\"\")\nprint()",
   columns: ["Output line", "Printed"],
   prefill: [["1", ""], ["2", ""], ["3", ""], ["4", ""], ["5", ""], ["6", ""]],
