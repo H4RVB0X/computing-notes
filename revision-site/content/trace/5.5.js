@@ -20,7 +20,7 @@ CS.registerTrace({
     ["10100000", "1110", "-2", "-0.75", "-0.1875"],
     ["01101000", "0011", "3", "0.8125", "6.5"],
   ],
-  instructions: "Use a minus sign for negative values. Do not include units or fractions; give decimals.",
+  instructions: "Type negative values with the ordinary minus/hyphen key (e.g. -1). Do not include units or fractions; give decimals.",
   hint: "A mantissa starting with 1 is negative: start from −1 and add the other place values. Exponent 1111 = −8 + 4 + 2 + 1 = −1.",
   note: "Sense check: positive mantissa + positive exponent → value ≥ 1; positive mantissa + negative exponent → between 0 and 1; negative mantissa → negative value.",
 });

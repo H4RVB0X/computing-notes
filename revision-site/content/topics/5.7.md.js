@@ -14,7 +14,7 @@ CS.registerTopic({ id: "5.7", title: "Images and sound" }, function () {/*
 - **Analogue** = continuously varying, any value in a range. **Digital** = discrete values (in a computer, binary).
 - **ADC**: samples an analogue signal at regular intervals, **quantises** each sample to the nearest of 2ⁿ levels, outputs binary. Used with **analogue sensors** and microphones.
 - **DAC**: turns binary values back into voltages to **reconstruct** an analogue waveform, e.g. to drive **speakers**.
-- **Bitmap**: grid of **pixels**. **Resolution** = width × height in pixels (or pixels per inch). **Colour depth** = bits per pixel; 2ⁿ colours.
+- **Bitmap**: grid of **pixels**. **Size in pixels** = width × height. **Resolution** = dots (pixels) per inch. **Colour depth** = bits per pixel; 2ⁿ colours.
 - **Bitmap size (bits) = width × height × colour depth** (+ metadata). Divide by 8 for bytes.
 - **Vector**: a **drawing list** of objects (line, rectangle, circle, polygon…) with properties (coordinates, radius, fill colour, line colour, line width). Scales **without** losing quality.
 - **Sound size (bits) = sampling rate × sample resolution × duration (s) × channels.**
@@ -28,7 +28,8 @@ Digital data :: Data represented by discrete values; in a computer, binary value
 ADC :: Analogue-to-digital converter: samples an analogue signal at regular intervals and converts each measurement to a binary value. :: Turns a real-world wave into numbers.
 DAC :: Digital-to-analogue converter: converts digital values into a corresponding analogue signal (voltage) to reconstruct the waveform. :: Turns numbers back into a wave.
 Pixel :: Picture element: the smallest addressable element of a bitmapped image, a single colour. :: One dot of the image.
-Resolution :: The number of pixels in an image, given as width × height (or pixels per inch for a printed/displayed image). :: How many dots.
+Resolution :: The number of dots per inch, where a dot is a pixel (AQA definition); often used loosely to mean the size in pixels. :: How densely packed the dots are.
+Size in pixels :: The width of an image in pixels × its height in pixels. :: How many dots across × how many down.
 Colour depth :: The number of bits used to represent the colour of each pixel; n bits give 2ⁿ colours. :: How many colours each dot can be.
 Metadata :: Data about data: information stored with an image (e.g. width, height, colour depth) so that it can be displayed correctly. :: The image's label and settings.
 Vector graphic :: An image represented as a list of geometric objects and their properties, from which the image is drawn. :: A recipe for drawing the picture.
@@ -154,7 +155,8 @@ A **bitmap** is a grid of **pixels**; each pixel's colour is stored as a binary 
 
 ### Resolution and colour depth
 
-- **Size in pixels / resolution**: width × height, e.g. 1920 × 1080 = 2 073 600 pixels. (Resolution is also quoted as **pixels per inch**, ppi/dpi, which determines how sharp an image looks at a given physical size.)
+- **Size in pixels**: width × height, e.g. 1920 × 1080 = 2 073 600 pixels.
+- **Resolution**: the AQA specification defines it as the number of **dots per inch**, where a dot is a pixel (ppi/dpi). It decides how sharp an image looks at a given physical size. In everyday speech (and some exam questions) "resolution" is also used to mean the size in pixels, so read the question carefully.
 - **Colour depth**: bits per pixel. **n bits → 2ⁿ colours**: 1 bit → 2 (black and white), 8 bits → 256, 24 bits → about 16.7 million ("true colour": 8 bits each for red, green and blue).
 - More pixels or more bits per pixel → better quality **and** a bigger file.
 

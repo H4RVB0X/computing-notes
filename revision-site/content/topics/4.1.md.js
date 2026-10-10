@@ -329,7 +329,7 @@ Abstraction makes big problems **thinkable**. Decomposition makes them **shareab
 :::
 
 :::challenge
-1. Three suspects: A says "B did it", B says "C did it", C says "B is lying". Exactly one tells the truth. Who did it? Write a Python brute-force check.
+1. Three suspects: A says "B did it", B says "C did it", C says "B is lying". Exactly one of them is lying. Who did it? Write a Python brute-force check.
 2. Decompose "run a school sports day" into at least three levels. Mark one place where composition happens.
 3. Write `hcf` recursively. Argue that it terminates.
 4. For a sat-nav, list three details removed by representational abstraction and one example of problem reduction.

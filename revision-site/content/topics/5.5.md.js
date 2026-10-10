@@ -106,7 +106,7 @@ Use two's complement for the whole pattern: the MSB is negative.
 |---|---|---|---|---|---|---|---|---|
 | 1 | 0 | 1 | 0 | . | 1 | 1 | 0 | 0 |
 
-+5.25 = 0101.0100 → copy up to the first 1 (`0100`), invert the rest (0101 → 1010): **1010.1100**.
++5.25 = 0101.0100 → from the right, copy up to and including the first 1 (`100`), then invert everything to its left (`0101.0` → `1010.1`): **1010.1100**.
 Check: −8 + 2 + 0.5 + 0.25 = −5.25 ✓
 :::
 
@@ -361,7 +361,8 @@ The textbook says 011.111010000 = 3.78125. In fact 2 + 1 + ½ + ¼ + ⅛ + 1/32 
 ### Other sources of error
 
 - **Truncation vs rounding**: truncating simply drops bits (always rounds towards zero for positive values); rounding adds 1 if the first dropped bit is 1. Rounding usually halves the maximum error.
-- **Cancellation**: adding a tiny number to a huge one may change nothing, because the tiny one falls off the end of the mantissa when the exponents are aligned.
+- **Adding a tiny number to a huge one** may change nothing: when the exponents are aligned, the tiny number's bits are shifted off the end of the mantissa (sometimes called *absorption*).
+- **Cancellation error**: subtracting two nearly equal numbers cancels out their leading significant bits, so the result has very few significant bits left and its relative error can be large.
 
 ## Fixed point vs floating point
 

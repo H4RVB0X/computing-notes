@@ -50,7 +50,7 @@ CS.registerTrace({
     ["6", "1", "2", "-74"],
     ["7", "0", "1", "-74"],
   ],
-  instructions: "Fill in bits[i], the place value and total after each pass (total stays the same when the bit is 0).",
+  instructions: "Fill in bits[i], the place value and total after each pass (total stays the same when the bit is 0). Type negative numbers with the ordinary minus/hyphen key, e.g. -128.",
   hint: "n = 8, so the MSB weighs −2⁷ = −128 and the place values for i = 1…7 are 64, 32, 16, 8, 4, 2, 1.",
   note: "OUTPUT: **−74**. Check by negating: invert 10110110 → 01001001, add 1 → 01001010 = 74.",
 });
