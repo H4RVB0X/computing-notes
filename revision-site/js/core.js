@@ -283,7 +283,8 @@
         .toLowerCase()
         .replace(/\s+/g, " ")
         .replace(/[’‘]/g, "'")
-        .replace(/[“”]/g, '"');
+        .replace(/[“”]/g, '"')
+        .replace(/[\u2212\u2013\u2014]/g, "-");
     },
     /** compare a student answer with accepted answers (strings or numbers) */
     answerMatches(given, accepted) {
