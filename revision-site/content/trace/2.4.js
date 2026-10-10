@@ -12,6 +12,7 @@ CS.registerTrace({
     ["2", "", "", ""],
     ["3", "", "", ""],
     ["", "", "", ""],
+    ["end", "", "", ""],
   ],
   rows: [
     ["0", "2", "2", "2"],
@@ -19,6 +20,7 @@ CS.registerTrace({
     ["2", "2", "7", "2"],
     ["3", "1", "8", "1"],
     ["", "", "8", "4"],
+    ["end", "", "", "4"],
   ],
   hint: "Each row sum is the degree of that vertex. In an undirected graph every edge is counted twice (once in each direction), so the number of edges is total ÷ 2.",
   note: "The graph has 4 edges: 0–1, 0–2, 1–2, 1–3. Sum of degrees = 2 × edges is the handshake lemma.",

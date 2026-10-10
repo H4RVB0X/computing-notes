@@ -14,6 +14,7 @@ CS.registerTrace({
     ["1", "1", "", "", ""],
     ["1", "2", "", "", ""],
     ["", "", "", "", ""],
+    ["end", "", "", "", ""],
   ],
   rows: [
     ["0", "0", "3", "3", ""],
@@ -23,6 +24,7 @@ CS.registerTrace({
     ["1", "1", "1", "8", ""],
     ["1", "2", "9", "9", ""],
     ["", "", "", "9", "9"],
+    ["end", "", "", "", "9"],
   ],
   hint: "The inner loop (c) runs completely for each value of the outer loop (r). `best` only changes when the current element is strictly bigger.",
   note: "This is the standard 'find the maximum in a table' pattern. Starting `best` at 0 only works because every value is positive; starting it at `grid[0][0]` is safer.",
