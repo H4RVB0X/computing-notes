@@ -64,6 +64,21 @@
       nav.appendChild(group);
     });
     updateSidebarProgress();
+    renderSaveBadge();
+  }
+
+  /* small sidebar notice when memory-only mode is on */
+  function renderSaveBadge() {
+    let b = document.getElementById("save-badge");
+    if (CS.store.isSaving()) {
+      if (b) b.remove();
+      return;
+    }
+    if (!b) {
+      b = h("a", { id: "save-badge", class: "pill warn", href: "#/progress", style: "margin:0 8px 10px;align-self:flex-start", title: "Progress is not being saved on this device. Click to change." , text: "⏸ Not saving progress" });
+      const brand = document.querySelector(".sidebar .brand");
+      if (brand) brand.insertAdjacentElement("afterend", b);
+    }
   }
 
   function updateSidebarProgress() {
@@ -388,6 +403,17 @@
     if (nt) grid.appendChild(card("#/trace/" + id, "🔍", "Trace challenges", nt + " code-tracing tasks"));
     grid.appendChild(card("#/mock", "🎲", "Mixed mock", "random questions across topics"));
     wrap.appendChild(grid);
+    const resetRow = h("div", { class: "row small", style: "justify-content:flex-end;margin-top:8px" });
+    const resetBtn = h("button", { class: "btn sm ghost", type: "button", text: "↺ Reset my progress on this page", title: "Forget reading progress, quiz and exam scores, checklist ticks, trace results and flashcard boxes for this page only" });
+    resetBtn.addEventListener("click", () => {
+      if (!confirm("Reset your progress on " + id + " only? This forgets reading progress, quiz and exam scores, saved exam answers, checklist ticks, trace results and flashcard boxes for this page.")) return;
+      CS.progress.resetTopic(id);
+      updateSidebarProgress();
+      CS.toast("Progress on " + id + " reset");
+      route();
+    });
+    resetRow.appendChild(resetBtn);
+    wrap.appendChild(resetRow);
     return wrap;
   }
 
@@ -675,7 +701,25 @@
     });
     row.append(exportBtn, importBtn, importInput, resetBtn);
     card.appendChild(row);
+    card.appendChild(h("p", { class: "small muted", text: "To reset a single page, use the “Reset my progress on this page” button at the bottom of that page." }));
     main.appendChild(card);
+
+    const mem = h("div", { class: "card", style: "margin-top:16px" });
+    mem.innerHTML = "<h3 style='margin-top:0'>Memory on this device</h3><p class='small muted'>When saving is off, nothing is written to this browser: progress, scores, flashcard boxes and settings last only until you close or reload the tab. Turning it off also deletes what is already saved here (export a backup first if you want it). Useful on a shared or school computer.</p>";
+    const memLabel = h("label", { class: "row" }, [h("input", { type: "checkbox" }), h("span", { html: "<b>Save my progress on this device</b>" })]);
+    const memBox = memLabel.querySelector("input");
+    memBox.checked = CS.store.isSaving();
+    memBox.addEventListener("change", () => {
+      if (!memBox.checked && !confirm("Stop saving on this device and delete the progress already saved here?")) {
+        memBox.checked = true;
+        return;
+      }
+      CS.store.setSaving(memBox.checked);
+      renderSaveBadge();
+      CS.toast(memBox.checked ? "Progress will be saved on this device" : "Saving is off — progress lasts until you close the tab");
+    });
+    mem.appendChild(memLabel);
+    main.appendChild(mem);
 
     const prefs = h("div", { class: "card", style: "margin-top:16px" });
     prefs.innerHTML = "<h3 style='margin-top:0'>Display</h3>";

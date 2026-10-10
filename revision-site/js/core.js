@@ -89,7 +89,16 @@
     }
     return memStore;
   }
+  const NOSAVE_KEY = "cs-revision-nosave";
+  function noSave() {
+    try {
+      return localStorage.getItem(NOSAVE_KEY) === "1";
+    } catch (e) {
+      return false;
+    }
+  }
   function saveStore() {
+    if (noSave()) return; /* memory-only mode: progress lasts until the tab is closed */
     try {
       localStorage.setItem(KEY, JSON.stringify(memStore));
     } catch (e) {
@@ -116,6 +125,34 @@
       cur[parts[parts.length - 1]] = value;
       saveStore();
     },
+    /** delete a value (and tidy up empty parent objects) */
+    remove(path) {
+      const parts = path.split(".");
+      const chain = [loadStore()];
+      for (let i = 0; i < parts.length - 1; i++) {
+        const next = chain[i] && chain[i][parts[i]];
+        if (next == null || typeof next !== "object") return;
+        chain.push(next);
+      }
+      delete chain[chain.length - 1][parts[parts.length - 1]];
+      for (let i = chain.length - 1; i > 0; i--) if (Object.keys(chain[i]).length === 0) delete chain[i - 1][parts[i - 1]];
+      saveStore();
+    },
+    /** memory-only mode: nothing is written to this device */
+    isSaving() {
+      return !noSave();
+    },
+    setSaving(on) {
+      try {
+        if (on) {
+          localStorage.removeItem(NOSAVE_KEY);
+          saveStore();
+        } else {
+          localStorage.setItem(NOSAVE_KEY, "1");
+          localStorage.removeItem(KEY);
+        }
+      } catch (e) {}
+    },
     update(path, fn, fallback) {
       const v = CS.store.get(path, fallback);
       CS.store.set(path, fn(v));
@@ -140,6 +177,17 @@
 
   /* ---------- progress helpers ---------- */
   CS.progress = {
+    /** forget everything recorded for one page: reading, quiz, exam, checklist, traces, flashcards */
+    resetTopic(id) {
+      CS.store.remove("topics." + id);
+      CS.store.remove("exam." + id);
+      CS.store.remove("examAnswers." + id);
+      const meta = CS.topicMeta ? CS.topicMeta(id) : null;
+      ((meta && meta.specPoints) || []).forEach((p) => CS.store.remove("checklist." + p.id));
+      (CS.tracesByTopic[id] || []).forEach((t) => CS.store.remove("trace." + t));
+      if (CS.flash) CS.flash.cardsFor(id).forEach((c) => CS.store.remove("flash." + c.id));
+      if (CS.store.get("lastTopic") === id) CS.store.remove("lastTopic");
+    },
     markViewed(id) {
       CS.store.set("topics." + id + ".viewed", Date.now());
       CS.store.set("lastTopic", id);

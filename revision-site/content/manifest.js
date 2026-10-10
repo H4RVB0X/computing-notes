@@ -13,6 +13,7 @@ CS.manifest = [
   "tools/call-stack-visualiser.js",
   "tools/cipher-tool.js",
   "tools/compression-tool.js",
+  "tools/dns-resolver.js",
   "tools/error-checking.js",
   "tools/fde-stepper.js",
   "tools/floating-point.js",
