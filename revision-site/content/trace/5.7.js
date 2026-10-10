@@ -1,0 +1,48 @@
+CS.registerTrace({
+  id: "5.7-1",
+  topic: "5.7",
+  title: "Image and sound storage calculations",
+  lang: "text",
+  code: "Bitmap bits = width × height × colour depth\nSound bits  = sampling rate × sample resolution × seconds × channels\nBytes = bits ÷ 8",
+  intro: "Complete each calculation. Give plain numbers without commas or units.",
+  columns: ["Scenario", "Total bits", "Total bytes"],
+  prefill: [
+    ["Bitmap 800 × 600, 12-bit colour", "", ""],
+    ["Bitmap 640 × 480, 8-bit colour", "", ""],
+    ["Bitmap 1920 × 1080, 24-bit colour", "", ""],
+    ["Sound 8000 Hz, 8-bit, mono, 10 s", "", ""],
+    ["Sound 44000 Hz, 16-bit, stereo, 300 s", "", ""],
+    ["Sound 44100 Hz, 16-bit, stereo, 180 s", "", ""],
+  ],
+  rows: [
+    ["Bitmap 800 × 600, 12-bit colour", "5760000", "720000"],
+    ["Bitmap 640 × 480, 8-bit colour", "2457600", "307200"],
+    ["Bitmap 1920 × 1080, 24-bit colour", "49766400", "6220800"],
+    ["Sound 8000 Hz, 8-bit, mono, 10 s", "640000", "80000"],
+    ["Sound 44000 Hz, 16-bit, stereo, 300 s", "422400000", "52800000"],
+    ["Sound 44100 Hz, 16-bit, stereo, 180 s", "254016000", "31752000"],
+  ],
+  instructions: "Type digits only (no commas or spaces).",
+  hint: "Stereo means × 2. Divide bits by 8 for bytes.",
+  note: "In kB (1000 bytes): 720, 307.2, 6220.8, 80, 52 800 and 31 752. Real files are slightly larger because of metadata/headers.",
+});
+
+CS.registerTrace({
+  id: "5.7-2",
+  topic: "5.7",
+  title: "ADC quantisation with a 3-bit sample resolution",
+  lang: "text",
+  code: "Input range 0 V to 7 V, 3-bit resolution → 8 levels (0 to 7)\nEach sample is rounded to the nearest level and stored as 3 bits.",
+  columns: ["Sample", "Measured voltage", "Nearest level (denary)", "Stored 3-bit code"],
+  prefill: [["1", "2.3", "", ""], ["2", "5.8", "", ""], ["3", "6.6", "", ""], ["4", "4.1", "", ""], ["5", "1.4", "", ""], ["6", "0.4", "", ""]],
+  rows: [
+    ["1", "2.3", "2", "010"],
+    ["2", "5.8", "6", "110"],
+    ["3", "6.6", "7", "111"],
+    ["4", "4.1", "4", "100"],
+    ["5", "1.4", "1", "001"],
+    ["6", "0.4", "0", "000"],
+  ],
+  hint: "Round to the nearest whole volt, then write it as 3-bit binary.",
+  note: "The difference between each measured voltage and its level (e.g. 0.3 V for sample 1) is the quantisation error. More bits per sample → more, finer levels → smaller error.",
+});

@@ -1,0 +1,28 @@
+CS.registerTrace({
+  id: "4.6-1",
+  topic: "4.6",
+  title: "Counting a triangle-shaped nested loop (n = 4)",
+  lang: "pseudocode",
+  code: "n ← 4\ncount ← 0\nFOR i ← 1 TO n\n  FOR j ← i TO n\n    count ← count + 1\n  ENDFOR\nENDFOR\nOUTPUT count",
+  intro: "Count how many times the inner statement runs. This is how you derive the time complexity of nested loops.",
+  columns: ["i", "j takes the values", "Inner iterations this pass", "count after this pass"],
+  prefill: [["1", "1 to 4", "", ""], ["2", "2 to 4", "", ""], ["3", "3 to 4", "", ""], ["4", "4 to 4", "", ""]],
+  rows: [["1", "1 to 4", "4", "4"], ["2", "2 to 4", "3", "7"], ["3", "3 to 4", "2", "9"], ["4", "4 to 4", "1", "10"]],
+  instructions: "Fill in the number of inner iterations for each value of i and the running total of count.",
+  hint: "The inner loop starts at i, so it gets one shorter on each pass of the outer loop.",
+  note: "OUTPUT **10** = 4 + 3 + 2 + 1 = n(n + 1)/2. In general that is ½n² + ½n, so the algorithm is **O(n²)**, even though it does about half the work of a full n × n nested loop.",
+});
+CS.registerTrace({
+  id: "4.6-2",
+  topic: "4.6",
+  title: "A halving loop (n = 20)",
+  lang: "pseudocode",
+  code: "n ← 20\nsteps ← 0\nWHILE n > 1\n  n ← n DIV 2\n  steps ← steps + 1\nENDWHILE\nOUTPUT steps",
+  intro: "`DIV` is integer division (the remainder is thrown away).",
+  columns: ["Iteration", "n before", "n after (n DIV 2)", "steps"],
+  prefill: [["1", "", "", ""], ["2", "", "", ""], ["3", "", "", ""], ["4", "", "", ""]],
+  rows: [["1", "20", "10", "1"], ["2", "10", "5", "2"], ["3", "5", "2", "3"], ["4", "2", "1", "4"]],
+  instructions: "Trace the loop until the condition n > 1 is False.",
+  hint: "5 DIV 2 = 2, not 2.5.",
+  note: "OUTPUT **4**. log₂ 20 ≈ 4.3, and the loop ran ⌊log₂ 20⌋ = 4 times. Doubling n to 40 would add just **one** iteration: this loop is **O(log n)**.",
+});

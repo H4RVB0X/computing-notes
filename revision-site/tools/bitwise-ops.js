@@ -120,7 +120,7 @@ CS.registerTool({
         html += "<p><b>Logical shift " + (left ? "left" : "right") + " by " + s + "</b>: every bit moves " + s + " place" + (s === 1 ? "" : "s") + " " + (left ? "left" : "right") + ". The " + s + " bit" + (s === 1 ? "" : "s") + " pushed off the " + (left ? "left" : "right") + " end <span style='color:var(--bad)'>(red, struck through: " + (lost || "none") + ")</span> are lost, and " + s + " zero" + (s === 1 ? "" : "s") + " <span style='color:var(--ok)'>(green)</span> fill in on the " + (left ? "right" : "left") + ".</p>";
         if (left) {
           html += lostOnes
-            ? "<p class=bad-text style="color:var(--bad);font-weight:600">A 1 fell off the left, so the result is <b>not</b> " + A + " × 2<sup>" + s + "</sup> = " + A * 2 ** s + " (it does not fit in " + n + " bits). The " + n + "-bit result is " + r + " = " + A * 2 ** s + " MOD " + 2 ** n + ".</p>"
+            ? "<p class=bad-text style='color:var(--bad);font-weight:600'>A 1 fell off the left, so the result is <b>not</b> " + A + " × 2<sup>" + s + "</sup> = " + A * 2 ** s + " (it does not fit in " + n + " bits). The " + n + "-bit result is " + r + " = " + A * 2 ** s + " MOD " + 2 ** n + ".</p>"
             : "<p class=ok-text>Shifting left " + s + " place" + (s === 1 ? "" : "s") + " multiplies by 2<sup>" + s + "</sup> = " + 2 ** s + ": " + A + " × " + 2 ** s + " = " + r + ".</p>";
         } else {
           html += "<p class=ok-text>Shifting right " + s + " place" + (s === 1 ? "" : "s") + " divides by 2<sup>" + s + "</sup> = " + 2 ** s + " and discards the remainder: " + A + " DIV " + 2 ** s + " = " + r + (lostOnes ? " (remainder " + (A % 2 ** s) + " lost — the bits that fell off)" : " (exact — only 0s fell off)") + ".</p>";

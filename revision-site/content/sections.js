@@ -384,7 +384,7 @@ CS.sections = [
   },
   {
     id: "13", spec: "4.13", title: "Systematic approach to problem solving", short: "Problem solving",
-    blurb: "Analysis, design, implementation, testing and evaluation — the software development lifecycle the NEA follows. Paper 2.",
+    blurb: "Analysis, design, implementation, testing and evaluation — the software development lifecycle the NEA follows. Paper 1.",
     topics: [
       { id: "13.1", title: "Analysis, design, implementation, testing and evaluation", spec: ["4.13.1.1", "4.13.1.2", "4.13.1.3", "4.13.1.4", "4.13.1.5"], specPoints: [
         { id: "4.13.1.1", text: "Analysis: define the problem, establish requirements by interaction with intended users, create a data model; prototyping/agile approaches" },
@@ -406,6 +406,49 @@ CS.sections = [
         { id: "NEA.4", text: "Produce a documented design: data structures, algorithms, modular structure, UI, validation, database design" },
         { id: "NEA.5", text: "Develop a technical solution that is complete, well-structured and demonstrates skills in the top band" },
         { id: "NEA.6", text: "Plan and evidence testing against the objectives, and evaluate honestly with end-user feedback" } ] },
+    ],
+  },
+  {
+    id: "P", spec: "", title: "Paper 1 skeleton program: Piles O' Tiles", short: "Skeleton: Piles O' Tiles",
+    blurb: "Everything for the 2027 Paper 1 preliminary material: the game, every method explained, the bugs AQA left in, predicted Section C questions, Section D modifications with tested model answers, and Section B practice programs.",
+    topics: [
+      { id: "P.1", title: "Paper 1 overview and exam strategy", spec: ["7517/1"], specPoints: [
+        { id: "P.1a", text: "Know the structure of Paper 1 (Sections A–D, marks and timing) and what each EAD question slot is likely to be" },
+        { id: "P.1b", text: "Know how Section D code and screenshot answers are marked, and how to avoid losing those marks" } ] },
+      { id: "P.2", title: "The game and the code: a method-by-method tour", spec: ["7517/1"], specPoints: [
+        { id: "P.2a", text: "Explain the rules of Piles O' Tiles and how they are implemented" },
+        { id: "P.2b", text: "Draw and explain the class diagram (aggregation, private vs protected attributes, encapsulation)" },
+        { id: "P.2c", text: "Explain the purpose of every subroutine and trace the program flow from Main() to the end of a game" },
+        { id: "P.2d", text: "Read and write the game file format and trace how LoadGame builds each pile" },
+        { id: "P.2e", text: "Convert between (x, y) coordinates and list indices with __GetIndex and its inverse" } ] },
+      { id: "P.3", title: "Bugs, weaknesses and unused features", spec: ["7517/1"], specPoints: [
+        { id: "P.3a", text: "Identify and explain every bug, missing validation and unused feature in the skeleton, and how to fix each" } ] },
+      { id: "P.4", title: "Section C: questions about the skeleton", spec: ["7517/1"], specPoints: [
+        { id: "P.4a", text: "Answer identify / explain / trace questions on the skeleton code using precise technical vocabulary" } ] },
+      { id: "P.5", title: "Section D: practice modifications", spec: ["7517/1"], specPoints: [
+        { id: "P.5-validate", text: "Validate the pile coordinates (done unaided and tested)" },
+        { id: "P.5-menu", text: "Accept lowercase and reject invalid menu choices (done unaided and tested)" },
+        { id: "P.5-winner", text: "Announce a draw for any number of players (done unaided and tested)" },
+        { id: "P.5-loadfix", text: "Fix the failed-load MaxScore bug (done unaided and tested)" },
+        { id: "P.5-extra", text: "Extra turn after a match (done unaided and tested)" },
+        { id: "P.5-bonus", text: "Use the pile bonus (done unaided and tested)" },
+        { id: "P.5-stalemate", text: "End the game after 10 turns without a match (done unaided and tested)" },
+        { id: "P.5-peek", text: "Peek power-up costing 1 point (done unaided and tested)" },
+        { id: "P.5-save", text: "Save the game to a file (done unaided and tested)" },
+        { id: "P.5-computer", text: "Computer player with a memory (done unaided and tested)" },
+        { id: "P.5-wild", text: "Wild tiles with inheritance and polymorphism (done unaided and tested)" },
+        { id: "P.5-points", text: "Require equal points as well as the same symbol for a match (done unaided and tested)" },
+        { id: "P.5-penalty", text: "Penalty of 1 point for choosing an empty pile, never below 0 (done unaided and tested)" },
+        { id: "P.5-players", text: "Choose the number of players and their names (done unaided and tested)" },
+        { id: "P.5-matched", text: "Show each player's matched symbols (done unaided and tested)" },
+        { id: "P.5-sortdiscard", text: "Display the discard in alphabetical order using your own sort (done unaided and tested)" },
+        { id: "P.5-symbols", text: "Count the symbols left on the board with a dictionary (done unaided and tested)" },
+        { id: "P.5-bonusempty", text: "Award a pile's bonus only when it is emptied (done unaided and tested)" },
+        { id: "P.5-align", text: "Line up the board display for 10+ tiles and grids wider than 9 (done unaided and tested)" },
+        { id: "P.5-endtop", text: "Rewrite Pile to use the end of the list as the top without changing behaviour (done unaided and tested)" },
+        { id: "P.5-shuffle", text: "Shuffle-the-board option costing 2 points (done unaided and tested)" } ] },
+      { id: "P.6", title: "Section B: writing a new program", spec: ["7517/1"], specPoints: [
+        { id: "P.6a", text: "Write a short standalone program from a specification, with validation, and evidence it with a test" } ] },
     ],
   },
   {

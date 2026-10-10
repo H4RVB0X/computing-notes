@@ -51,7 +51,7 @@ A systematic approach breaks development into stages so that each question is an
 | **Evaluation** | How *well* does it meet the need, and what next? | Evaluation against requirements, user feedback, improvements |
 
 :::spec
-Section 4.13 is examined on **Paper 2**. The spec says "be aware" for most of it, so questions are usually short (1–4 marks): define a stage, name a requirements-gathering method, choose test data, explain acceptance testing. The same stages structure your [NEA project](#/topic/14.1).
+In AQA's scheme of assessment the skills of section 4.13 are listed under **Paper 1** (the on-screen exam, alongside sections 4.1–4.4), and they also underpin the NEA. (The site's section heading says Paper 2; if in doubt, check the current specification.) The spec says "be aware" for most of it, so questions are usually short (1–4 marks): define a stage, name a requirements-gathering method, choose test data, explain acceptance testing. The same stages structure your [NEA project](#/topic/14.1).
 :::
 
 :::figure The waterfall model: each stage feeds the next; dashed arrows show going back when a problem is found
@@ -247,7 +247,7 @@ After each iteration the librarian uses the working version and gives feedback, 
 - **Spiral model**: repeated loops of *plan → risk analysis → engineering → evaluation*; each loop explicitly identifies and reduces the biggest risk. Suits large, high-risk projects.
 - **Rapid application development (RAD)**: build prototypes quickly (often with reusable components and tools), get user feedback in workshops, and time-box each phase. Suits projects where speed matters and users are available.
 - **Extreme programming (XP)**: an agile method with pair programming, test-first development and very frequent releases.
-- The spec only asks you to be aware of **prototyping/agile** versus a stage-by-stage approach, so in Paper 2 that is the comparison to make.
+- The spec only asks you to be aware of **prototyping/agile** versus a stage-by-stage approach, so in the written exam that is the comparison to make.
 :::
 
 :::trap

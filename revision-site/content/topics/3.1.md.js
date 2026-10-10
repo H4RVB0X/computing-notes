@@ -115,7 +115,7 @@ The order of the visited list is the **depth-first order**.
 - **Pop only when stuck.** In the hand method a vertex stays on the stack until *all* its neighbours are visited. Popping straight after visiting gives the wrong backtracking.
 - **Check the visited list before every push.** Re-visiting a vertex is the most common error and usually means the stack never empties.
 - **Alphabetical order** is a convention, not part of the algorithm. If the question gives a different order (e.g. "neighbours in the order listed"), follow the question.
-- Different implementations can give **different valid DFS orders**. The "push every unvisited neighbour at once, then pop" version used on the Isaac page visits Graph 1 as A, G, E, D, F, C, H, B. In an exam, always follow the algorithm or rule you are given.
+- Different implementations can give **different valid DFS orders**. The "push every unvisited neighbour at once (marking each as visited when pushed), then pop" version visits Graph 1 in the order A, G, E, D, F, C, H, B. In an exam, always follow the algorithm or rule you are given.
 :::
 
 ### DFS in code
