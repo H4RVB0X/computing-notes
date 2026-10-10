@@ -1,0 +1,28 @@
+CS.registerTrace({
+  id: "4.8-1",
+  topic: "4.8",
+  title: "Bit inverter on 101",
+  lang: "text",
+  code: "δ(S0, 0) = (S0, 1, R)\nδ(S0, 1) = (S0, 0, R)\nδ(S0, □) = (H, □, L)\n\nStart state S0, head on cell 0.\nTape:  1 0 1 □ □ …\ncell:  0 1 2 3 4",
+  intro: "Trace the bit inverter. Each row is one step: the state and head position **before** the step, then what the rule does.",
+  columns: ["Step", "State", "Head (cell)", "Read", "Write", "Move", "Next state", "Tape cells 0-2 after"],
+  prefill: [["1", "S0", "0", "", "", "", "", ""], ["2", "", "", "", "", "", "", ""], ["3", "", "", "", "", "", "", ""], ["4", "", "", "□", "□", "", "", ""]],
+  rows: [["1", "S0", "0", "1", "0", "R", "S0", "001"], ["2", "S0", "1", "0", "1", "R", "S0", "011"], ["3", "S0", "2", "1", "0", "R", "S0", "010"], ["4", "S0", "3", "□", "□", "L", "H", "010"]],
+  instructions: "Fill in every cell. Write the tape as three symbols with no spaces, e.g. 001.",
+  hint: "Write first, then move. After step 3 the head is on cell 3, which is blank.",
+  note: "The machine enters H, which has no transitions, so it **halts** with **010** on the tape (the inverse of 101) and the head back on cell 2.",
+});
+CS.registerTrace({
+  id: "4.8-2",
+  topic: "4.8",
+  title: "What does this machine do? (input 1011)",
+  lang: "text",
+  code: "δ(S1, 0) = (S3, 0, R)\nδ(S1, 1) = (S2, 1, R)\nδ(S1, □) = (S5, □, R)\nδ(S2, 0) = (S2, 0, R)\nδ(S2, 1) = (S3, 1, R)\nδ(S2, □) = (S4, 0, R)\nδ(S3, 0) = (S3, 0, R)\nδ(S3, 1) = (S2, 1, R)\nδ(S3, □) = (S4, 1, R)\n\nStart state S1, head on cell 0. Tape: 1 0 1 1 □ …",
+  intro: "This machine (from the Isaac page in your notes) only ever moves right. Trace it on **1011**, then work out its purpose.",
+  columns: ["Step", "Current state", "Head (cell)", "Symbol read", "Next state", "Whole tape after step"],
+  prefill: [["1", "S1", "0", "", "", ""], ["2", "", "", "", "", ""], ["3", "", "", "", "", ""], ["4", "", "", "", "", ""], ["5", "", "", "□", "", ""]],
+  rows: [["1", "S1", "0", "1", "S2", "1011"], ["2", "S2", "1", "0", "S2", "1011"], ["3", "S2", "2", "1", "S3", "1011"], ["4", "S3", "3", "1", "S2", "1011"], ["5", "S2", "4", "□", "S4", "10110"]],
+  instructions: "Fill in each step. Ignore trailing blanks when writing the tape.",
+  hint: "Only the last step changes the tape. S4 and S5 have no rules, so they are halting states.",
+  note: "It halts in S4 with **10110**. S2 means \"an odd number of 1s read so far\" and S3 means \"even\". At the end it writes 0 (if odd) or 1 (if even), so the finished string always has an **odd** number of 1s: it appends an **odd parity bit**.",
+});

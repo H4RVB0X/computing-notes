@@ -86,6 +86,10 @@ The textbook answer in your notes says "the codomain is the subset" and gives co
 | **Exponential** | y = aˣ (a > 1) | y = 2ˣ | by multiplying: each +1 to x **doubles** y |
 | **Logarithmic** | y = logₐ x | y = log₂ x | ever more slowly: doubling x adds just 1 |
 
+:::trap Marks are lost here
+The Isaac page in your notes says a polynomial graph is always a "symmetrical curve". Only some are (y = x² is symmetrical about the y-axis). y = x³ − x² is a polynomial with no symmetry at all. What matters here is the **growth rate**: a polynomial's highest power k fixes how fast it grows.
+:::
+
 **log₂ n** is "how many times can I halve n before I reach 1?". log₂ 8 = 3 because 2³ = 8; log₂ 1024 = 10. Logarithms are the **inverse** of exponentials, which is why halving algorithms are logarithmic.
 
 ### Permutations and n!
