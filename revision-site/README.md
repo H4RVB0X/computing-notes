@@ -4,11 +4,40 @@ A complete, offline revision site covering every section of the AQA 7517 specifi
 the NEA. Notes, worked examples, quizzes, exam-style questions with mark schemes, flashcards with spaced
 repetition, trace-table challenges and interactive tools — all in plain HTML/CSS/JS.
 
+## What's inside
+
+| | Count |
+|---|---|
+| Pages of notes (sections 1–14, reference R.1–R.3, Piles O' Tiles P.1–P.6) | 79 |
+| AQA spec points mapped (see `../COVERAGE.md`) | 283, all covered |
+| Quiz questions (MCQ, short answer, true/false, ordering, spot-the-error) | 1,585 |
+| Exam-style questions with self-marking mark schemes | 584 |
+| Flashcards (plus every key term automatically) | 700 |
+| Trace-table challenges | 89 |
+| Interactive tools | 41 |
+
+**Paper 1 skeleton: Piles O' Tiles (section P).** Built from the 2027 preliminary material and the class prep page:
+- P.1–P.4: paper strategy, a method-by-method code tour, the bugs and weaknesses, and 58 Section C questions.
+- P.5: 21 Section D modification tasks with hints, tested model answers and screenshot tests.
+- P.6: 10 Section B practice programs.
+- `pot-console`: a faithful in-browser copy of the game (matched against the real Python in 61 test runs), with switches for the model-answer fixes.
+
+The preliminary material is for candidates at the centre only. Keep the site link within the class.
+
 ## Open it
 
 Double-click **`revision-site/index.html`** (or drag it into a browser). No server, no build step, no internet.
 Works in Chrome, Edge, Firefox and Safari. Progress (quiz scores, flashcard boxes, checklist ticks, mock history)
 is saved in the browser's localStorage for that file; use **Progress & settings → Export** to back it up.
+
+**Memory controls.**
+- Each page has a *Reset my progress on this page* button at the bottom.
+- *Progress & settings* has a **Save my progress on this device** switch. When it's off, nothing is written to the browser, which is handy on shared school PCs.
+- *Progress & settings* also has Export, Import and Reset all.
+
+Accounts (cross-device sync) are not built yet. The proposed design (Firebase + Google sign-in) is in `docs/accounts-plan.md`.
+
+**Hosting on GitHub Pages.** The site is static, so Pages can serve the `revision-site/` folder as is. A Pages site is publicly reachable even when the repository is private.
 
 Keyboard: `/` focuses search · in flashcards `space` flips, `1` = not yet, `2` = got it.
 
@@ -41,7 +70,7 @@ revision-site/
 └── README.md               this file
 ```
 
-Page ids are the numbers you see in the sidebar (`1.1` … `14.2`, `R.1` … `R.3`).
+Page ids are the numbers you see in the sidebar (`1.1` … `14.2`, `R.1` … `R.3`, `P.1` … `P.6`).
 
 ## Adding or editing notes
 
@@ -63,7 +92,7 @@ To add quiz questions: edit `content/quizzes/<id>.js` — the question formats a
 cd revision-site
 python3 dev/build_manifest.py        # rescan content/ and tools/ and rewrite manifest.js
 python3 dev/check_content.py         # validates every file: schema, balanced blocks, links, trace shapes
-python3 dev/run_python_snippets.py   # runs every ```python block in the notes
+python3 dev/run_python_snippets.py   # runs every Python example and checks it against its output block
 node dev/smoke_test.js               # headless Chromium: visits every page/tool and reports console errors
 python3 dev/build_coverage.py        # regenerates ../COVERAGE.md from sections.js + the content folders
 ```
