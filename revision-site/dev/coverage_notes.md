@@ -1,7 +1,8 @@
 ## How the content was checked
 
 - Every page was written from the AQA 7517 specification and the notes in `Notes/`. Every worked example, trace table, quiz key and mark scheme was **recomputed with code** (Python, sqlite3, `re`, the real Piles O' Tiles skeleton, an AQA assembly interpreter) or traced by hand where code can't run (Haskell).
-- An **independent reviewer** (not the author) re-checked every section. 7.1–7.3 and 11–14 are checked; 1–10 are checked except 7.4/7.5 and 10.x (in progress at the time of writing); R and P are in progress.
+- An **independent reviewer** (not the author) re-checked every page: sections 1–14, R and P. They recomputed examples, ran SQL in sqlite3, ran regexes and state machines, ran the real skeleton for P, and brute-forced Boolean identities. About 25 errors were found and fixed, for example an Amdahl's law figure (4.71×, not 4.85×), AQA's definitions of image size vs resolution, ZIP using DEFLATE not LZW, a fixed-point shortcut, a two-answer logic puzzle, and a few wrong trace labels.
+- `dev/run_python_snippets.py` now also compares each example's real output with the output block shown on the page (188 runnable examples, all matching).
 - Every runnable Python block on the site is executed by `dev/run_python_snippets.py`. Every page, quiz, exam set, flashcard deck, trace and tool is loaded by `dev/smoke_test.js` (Playwright, desktop and 360px mobile), which checks for console errors and missing tools.
 
 ## Gaps in the notes filled from own knowledge
@@ -29,6 +30,7 @@ The full list is in each section's trap boxes.
 
 - **NEA (14.1):** the mark split (Analysis 9, Design 12, Completeness 15, Techniques 27, Testing 8, Evaluation 4) and the Group A/B/C technique tables were reproduced from memory. A reviewer confirmed them, but the page still says "check current AQA guidance".
 - **Consequences (8.x):** law that is being phased in or is recent: the Data (Use and Access) Act 2025 commencement, the EU AI Act dates, Getty v Stability AI (2025), the UK Advanced Data Protection withdrawal ("reportedly"). Statistics (data-centre energy, e-waste) are approximate.
+- **Exam papers (R.3):** section 4.12 (functional programming) is listed under Paper 2 along with 4.5–4.11, marked "(check)". Confirm against the current AQA specification.
 - **Pseudocode (1.x, R.1):** AQA has no official syntax for CASE, records, try/except or date handling, so these are labelled. `^` is used for exponent. SUBSTRING is taken as 0-indexed with the end included; students are told to follow the question's definition.
 - **Data representation (5.x):**
   - kB = 1000 vs 1024 when a question doesn't say ("usually either, if consistent").
