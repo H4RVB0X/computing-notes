@@ -94,6 +94,7 @@ python3 scripts/build_manifest.py        # rescan content/ and tools/ and rewrit
 python3 scripts/check_content.py         # validates every file: schema, balanced blocks, links, trace shapes
 python3 scripts/run_python_snippets.py   # runs every Python example and checks it against its output block
 node scripts/smoke_test.js               # headless Chromium: visits every page/tool and reports console errors
+node scripts/check_quiz_balance.js       # flags MCQs whose correct option is noticeably the longest
 python3 scripts/build_coverage.py        # regenerates ../COVERAGE.md from sections.js + the content folders
 ```
 (`node scripts/smoke_test.js` needs the `playwright` npm package; the other scripts need only Python 3.)

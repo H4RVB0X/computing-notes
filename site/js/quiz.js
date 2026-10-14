@@ -45,9 +45,11 @@
       const options = type === "truefalse" ? ["True", "False"] : q.options;
       const multi = Array.isArray(q.answer);
       const answerSet = new Set(multi ? q.answer : [q.answer]);
-      // keep options order (authors control distractor placement) unless q.shuffle
+      // shuffle MCQ options every time (so the answer's position gives nothing away), unless the
+      // author opts out or an option refers to the others ("All of the above", "Both A and B"…)
       let order = options.map((o, i) => i);
-      if (q.shuffle) order = U.shuffle(order);
+      const refersToOthers = options.some((o) => /\b(all|none|both|neither) of the (above|others)\b|\b(both|neither) [A-D] (and|nor) [A-D]\b|\boptions? [A-D]\b/i.test(String(o)));
+      if (type === "mcq" && q.shuffle !== false && !refersToOthers) order = U.shuffle(order);
       const opts = h("div", { class: "opts", role: multi ? "group" : "radiogroup" });
       const selected = new Set();
       const btns = [];
