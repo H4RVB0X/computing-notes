@@ -3,7 +3,7 @@
  *
  * A question is FLAGGED when the correct option is more than 15% longer (in visible characters) than the
  * longest wrong option. Per file, the share of MCQs whose answer is the longest option at all should stay
- * near chance (target ≤ 40%).
+ * near chance: files with 8+ MCQs are warned if it is above 40% or below 15% ("never the longest" is also a tell).
  *
  * Usage:  node scripts/check_quiz_balance.js            summary for every quiz file
  *         node scripts/check_quiz_balance.js 7.5 P.3    list the flagged questions in those files
@@ -40,8 +40,9 @@ for (const f of fs.readdirSync(path.join(root, "content", "quizzes")).sort()) {
 for (const r of rows) {
   if (only.length && !only.includes(r.id)) continue;
   const pct = r.mcq ? Math.round((100 * r.longest) / r.mcq) : 0;
-  if (only.length || r.flagged.length || pct > 40)
-    console.log(`${r.id.padEnd(5)} MCQs ${String(r.mcq).padStart(3)} · answer longest ${String(pct).padStart(3)}% · flagged ${r.flagged.length}`);
+  const skew = r.mcq >= 8 && (pct > 40 || pct < 15) ? (pct > 40 ? "  ⚠ answer too often the longest" : "  ⚠ answer almost never the longest (also a tell)") : "";
+  if (only.length || r.flagged.length || skew)
+    console.log(`${r.id.padEnd(5)} MCQs ${String(r.mcq).padStart(3)} · answer longest ${String(pct).padStart(3)}% · flagged ${r.flagged.length}${skew}`);
   if (only.length) r.flagged.forEach((x) => console.log(`   Q${x.n}: answer ${x.a} chars vs longest wrong ${x.maxWrong} — ${x.q}`));
 }
 console.log(`\nTOTAL: ${mcqTotal} single-answer MCQs · answer is longest in ${Math.round((100 * longestTotal) / mcqTotal)}% (chance ≈ 25%) · flagged ${flaggedTotal}`);
