@@ -31,6 +31,8 @@ jobs:
         run: python3 scripts/check_content.py
       - name: Run every Python example and compare with its shown output
         run: python3 scripts/run_python_snippets.py
+      - name: Check multiple-choice answers don't give themselves away by length
+        run: node scripts/check_quiz_balance.js
 
   deploy:
     needs: check
