@@ -16,20 +16,20 @@ Use mark-scheme wording for definitions, then translate to plain English.
 ## 1. Where files go and how they load
 
 ```
-revision-site/
+site/
   index.html                 shell (do not edit for content)
   content/sections.js        site map: sections → topic ids/titles/spec points (do NOT add topics here without instruction)
-  content/manifest.js        AUTO-GENERATED list of files to load — run  python3 dev/build_manifest.py
+  content/manifest.js        AUTO-GENERATED list of files to load — run  python3 scripts/build_manifest.py
   content/topics/<id>.md.js  notes for one topic (markdown inside a JS comment)
   content/quizzes/<id>.js    quiz questions for one topic
   content/exam/<id>.js       exam-style questions with mark schemes
   content/flashcards/<id>.js extra flashcards (key terms are ALSO turned into cards automatically)
   content/trace/<id>.js      trace-table challenges
   tools/<tool-id>.js         one interactive tool per file
-  dev/build_manifest.py      regenerate manifest.js
-  dev/check_content.py       validator — run it before you finish, fix every ERROR, read the WARNs
-  dev/run_python_snippets.py executes every ```python block in the topic files
-  dev/smoke_test.js          headless Chromium click-through (node dev/smoke_test.js)
+  scripts/build_manifest.py      regenerate manifest.js
+  scripts/check_content.py       validator — run it before you finish, fix every ERROR, read the WARNs
+  scripts/run_python_snippets.py executes every ```python block in the topic files
+  scripts/smoke_test.js          headless Chromium click-through (node scripts/smoke_test.js)
 ```
 
 Topic ids (e.g. `2.3`, `R.1`) come from `content/sections.js`. The id in the file name must match the id
@@ -130,7 +130,7 @@ Use inline SVG for anything spatial: architectures, data structures, FSMs, trees
 
 ### 2.6 Code
 
-- Python 3 code must be **correct and runnable** (`dev/run_python_snippets.py` executes it). Print outputs and show them as `# 42` comments or a following ```` ```output ```` block. Never call `input()` in a checked block; if you must, mark the fence ```` ```python nocheck ````.
+- Python 3 code must be **correct and runnable** (`scripts/run_python_snippets.py` executes it). Print outputs and show them as `# 42` comments or a following ```` ```output ```` block. Never call `input()` in a checked block; if you must, mark the fence ```` ```python nocheck ````.
 - Pseudocode follows AQA style: `←` assignment, `IF … THEN … ELSE … ENDIF`, `WHILE … ENDWHILE`, `FOR i ← 0 TO 9 … ENDFOR`, `REPEAT … UNTIL`, `SUBROUTINE name(params) … ENDSUBROUTINE`, `RETURN`, `OUTPUT`, `USERINPUT`, `DIV`, `MOD`, `LEN()`, `POSITION()`, `SUBSTRING()`, 0-indexed arrays `a[0]`.
 - When a construct matters for the exam, show **both** pseudocode and Python in a `::::tabs` block.
 - Keep snippets short (≤ 30 lines) and focused.
@@ -238,18 +238,18 @@ Rules:
 - Must work in both themes, at 360px width (controls wrap), with keyboard (real `<button>`s, labelled inputs).
 - **Show the working.** Every tool should explain *what just happened* in exam language (e.g. a log line "pop(): not empty → item ← stack[2]"). Step controls (◀ ▶ ▶▶ Reset) for anything algorithmic, with a comparison/swap counter where relevant.
 - Validate input and show a friendly `.err` message instead of throwing. Never let an exception escape `mount`.
-- Keep each tool self-contained in one file ≤ ~600 lines. Test it with `node dev/smoke_test.js`.
+- Keep each tool self-contained in one file ≤ ~600 lines. Test it with `node scripts/smoke_test.js`.
 
 ---
 
 ## 8. Before you finish (every agent)
 
 ```bash
-cd revision-site
-python3 dev/build_manifest.py          # picks up your new files
-python3 dev/check_content.py           # must report 0 errors for YOUR files; read the warnings
-python3 dev/run_python_snippets.py     # every python block must run
-node dev/smoke_test.js                 # no console errors on any route
+# run from the repository root
+python3 scripts/build_manifest.py          # picks up your new files
+python3 scripts/check_content.py           # must report 0 errors for YOUR files; read the warnings
+python3 scripts/run_python_snippets.py     # every python block must run
+node scripts/smoke_test.js                 # no console errors on any route
 ```
 Then report: files written, question counts, any spec points you could not cover confidently, and any
 factual uncertainty (these go into COVERAGE.md).

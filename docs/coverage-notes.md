@@ -2,8 +2,8 @@
 
 - Every page was written from the AQA 7517 specification and the notes in `Notes/`. Every worked example, trace table, quiz key and mark scheme was **recomputed with code** (Python, sqlite3, `re`, the real Piles O' Tiles skeleton, an AQA assembly interpreter) or traced by hand where code can't run (Haskell).
 - An **independent reviewer** (not the author) re-checked every page: sections 1–14, R and P. They recomputed examples, ran SQL in sqlite3, ran regexes and state machines, ran the real skeleton for P, and brute-forced Boolean identities. About 25 errors were found and fixed, for example an Amdahl's law figure (4.71×, not 4.85×), AQA's definitions of image size vs resolution, ZIP using DEFLATE not LZW, a fixed-point shortcut, a two-answer logic puzzle, and a few wrong trace labels.
-- `dev/run_python_snippets.py` now also compares each example's real output with the output block shown on the page (188 runnable examples, all matching).
-- Every runnable Python block on the site is executed by `dev/run_python_snippets.py`. Every page, quiz, exam set, flashcard deck, trace and tool is loaded by `dev/smoke_test.js` (Playwright, desktop and 360px mobile), which checks for console errors and missing tools.
+- `scripts/run_python_snippets.py` now also compares each example's real output with the output block shown on the page (188 runnable examples, all matching).
+- Every runnable Python block on the site is executed by `scripts/run_python_snippets.py`. Every page, quiz, exam set, flashcard deck, trace and tool is loaded by `scripts/smoke_test.js` (Playwright, desktop and 360px mobile), which checks for console errors and missing tools.
 
 ## Gaps in the notes filled from own knowledge
 
@@ -55,7 +55,7 @@ The full list is in each section's trap boxes.
 
 ## Known limitations
 
-- **Progress storage:** progress is stored per browser (localStorage). Use export/import to move it, or switch saving off on shared computers. There are no accounts yet; see `revision-site/docs/accounts-plan.md`.
+- **Progress storage:** progress is stored per browser (localStorage). Use export/import to move it, or switch saving off on shared computers. There are no accounts yet; see `site/docs/accounts-plan.md`.
 - **Haskell:** the Haskell list lab supports whole numbers only (no strings, tuples or `let`).
 - **SQL playground:** no subqueries and no LEFT JOIN.
 - **Huffman:** ties may give a different tree from a mark scheme's, with the same total bits.

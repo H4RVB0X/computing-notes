@@ -1,4 +1,4 @@
-# AQA A-Level Computer Science (7517) — revision site
+# Developer guide
 
 A complete, offline revision site covering every section of the AQA 7517 specification (Papers 1 and 2) plus
 the NEA. Notes, worked examples, quizzes, exam-style questions with mark schemes, flashcards with spaced
@@ -9,7 +9,7 @@ repetition, trace-table challenges and interactive tools — all in plain HTML/C
 | | Count |
 |---|---|
 | Pages of notes (sections 1–14, reference R.1–R.3, Piles O' Tiles P.1–P.6) | 79 |
-| AQA spec points mapped (see `../COVERAGE.md`) | 283, all covered |
+| AQA spec points mapped (see `COVERAGE.md`) | 283, all covered |
 | Quiz questions (MCQ, short answer, true/false, ordering, spot-the-error) | 1,585 |
 | Exam-style questions with self-marking mark schemes | 584 |
 | Flashcards (plus every key term automatically) | 700 |
@@ -26,7 +26,7 @@ The preliminary material is for candidates at the centre only. Keep the site lin
 
 ## Open it
 
-Double-click **`revision-site/index.html`** (or drag it into a browser). No server, no build step, no internet.
+Double-click **`site/index.html`** (or drag it into a browser). No server, no build step, no internet.
 Works in Chrome, Edge, Firefox and Safari. Progress (quiz scores, flashcard boxes, checklist ticks, mock history)
 is saved in the browser's localStorage for that file; use **Progress & settings → Export** to back it up.
 
@@ -37,14 +37,14 @@ is saved in the browser's localStorage for that file; use **Progress & settings 
 
 Accounts (cross-device sync) are not built yet. The proposed design (Firebase + Google sign-in) is in `docs/accounts-plan.md`.
 
-**Hosting on GitHub Pages.** The site is static, so Pages can serve the `revision-site/` folder as is. A Pages site is publicly reachable even when the repository is private.
+**Hosting on GitHub Pages.** The site is static, so Pages can serve the `site/` folder as is. A Pages site is publicly reachable even when the repository is private.
 
 Keyboard: `/` focuses search · in flashcards `space` flips, `1` = not yet, `2` = got it.
 
 ## How it is organised
 
 ```
-revision-site/
+site/
 ├── index.html              the app shell (sidebar, header, routing)
 ├── css/style.css           all styling, light + dark themes
 ├── js/                     engine (no content in here)
@@ -58,16 +58,17 @@ revision-site/
 │   └── search.js           site-wide search
 ├── content/
 │   ├── sections.js         THE SITE MAP: sections → pages → AQA spec points (drives sidebar, checklist, COVERAGE.md)
-│   ├── manifest.js         auto-generated list of files to load (python3 dev/build_manifest.py)
+│   ├── manifest.js         auto-generated list of files to load (python3 scripts/build_manifest.py)
 │   ├── topics/<id>.md.js   notes for each page, written in Markdown inside a JS comment
 │   ├── quizzes/<id>.js     quiz questions
 │   ├── exam/<id>.js        exam-style questions + mark schemes
 │   ├── flashcards/<id>.js  extra flashcards (key terms become cards automatically)
 │   └── trace/<id>.js       trace-table challenges
-├── tools/<id>.js           one interactive tool per file
-├── dev/                    helper scripts (see below)
-├── CONTENT_SPEC.md         the full authoring guide (formats, directives, quality bar)
-└── README.md               this file
+└── tools/<id>.js           one interactive tool per file
+
+scripts/                    build and check scripts (see below) — not published
+docs/                       CONTENT_SPEC.md (authoring guide), this file, accounts plan, coverage notes
+.github/workflows/pages.yml checks the site, then deploys site/ to GitHub Pages
 ```
 
 Page ids are the numbers you see in the sidebar (`1.1` … `14.2`, `R.1` … `R.3`, `P.1` … `P.6`).
@@ -82,21 +83,20 @@ Page ids are the numbers you see in the sidebar (`1.1` … `14.2`, `R.1` … `R.
 To add a brand-new page:
 1. Add it to the right section in `content/sections.js` (id, title, spec, specPoints).
 2. Create `content/topics/<id>.md.js` (copy `2.3.md.js` as a template), and optionally quiz/exam/flashcards/trace files.
-3. Run `python3 dev/build_manifest.py` (or add the file paths to `content/manifest.js` by hand).
+3. Run `python3 scripts/build_manifest.py` (or add the file paths to `content/manifest.js` by hand).
 
 To add quiz questions: edit `content/quizzes/<id>.js` — the question formats are documented in `CONTENT_SPEC.md §3`.
 
 ## Checking your edits
 
 ```bash
-cd revision-site
-python3 dev/build_manifest.py        # rescan content/ and tools/ and rewrite manifest.js
-python3 dev/check_content.py         # validates every file: schema, balanced blocks, links, trace shapes
-python3 dev/run_python_snippets.py   # runs every Python example and checks it against its output block
-node dev/smoke_test.js               # headless Chromium: visits every page/tool and reports console errors
-python3 dev/build_coverage.py        # regenerates ../COVERAGE.md from sections.js + the content folders
+python3 scripts/build_manifest.py        # rescan content/ and tools/ and rewrite manifest.js
+python3 scripts/check_content.py         # validates every file: schema, balanced blocks, links, trace shapes
+python3 scripts/run_python_snippets.py   # runs every Python example and checks it against its output block
+node scripts/smoke_test.js               # headless Chromium: visits every page/tool and reports console errors
+python3 scripts/build_coverage.py        # regenerates ../COVERAGE.md from sections.js + the content folders
 ```
-(`node dev/smoke_test.js` needs the `playwright` npm package; the other scripts need only Python 3.)
+(`node scripts/smoke_test.js` needs the `playwright` npm package; the other scripts need only Python 3.)
 
 ## Progress data
 

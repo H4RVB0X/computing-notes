@@ -4,10 +4,10 @@
 Blocks that call input(), import unavailable modules, or are marked ```python nocheck
 are skipped. A block whose last comment lines contain expected output like
 "# 42" is not auto-compared (keep those as documentation), but any exception fails.\nIf a ```python block is immediately followed by an ```output block, stdout must match it\n(trailing spaces ignored; blocks using random are not compared).
-Run:  python3 revision-site/dev/run_python_snippets.py [topic-id-filter]
+Run:  python3 scripts/run_python_snippets.py [topic-id-filter]
 """
 import re, subprocess, sys, pathlib, tempfile, os
-ROOT = pathlib.Path(__file__).resolve().parent.parent
+ROOT = pathlib.Path(__file__).resolve().parent.parent / "site"
 filt = sys.argv[1] if len(sys.argv) > 1 else ""
 files = sorted((ROOT / "content" / "topics").glob("*.md.js"))
 total = ok = skipped = 0
