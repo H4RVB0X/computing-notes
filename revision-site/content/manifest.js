@@ -201,6 +201,7 @@ CS.manifest = [
   "content/quizzes/P.6.js",
   "content/quizzes/R.1.js",
   "content/quizzes/R.2.js",
+  "content/quizzes/R.3.js",
   // exam
   "content/exam/1.1.js",
   "content/exam/1.2.js",
@@ -279,6 +280,7 @@ CS.manifest = [
   "content/exam/P.6.js",
   "content/exam/R.1.js",
   "content/exam/R.2.js",
+  "content/exam/R.3.js",
   // flashcards
   "content/flashcards/1.1.js",
   "content/flashcards/1.2.js",
@@ -357,6 +359,7 @@ CS.manifest = [
   "content/flashcards/P.6.js",
   "content/flashcards/R.1.js",
   "content/flashcards/R.2.js",
+  "content/flashcards/R.3.js",
   // trace
   "content/trace/1.2.js",
   "content/trace/1.3.js",
