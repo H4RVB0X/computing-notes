@@ -31,7 +31,7 @@ This project is mainly an exercise in **directing AI agents to build something l
 
 **My role**
 - Defined the product: what a textbook replacement needs, the page template, question types, tools, accessibility, offline use and the quality bar.
-- Supplied the source material (my class notes) and the exam-board constraints, and made the design decisions: logo, privacy, memory controls, hosting.
+- Supplied the source material (my class notes, kept private and not in this repo) and the exam-board constraints, and made the design decisions: logo, privacy, memory controls, hosting.
 - Ran the build: reviewed reports, re-prioritised, and kept the work inside a limited usage budget (at most two agents at a time).
 
 **How the AI work was organised**
@@ -60,7 +60,6 @@ site/        the website (this folder is what GitHub Pages publishes)
   tools/                         one file per interactive tool
 scripts/     build_manifest, check_content, run_python_snippets, build_coverage, smoke_test
 docs/        authoring guide, developer guide, accounts plan, coverage notes, screenshots
-Notes/       my original course notes (source material)
 COVERAGE.md  every AQA spec point → page → status
 ```
 

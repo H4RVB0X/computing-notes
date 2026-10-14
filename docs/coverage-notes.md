@@ -1,13 +1,13 @@
 ## How the content was checked
 
-- Every page was written from the AQA 7517 specification and the notes in `Notes/`. Every worked example, trace table, quiz key and mark scheme was **recomputed with code** (Python, sqlite3, `re`, the real Piles O' Tiles skeleton, an AQA assembly interpreter) or traced by hand where code can't run (Haskell).
+- Every page was written from the AQA 7517 specification and my own course notes (kept private, not in this repository). Every worked example, trace table, quiz key and mark scheme was **recomputed with code** (Python, sqlite3, `re`, the real Piles O' Tiles skeleton, an AQA assembly interpreter) or traced by hand where code can't run (Haskell).
 - An **independent reviewer** (not the author) re-checked every page: sections 1–14, R and P. They recomputed examples, ran SQL in sqlite3, ran regexes and state machines, ran the real skeleton for P, and brute-forced Boolean identities. About 25 errors were found and fixed, for example an Amdahl's law figure (4.71×, not 4.85×), AQA's definitions of image size vs resolution, ZIP using DEFLATE not LZW, a fixed-point shortcut, a two-answer logic puzzle, and a few wrong trace labels.
 - `scripts/run_python_snippets.py` now also compares each example's real output with the output block shown on the page (188 runnable examples, all matching).
 - Every runnable Python block on the site is executed by `scripts/run_python_snippets.py`. Every page, quiz, exam set, flashcard deck, trace and tool is loaded by `scripts/smoke_test.js` (Playwright, desktop and 360px mobile), which checks for console errors and missing tools.
 
 ## Gaps in the notes filled from own knowledge
 
-- **Sections 13 (systematic approach) and 14 (NEA)**: the `Notes/` folder has no material for them. Both were written from the specification and AQA's published NEA criteria.
+- **Sections 13 (systematic approach) and 14 (NEA)**: my course notes had no material for them. Both were written from the specification and AQA's published NEA criteria.
 - **Reference pages R.1–R.3** (pseudocode ↔ Python, Boolean algebra, exam technique) and the **Piles O' Tiles** section (built from the class prep page and AQA's 2027 preliminary material) are additions.
 - Smaller gaps filled across sections: assembly-language programs (7.3), interrupts and performance factors (7.4), REST/JSON/WebSockets (9.7), the Data (Use and Access) Act 2025 (8.2), Mealy machines and Turing machine traces (4.2, 4.8).
 

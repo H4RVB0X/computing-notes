@@ -105,6 +105,6 @@ import it on another device, or reset everything.
 
 ## Sources
 
-The notes were written against the AQA 7517 specification and the student's own course materials in `../Notes/`
+The notes were written against the AQA 7517 specification and the student's own course materials (kept privately; not in this repository)
 (teacher slides, Isaac Computer Science pages and question sheets), with known errors in those materials
 corrected and flagged in the relevant pages. `../COVERAGE.md` maps every spec point to its page.
