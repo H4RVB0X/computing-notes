@@ -150,7 +150,7 @@ AQA often gives a short sequence of inputs and asks for the output or for values
 
 | Situation | What actually happens |
 |---|---|
-| Pile line `0,A,1,B` (odd number of items) | `int("B\n")` raises `ValueError` → "File not loaded" → "Setting up default game". The piles already read are **kept** and 36 default piles are appended, so a 7×7 board is shown. |
+| Pile line `0,A,1,B` (odd number of items) | `int("B\n")` raises `ValueError` → "File not loaded" → "Setting up default game". The piles already read are **kept** and 36 default piles are appended. For pile (3,4): 14 + 36 = 50 piles, int(√50) = 7, so a 7×7 board is shown; corrupting an earlier pile gives a smaller board (e.g. pile (1,2): 4 + 36 = 40 → 6×6). |
 | Discard line `A,1,` (trailing comma) | Loads one A tile; `Discard: A`. |
 | Discard line `A,1,B` | Loads one A tile; the B is ignored. |
 | MaxScore line not a number | Same partial-load bug: 16 + 36 = 52 piles (7×7 shown) and **four** players: Boris, Poppy, Player 1, Player 2. |
