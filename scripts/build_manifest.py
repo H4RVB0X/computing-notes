@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 """Regenerate content/manifest.js by scanning the content and tools folders.
 
-Run from anywhere:  python3 revision-site/dev/build_manifest.py
+Run from anywhere:  python3 scripts/build_manifest.py
 The site loads every file listed in the manifest at start-up, in this order:
 tools, topics, quizzes, exam, flashcards, trace.
 """
 import os, re, pathlib
 
-ROOT = pathlib.Path(__file__).resolve().parent.parent
+ROOT = pathlib.Path(__file__).resolve().parent.parent / "site"
 GROUPS = [("tools", "tools"), ("content/topics", "topics"), ("content/quizzes", "quizzes"),
           ("content/exam", "exam"), ("content/flashcards", "flashcards"), ("content/trace", "trace")]
 

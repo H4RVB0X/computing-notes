@@ -5,11 +5,11 @@ Checks: files parse as JS; every registered topic/quiz/exam/flashcard/trace id e
 sections.js; quiz questions have valid schema; trace rows match columns; markdown
 directive blocks are balanced; {{tool:}} and {{trace:}} shortcodes refer to registered ids;
 internal links point at real topics; Python code blocks are counted.
-Run:  python3 revision-site/dev/check_content.py   (exit code 1 if any ERROR)
+Run:  python3 scripts/check_content.py   (exit code 1 if any ERROR)
 """
 import json, os, re, subprocess, sys, pathlib
 
-ROOT = pathlib.Path(__file__).resolve().parent.parent
+ROOT = pathlib.Path(__file__).resolve().parent.parent / "site"
 NODE_SCRIPT = r"""
 const vm = require("vm"); const fs = require("fs"); const path = require("path");
 const root = process.env.SITE_ROOT;

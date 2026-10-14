@@ -1,7 +1,7 @@
 // Headless smoke test: visit every route, record console errors, click through quiz/flashcards/tools.
 const { chromium } = require("playwright");
 const path = require("path");
-const SITE = "file://" + path.resolve(process.argv[2] || "/home/user/computing-notes/revision-site/index.html");
+const SITE = "file://" + path.resolve(process.argv[2] || path.join(__dirname, "..", "site", "index.html"));
 const SHOT = process.argv[3] || require("os").tmpdir();
 (async () => {
   const browser = await chromium.launch();
