@@ -11,7 +11,9 @@ repetition, trace-table challenges and interactive tools — all in plain HTML/C
 | Pages of notes (sections 1–14, reference R.1–R.3, Piles O' Tiles P.1–P.6) | 79 |
 | AQA spec points mapped (see `COVERAGE.md`) | 283, all covered |
 | Quiz questions (MCQ, short answer, true/false, ordering, spot-the-error) | 1,585 |
-| Exam-style questions with self-marking mark schemes | 584 |
+| Exam-style questions with self-marking mark schemes | 595 |
+| Levelled (6/9/12-mark) questions with example answers per level | 33 |
+| Python coding problems / automatic tests | 60 / 373 |
 | Flashcards (plus every key term automatically) | 700 |
 | Trace-table challenges | 89 |
 | Interactive tools | 41 |
