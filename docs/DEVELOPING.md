@@ -11,7 +11,9 @@ repetition, trace-table challenges and interactive tools — all in plain HTML/C
 | Pages of notes (sections 1–14, reference R.1–R.3, Piles O' Tiles P.1–P.6) | 79 |
 | AQA spec points mapped (see `COVERAGE.md`) | 283, all covered |
 | Quiz questions (MCQ, short answer, true/false, ordering, spot-the-error) | 1,585 |
-| Exam-style questions with self-marking mark schemes | 584 |
+| Exam-style questions with self-marking mark schemes | 595 |
+| Levelled (6/9/12-mark) questions with example answers per level | 33 |
+| Python coding problems / automatic tests | 60 / 373 |
 | Flashcards (plus every key term automatically) | 700 |
 | Trace-table challenges | 89 |
 | Interactive tools | 41 |
@@ -35,7 +37,10 @@ is saved in the browser's localStorage for that file; use **Progress & settings 
 - *Progress & settings* has a **Save my progress on this device** switch. When it's off, nothing is written to the browser, which is handy on shared school PCs.
 - *Progress & settings* also has Export, Import and Reset all.
 
-Accounts (cross-device sync) are not built yet. The proposed design (Firebase + Google sign-in) is in `docs/accounts-plan.md`.
+**Features that need the live site (or a local server).** Browsers block these from `file://`. To try them locally, run `python3 -m http.server` inside `site/`:
+- installing as an app and offline mode (`sw.js`, `manifest.webmanifest`)
+- code practice (Python runs in a Web Worker with Pyodide, loaded from jsDelivr on first use)
+- accounts and sync (Firebase; switched off until `js/config.js` is filled in, see `docs/SETUP.md`).
 
 **Hosting on GitHub Pages.** The site is static, so Pages can serve the `site/` folder as is. A Pages site is publicly reachable even when the repository is private.
 
@@ -55,7 +60,15 @@ site/
 │   ├── quiz.js             quizzes, exam-style self-marking, mixed mock mode
 │   ├── flashcards.js       Leitner spaced repetition
 │   ├── trace.js            trace-table challenges
+│   ├── review.js           My mistakes deck (spaced re-asking of wrong answers) and "Report a mistake" links
+│   ├── levels.js           extended-answer trainer: mark example answers to levelled questions
+│   ├── code.js             code practice pages, test checking, the small code editor
+│   ├── py-worker.js        Web Worker that runs Python with Pyodide (same test rules as check_problems.py)
+│   ├── sync.js             optional Google sign-in + Firestore sync, and the progress merge rules
+│   ├── config.js           settings: report form, Firebase project (see docs/SETUP.md)
 │   └── search.js           site-wide search
+├── sw.js                   service worker: saves the site for offline use (network first)
+├── manifest.webmanifest    makes the site installable; icons in icons/
 ├── content/
 │   ├── sections.js         THE SITE MAP: sections → pages → AQA spec points (drives sidebar, checklist, COVERAGE.md)
 │   ├── manifest.js         auto-generated list of files to load (python3 scripts/build_manifest.py)
@@ -63,11 +76,14 @@ site/
 │   ├── quizzes/<id>.js     quiz questions
 │   ├── exam/<id>.js        exam-style questions + mark schemes
 │   ├── flashcards/<id>.js  extra flashcards (key terms become cards automatically)
-│   └── trace/<id>.js       trace-table challenges
+│   ├── trace/<id>.js       trace-table challenges
+│   └── problems/<group>.js coding problems with tests (code practice)
 └── tools/<id>.js           one interactive tool per file
 
+firebase/firestore.rules    database security rules for accounts
+
 scripts/                    build and check scripts (see below) — not published
-docs/                       CONTENT_SPEC.md (authoring guide), this file, accounts plan, coverage notes
+docs/                       CONTENT_SPEC.md (authoring guide), this file, SETUP.md (Pages, report form, Firebase), coverage notes
 .github/workflows/pages.yml checks the site, then deploys site/ to GitHub Pages
 ```
 
@@ -87,6 +103,12 @@ To add a brand-new page:
 
 To add quiz questions: edit `content/quizzes/<id>.js` — the question formats are documented in `CONTENT_SPEC.md §3`.
 
+**Question ids.** Every quiz and exam question gets a stable id from its topic and a hash of its text (`2.3/q-1x9k2a`). Progress, My mistakes and reports use it. Reordering questions or rewording the options is safe. Changing the question text gives the question a new id, which loses saved progress on that one question. To keep the id while rewording, add `id: "<the old id>"` to the question. `node scripts/check_ids.js` catches duplicates.
+
+**Extended-answer examples.** A levelled exam question (`levels: [...]`) needs `exemplars: [{ level, mark, answer, comment }]`, one per band, to appear in the trainer. Keep lengths honest: a long answer that only describes should sit low, so length never gives the level away.
+
+**Coding problems.** `content/problems/<group>.js` calls `CS.registerProblems([...])`. Each problem has `id`, `title`, `topic`, `difficulty`, `task`, `tests: [{ name, input, code, expect, hidden }]`, `hints` and `solution` (optionally `starter`, `files`, `match`, `explain`). `python3 scripts/check_problems.py` runs every model solution against its tests with real Python, using exactly the rules the browser uses: `input()` prompts aren't checked, outputs are compared line by line ignoring trailing spaces, and there's a 2-second limit.
+
 ## Checking your edits
 
 ```bash
@@ -96,13 +118,17 @@ python3 scripts/run_python_snippets.py   # runs every Python example and checks 
 node scripts/smoke_test.js               # headless Chromium: visits every page/tool and reports console errors
 node scripts/check_quiz_balance.js       # flags MCQs whose correct option is noticeably the longest
 python3 scripts/build_coverage.py        # regenerates ../COVERAGE.md from sections.js + the content folders
+python3 scripts/check_problems.py        # runs every coding problem's model answer against its tests
+node scripts/check_ids.js                # every question has a unique stable id
+node scripts/check_sync_merge.js         # unit tests for the cloud-sync merge rules
 ```
 (`node scripts/smoke_test.js` needs the `playwright` npm package; the other scripts need only Python 3.)
 
 ## Progress data
 
 Stored under the key `cs-revision-v1` in localStorage. **Progress & settings** lets you export it as JSON,
-import it on another device, or reset everything.
+import it on another device, or reset everything. When accounts are on, a merged copy lives in Firestore
+(`users/{uid}`); the merge rules are in `js/sync.js` and tested by `scripts/check_sync_merge.js`.
 
 ## Sources
 

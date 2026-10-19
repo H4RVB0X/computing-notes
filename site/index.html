@@ -7,6 +7,20 @@
 <meta name="description" content="Complete revision site for AQA A-Level Computer Science 7517: notes, worked examples, quizzes, flashcards and interactive tools. Works offline from a single folder.">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 64 64%22%3E%3Cdefs%3E%3ClinearGradient id=%22lg%22 x1=%220%22 y1=%220%22 x2=%221%22 y2=%221%22%3E%3Cstop offset=%220%22 stop-color=%22#3b5bdb%22/%3E%3Cstop offset=%221%22 stop-color=%22#7048e8%22/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width=%2264%22 height=%2264%22 rx=%2215%22 fill=%22url(#lg)%22/%3E%3Cg fill=%22none%22 stroke=%22#fff%22 stroke-width=%224%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22%3E%3Cpath d=%22M22 18h10a14 14 0 0 1 0 28H22z%22/%3E%3Cpath d=%22M10 25h12M10 39h12M46 32h9%22/%3E%3C/g%3E%3Ccircle cx=%2255%22 cy=%2232%22 r=%223.2%22 fill=%22#ffd43b%22/%3E%3C/svg%3E">
 <link rel="stylesheet" href="css/style.css">
+<meta name="theme-color" content="#3b5bdb">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="CS Revision">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<script>
+  // installable app (PWA): only when served over http(s) — browsers refuse manifests and service workers from file://
+  if (/^https?:$/.test(location.protocol)) {
+    var m = document.createElement("link"); m.rel = "manifest"; m.href = "manifest.webmanifest"; document.head.appendChild(m);
+    if ("serviceWorker" in navigator) window.addEventListener("load", function () { navigator.serviceWorker.register("sw.js").catch(function () {}); });
+  }
+  window.addEventListener("beforeinstallprompt", function (e) { e.preventDefault(); window.CS = window.CS || {}; window.CS.installPrompt = e; });
+</script>
 <script>
   // apply saved theme before first paint to avoid a flash
   try { var p = JSON.parse(localStorage.getItem("cs-revision-v1") || "{}").prefs || {}; if (p.theme) document.documentElement.setAttribute("data-theme", p.theme); if (p.fontScale) document.documentElement.style.setProperty("--font-scale", p.fontScale); } catch (e) {}
@@ -26,6 +40,9 @@
       <li><a href="#/tools" data-page="tools"><span class="ico">🧰</span>Interactive tools</a></li>
       <li><a href="#/flashcards" data-page="flashcards"><span class="ico">🃏</span>Flashcards</a></li>
       <li><a href="#/mock" data-page="mock"><span class="ico">🎲</span>Mixed mock</a></li>
+      <li><a href="#/mistakes" data-page="mistakes"><span class="ico">🔁</span>My mistakes</a></li>
+      <li><a href="#/levels" data-page="levels"><span class="ico">🎯</span>Extended-answer trainer</a></li>
+      <li><a href="#/code" data-page="code"><span class="ico">💻</span>Code practice</a></li>
       <li><a href="#/checklist" data-page="checklist"><span class="ico">✅</span>Spec checklist</a></li>
       <li><a href="#/glossary" data-page="glossary"><span class="ico">📖</span>Glossary</a></li>
       <li><a href="#/progress" data-page="progress"><span class="ico">📈</span>Progress &amp; settings</a></li>
@@ -48,12 +65,17 @@
     <main class="content" id="content" tabindex="-1"></main>
   </div>
 </div>
+<script src="js/config.js"></script>
 <script src="js/core.js"></script>
 <script src="js/highlight.js"></script>
 <script src="js/markdown.js"></script>
 <script src="js/quiz.js"></script>
 <script src="js/flashcards.js"></script>
 <script src="js/trace.js"></script>
+<script src="js/review.js"></script>
+<script src="js/sync.js"></script>
+<script src="js/levels.js"></script>
+<script src="js/code.js"></script>
 <script src="js/search.js"></script>
 <script src="content/sections.js"></script>
 <script src="content/manifest.js"></script>

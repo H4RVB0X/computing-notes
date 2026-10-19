@@ -38,6 +38,7 @@
   });
 
   function init() {
+    CS.migrateStore();
     renderSidebar();
     bindHeader();
     window.addEventListener("hashchange", route);
@@ -212,6 +213,8 @@
     const actions = h("div", { class: "row", style: "margin-top:14px" });
     if (lastMeta) actions.appendChild(h("a", { class: "btn primary", href: "#/topic/" + last, text: "Continue: " + last + " " + lastMeta.title }));
     actions.appendChild(h("a", { class: "btn", href: "#/mock", text: "🎲 Mixed mock" }));
+    actions.appendChild(h("a", { class: "btn", href: "#/mistakes", text: "🔁 My mistakes" }));
+    actions.appendChild(h("a", { class: "btn", href: "#/code", text: "💻 Code practice" }));
     actions.appendChild(h("a", { class: "btn", href: "#/flashcards", text: "🃏 Flashcards" }));
     actions.appendChild(h("a", { class: "btn", href: "#/tools", text: "🧰 Tools (" + nTools + ")" }));
     actions.appendChild(h("a", { class: "btn", href: "#/checklist", text: "✅ Spec checklist" }));
@@ -263,6 +266,8 @@
   function nextSuggestions() {
     const out = [];
     const ids = CS.allTopicIds();
+    const mistakesDue = CS.mistakes ? CS.mistakes.dueCount() : 0;
+    if (mistakesDue) out.push({ id: "mistakes", label: "Review My mistakes", href: "#/mistakes", why: mistakesDue + " question" + (mistakesDue === 1 ? " is" : "s are") + " due again", custom: true });
     const dueCount = CS.flash ? CS.flash.dueCount() : 0;
     if (dueCount) out.push({ id: "flash", label: "Review flashcards", href: "#/flashcards/due", why: dueCount + " cards are due for review", custom: true });
     // weakest with attempts
@@ -401,17 +406,22 @@
     if (ne) grid.appendChild(card("#/exam/" + id, "📝", "Exam-style questions", ne + " questions with mark schemes"));
     if (nf) grid.appendChild(card("#/flashcards/" + id, "🃏", "Flashcards", nf + " cards, spaced repetition"));
     if (nt) grid.appendChild(card("#/trace/" + id, "🔍", "Trace challenges", nt + " code-tracing tasks"));
+    const np = Object.values(CS.problems || {}).filter((p) => p.topic === id).length;
+    if (np) grid.appendChild(card("#/code", "💻", "Code practice", np + " Python problem" + (np === 1 ? "" : "s") + " with automatic tests"));
+    const nl = (CS.exams[id] || []).filter((q) => q.levels && q.exemplars).length;
+    if (nl) grid.appendChild(card("#/levels/" + (CS.exams[id] || []).find((q) => q.levels && q.exemplars).id, "🎯", "Extended answers", "mark example answers to " + nl + " levelled question" + (nl === 1 ? "" : "s")));
     grid.appendChild(card("#/mock", "🎲", "Mixed mock", "random questions across topics"));
     wrap.appendChild(grid);
     const resetRow = h("div", { class: "row small", style: "justify-content:flex-end;margin-top:8px" });
     const resetBtn = h("button", { class: "btn sm ghost", type: "button", text: "↺ Reset my progress on this page", title: "Forget reading progress, quiz and exam scores, checklist ticks, trace results and flashcard boxes for this page only" });
     resetBtn.addEventListener("click", () => {
-      if (!confirm("Reset your progress on " + id + " only? This forgets reading progress, quiz and exam scores, saved exam answers, checklist ticks, trace results and flashcard boxes for this page.")) return;
+      if (!confirm("Reset your progress on " + id + " only? This forgets reading progress, quiz and exam scores, saved exam answers, checklist ticks, trace results, flashcard boxes and My mistakes entries for this page.")) return;
       CS.progress.resetTopic(id);
       updateSidebarProgress();
       CS.toast("Progress on " + id + " reset");
       route();
     });
+    if (CS.report) resetRow.appendChild(CS.report.link({ where: "Notes page " + id }, "⚑ Report a mistake on this page"));
     resetRow.appendChild(resetBtn);
     wrap.appendChild(resetRow);
     return wrap;
@@ -639,9 +649,35 @@
   };
 
   /* ---------------- PROGRESS / SETTINGS ---------------- */
+  /** "Install as an app" instructions: a real button where the browser offers one, steps for iPhone/iPad */
+  function installCard() {
+    const card = h("div", { class: "card", style: "margin-bottom:16px" });
+    const standalone = (window.matchMedia && window.matchMedia("(display-mode: standalone)").matches) || navigator.standalone;
+    const ios = /iphone|ipad|ipod/i.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+    let body;
+    if (standalone) body = "<p class='small' style='margin:0'>✅ You're using the installed app. It works offline: everything is saved on this device.</p>";
+    else if (!/^https?:$/.test(location.protocol)) body = "<p class='small muted' style='margin:0'>Installing only works on the live website (not when the page is opened as a file).</p>";
+    else if (ios) body = "<ol class='small' style='margin:0;padding-left:1.2em'><li>Open this site in <b>Safari</b>.</li><li>Tap the <b>Share</b> button (the square with an arrow).</li><li>Choose <b>Add to Home Screen</b>, then <b>Add</b>.</li></ol><p class='small muted' style='margin:8px 0 0'>It opens full screen from its own icon and works offline. Open it at least once a week: iOS can clear saved progress from web apps that haven't been used for a while.</p>";
+    else body = "<p class='small' style='margin:0 0 8px'>Add the site to your home screen or desktop. It opens in its own window and works offline.</p>";
+    card.innerHTML = "<h3 style='margin-top:0'>📲 Install as an app</h3>" + body;
+    if (!standalone && !ios && /^https?:$/.test(location.protocol)) {
+      const btn = h("button", { type: "button", class: "btn primary", text: "Install app" });
+      btn.addEventListener("click", async () => {
+        if (!CS.installPrompt) return alert("Use your browser's menu: ⋮ → Install app (Chrome/Edge) or Add to Home screen (Android).");
+        CS.installPrompt.prompt();
+        await CS.installPrompt.userChoice;
+        CS.installPrompt = null;
+      });
+      card.appendChild(btn);
+    }
+    return card;
+  }
+
   CS.views.progress = function (main) {
     document.title = "CS Revision · Progress";
     main.appendChild(h("div", { class: "topic-head", html: '<div class="crumbs"><a href="#/">Home</a> › Progress</div><h1>Progress &amp; settings</h1>' }));
+    (CS.settingsCards || []).forEach((make) => main.appendChild(make())); // e.g. accounts (sync.js)
+    main.appendChild(installCard());
     const table = h("div", { class: "table-wrap" });
     let html = "<table><thead><tr><th>Topic</th><th>Read</th><th>Quiz best</th><th>Attempts</th><th>Checklist</th><th>Overall</th></tr></thead><tbody>";
     CS.sections.forEach((s) =>
@@ -679,6 +715,7 @@
       r.onload = () => {
         try {
           CS.store.replace(JSON.parse(r.result));
+          CS.migrateStore();
           CS.prefs.apply();
           CS.toast("Progress imported");
           route();

@@ -12,9 +12,11 @@ const SHOT = process.argv[3] || require("os").tmpdir();
   await page.goto(SITE, { waitUntil: "load" });
   await page.waitForFunction(() => window.CS && Object.keys(window.CS.topics || {}).length >= 0 && document.querySelectorAll('#nav .nav-group').length > 0, null, { timeout: 15000 });
   const routes = JSON.parse(await page.evaluate(() => {
-    const r = ["#/", "#/tools", "#/flashcards", "#/mock", "#/checklist", "#/glossary", "#/progress", "#/search/stack"];
+    const r = ["#/", "#/tools", "#/flashcards", "#/mock", "#/mistakes", "#/levels", "#/code", "#/checklist", "#/glossary", "#/progress", "#/search/stack"];
     CS.allTopicIds().forEach((id) => { if (CS.topics[id]) r.push("#/topic/" + id); if (CS.quizzes[id]) r.push("#/quiz/" + id); if (CS.exams[id]) r.push("#/exam/" + id); if (CS.flashcards[id] || CS.topics[id]) r.push("#/flashcards/" + id); if (CS.tracesByTopic[id]) r.push("#/trace/" + id); });
     Object.keys(CS.tools).forEach((t) => r.push("#/tool/" + t));
+    Object.keys(CS.problems || {}).forEach((p) => r.push("#/code/" + p));
+    ((CS.levelsTrainer && CS.levelsTrainer.questions()) || []).forEach((q) => r.push("#/levels/" + q.id));
     return JSON.stringify(r);
   }));
   const report = [];

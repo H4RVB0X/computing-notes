@@ -20,6 +20,7 @@
     const box = h("div", { class: "quiz-q" });
     const diff = q.difficulty || 2;
     const head = h("div", { class: "qnum" }, [h("span", { text: "Question " + (index + 1) }), h("span", { class: "diff diff-" + diff, text: diff === 1 ? "warm-up" : diff === 2 ? "standard" : "stretch" }), q.topic ? h("span", { class: "pill", text: q.topic }) : null]);
+    if (CS.report) head.appendChild(CS.report.link({ where: "Quiz " + (q.topicId || q.topic || ""), id: q.id, text: q.q }, "⚑ Report"));
     box.appendChild(head);
     const qtext = h("div", { class: "qtext" });
     qtext.innerHTML = md(q.q);
@@ -283,6 +284,7 @@
       const box = renderQuestion(wrap, q, i, (ok) => {
         if (ok) score++;
         results.push({ q: q, ok: ok });
+        if (CS.mistakes) CS.mistakes.record(q, ok);
         nextBtn.style.display = "";
         nextBtn.textContent = i === qs.length - 1 ? "See results →" : "Next question →";
         nextBtn.focus();
@@ -320,6 +322,7 @@
         wrong.forEach((r, k) => {
           const d = h("div", { class: "quiz-q" });
           d.innerHTML = '<div class="qnum">' + (r.q.topic ? "<span class='pill'>" + U.esc(r.q.topic) + "</span>" : "") + '</div><div class="qtext">' + md(r.q.q) + "</div>" + answerHtml(r.q) + (r.q.explain ? '<div class="feedback ok" style="margin-top:8px">' + md(r.q.explain) + "</div>" : "");
+          if (CS.report) d.querySelector(".qnum").appendChild(CS.report.link({ where: "Quiz " + (r.q.topicId || ""), id: r.q.id, text: r.q.q }, "⚑ Report"));
           wrap.appendChild(d);
         });
       }
@@ -373,7 +376,7 @@
     const scores = {};
     const saved = CS.store.get("exam." + id, {});
     const updateTotal = () => {
-      const t = Object.values(scores).reduce((a, b) => a + b, 0);
+      const t = Object.keys(scores).reduce((a, k2) => a + (k2.endsWith("_pts") ? 0 : scores[k2]), 0);
       document.getElementById("exam-total").textContent = t;
       CS.store.set("exam." + id, scores);
       if (Object.keys(scores).length) CS.store.set("topics." + id + ".examDone", true);
@@ -389,13 +392,13 @@
         CS.enhance && CS.enhance(fig);
       }
       const ta = h("textarea", { placeholder: "Write your answer here…", "aria-label": "Your answer" });
-      ta.value = CS.store.get("examAnswers." + id + "." + k, "");
-      ta.addEventListener("input", U.debounce(() => CS.store.set("examAnswers." + id + "." + k, ta.value), 400));
+      ta.value = CS.store.get("examAnswers." + id, {})[q.id] || "";
+      ta.addEventListener("input", U.debounce(() => CS.store.update("examAnswers." + id, (all) => Object.assign(all, { [q.id]: ta.value }), {}), 400));
       box.appendChild(ta);
       const reveal = h("button", { type: "button", class: "btn sm", text: "Reveal mark scheme", style: "margin-top:8px" });
       box.appendChild(reveal);
       const scheme = h("div", { class: "scheme", style: "display:none" });
-      const qKey = String(k);
+      const qKey = q.id;
       if (q.levels) {
         scheme.appendChild(h("p", { html: "<b>Levels of response.</b> Choose the band that best describes your answer." + (q.guidance ? " " + md(q.guidance) : "") }));
         q.levels.forEach((lv) => {
@@ -409,6 +412,7 @@
           scheme.appendChild(d);
         });
         if (q.points && q.points.length) scheme.appendChild(h("div", { html: "<p><b>Indicative content</b> (what a top answer mentions):</p><ul>" + q.points.map((p) => "<li>" + CS.markdown.inline(p) + "</li>").join("") + "</ul>" }));
+        if (q.exemplars && q.exemplars.length) scheme.appendChild(h("p", { class: "small", html: "🎯 Not sure which level you're in? <a href='#/levels/" + q.id + "'>Mark three example answers for this question</a> in the extended-answer trainer." }));
       } else {
         const pts = q.scheme || q.points || [];
         scheme.appendChild(h("p", { html: "<b>Mark scheme</b> — tick each point you made. " + (q.maxPoints && q.maxPoints < pts.length ? "Any <b>" + q.marks + "</b> of these for full marks." : "") + (q.guidance ? "<br>" + CS.markdown.inline(q.guidance) : "") }));
@@ -439,6 +443,10 @@
         }
       }
       if (q.model) scheme.appendChild(h("details", { class: "collapse", style: "margin-top:10px", html: "<summary>Model answer</summary><div class='collapse-body'>" + md(q.model) + "</div>" }));
+      const tools = h("div", { class: "row small", style: "justify-content:flex-end;margin-top:8px" });
+      if (CS.mistakes) tools.appendChild(CS.mistakes.addButton(q));
+      if (CS.report) tools.appendChild(CS.report.link({ where: "Exam questions " + id + ", Q" + (k + 1), id: q.id, text: q.q }));
+      scheme.appendChild(tools);
       box.appendChild(scheme);
       reveal.addEventListener("click", () => {
         scheme.style.display = scheme.style.display === "none" ? "" : "none";

@@ -33,6 +33,14 @@ jobs:
         run: python3 scripts/run_python_snippets.py
       - name: Check multiple-choice answers don't give themselves away by length
         run: node scripts/check_quiz_balance.js
+      - name: Check every question has a unique stable id
+        run: node scripts/check_ids.js
+      - name: Unit-test the cloud-sync progress merge
+        run: node scripts/check_sync_merge.js
+      - name: Run every coding problem's model answer against its tests
+        run: python3 scripts/check_problems.py
+      - name: Check the in-browser Python harness (py-worker.js) under real Python
+        run: python3 scripts/check_worker_harness.py
 
   deploy:
     needs: check
