@@ -415,4 +415,8 @@ CS.manifest = [
   "content/trace/13.1.js",
   "content/trace/P.2.js",
   "content/trace/P.4.js",
+  // problems
+  "content/problems/basics.js",
+  "content/problems/number.js",
+  "content/problems/strings.js",
 ];
