@@ -117,6 +117,7 @@
     }
   }
   function saveStore() {
+    if (CS.store && CS.store.onChange) CS.store.onChange(); /* cloud sync (sync.js) */
     if (noSave()) return; /* memory-only mode: progress lasts until the tab is closed */
     try {
       localStorage.setItem(KEY, JSON.stringify(memStore));
@@ -184,7 +185,8 @@
       saveStore();
     },
     reset() {
-      memStore = {};
+      memStore = { syncEpoch: Date.now() }; /* a full reset also wins over older copies in the cloud (sync.js) */
+      if (CS.store.onChange) CS.store.onChange();
       try {
         localStorage.removeItem(KEY);
       } catch (e) {}
@@ -207,6 +209,7 @@
       if (CS.flash) CS.flash.cardsFor(id).forEach((c) => CS.store.remove("flash." + c.id));
       if (CS.mistakes) CS.mistakes.forgetTopic(id);
       if (CS.store.get("lastTopic") === id) CS.store.remove("lastTopic");
+      if (CS.sync && CS.sync.overwrite) CS.sync.overwrite();
     },
     markViewed(id) {
       CS.store.set("topics." + id + ".viewed", Date.now());

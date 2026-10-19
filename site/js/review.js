@@ -51,6 +51,8 @@
   const today = () => new Date(new Date().toDateString()).getTime();
   const all = () => CS.store.get("mistakes", {});
   const save = (m) => CS.store.set("mistakes", m);
+  /** remember when an entry left the deck, so a cloud copy from another device doesn't bring it back */
+  const bury = (id) => CS.store.update("mistakesGone", (g) => Object.assign(g, { [id]: Date.now() }), {});
   const isDue = (e) => e.due <= Date.now();
 
   CS.mistakes = {
@@ -59,13 +61,14 @@
     add(q, src) {
       if (!q || !q.id) return;
       const m = all();
-      m[q.id] = { box: 1, due: today() + INTERVALS[1] * DAY, added: (m[q.id] && m[q.id].added) || Date.now(), src: src || "quiz" };
+      m[q.id] = { box: 1, due: today() + INTERVALS[1] * DAY, added: (m[q.id] && m[q.id].added) || Date.now(), src: src || "quiz", at: Date.now() };
       save(m);
     },
     remove(id) {
       const m = all();
       delete m[id];
       save(m);
+      bury(id);
     },
     /** record an answer. In ordinary quizzes a right answer only counts once the question is due. */
     record(q, ok, fromReview) {
@@ -74,10 +77,13 @@
       const e = m[q.id];
       if (!ok) return CS.mistakes.add(q, e ? e.src : "quiz");
       if (!e || (!fromReview && !isDue(e))) return;
-      if (e.box >= 3) delete m[q.id];
-      else {
+      if (e.box >= 3) {
+        delete m[q.id];
+        bury(q.id);
+      } else {
         e.box++;
         e.due = today() + INTERVALS[e.box] * DAY;
+        e.at = Date.now();
       }
       save(m);
     },
@@ -96,7 +102,11 @@
     },
     forgetTopic(topicId) {
       const m = all();
-      Object.keys(m).forEach((id) => id.split("/")[0] === topicId && delete m[id]);
+      Object.keys(m).forEach((id) => {
+        if (id.split("/")[0] !== topicId) return;
+        delete m[id];
+        bury(id);
+      });
       save(m);
     },
   };

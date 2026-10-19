@@ -118,6 +118,27 @@ for id, qs in data["exams"].items():
         if q.get("levels"):
             for lv in q["levels"]:
                 if not all(x in lv for x in ("band", "marks", "desc", "score")): err(f"{tag}: each level needs band, marks, desc, score")
+            if not q.get("exemplars"): err(f"{tag}: levelled question has no exemplars (one example answer per level is needed for the 12-marker trainer)")
+        if q.get("exemplars"):
+            if not q.get("levels"): err(f"{tag}: has exemplars but no levels")
+            # band number -> (low, high) mark range, from marks like "1-3" or "1–3"
+            ranges = {}
+            for lv in q.get("levels") or []:
+                m = re.match(r"^\s*(\d+)\s*[-–]\s*(\d+)\s*$", str(lv.get("marks", "")))
+                if m: ranges[str(lv.get("band"))] = (int(m.group(1)), int(m.group(2)))
+                else: err(f"{tag}: level band {lv.get('band')} has unreadable marks range '{lv.get('marks')}'")
+            seen = []
+            for n, ex in enumerate(q["exemplars"], 1):
+                etag = f"{tag} exemplar {n}"
+                missing_f = [x for x in ("level", "mark", "answer", "comment") if x not in ex or ex[x] in (None, "")]
+                if missing_f: err(f"{etag}: missing {', '.join(missing_f)}"); continue
+                lvl = str(ex["level"]); seen.append(lvl)
+                if lvl not in ranges: err(f"{etag}: level {lvl} is not one of the question's bands {sorted(ranges)}"); continue
+                lo, hi = ranges[lvl]
+                if not isinstance(ex["mark"], int) or not (lo <= ex["mark"] <= hi): err(f"{etag}: mark {ex['mark']} is outside band {lvl} range {lo}-{hi}")
+                if not isinstance(ex["answer"], str) or len(ex["answer"].split()) < 15: err(f"{etag}: answer is missing or too short to be a realistic response")
+            if ranges and sorted(seen) != sorted(ranges):
+                err(f"{tag}: exemplars must cover each band exactly once (bands {sorted(ranges)}, exemplars {sorted(seen)})")
 
 for id, cs in data["flashcards"].items():
     if id not in topic_ids: err(f"flashcards {id}: unknown topic id")

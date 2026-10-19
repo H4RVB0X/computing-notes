@@ -1,0 +1,32 @@
+rules_version = '2';
+// Security rules for the revision site's Firestore database.
+// Paste these into Firebase console → Firestore Database → Rules → Publish (see docs/SETUP.md).
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() {
+      return request.auth != null;
+      // To allow only your school's Google accounts, replace the line above with:
+      // return request.auth != null && request.auth.token.email.matches('.*@myschool[.]org[.]uk$');
+    }
+
+    // one document per person: only they can read or change it
+    match /users/{uid} {
+      allow read, delete: if signedIn() && request.auth.uid == uid;
+      allow create, update: if signedIn() && request.auth.uid == uid
+        && request.resource.data.keys().hasOnly(['data', 'updated'])
+        && request.resource.data.data is string
+        && request.resource.data.data.size() < 900000;
+    }
+
+    // "Report a mistake": anyone signed in can send one; nobody can read them from the site
+    // (read them in the Firebase console)
+    match /reports/{id} {
+      allow create: if signedIn()
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.message is string
+        && request.resource.data.message.size() <= 2000;
+      allow read, update, delete: if false;
+    }
+  }
+}
