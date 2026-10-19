@@ -96,7 +96,7 @@
   CS.views.code = function (main, arg) {
     if (arg[0]) return problemPage(main, arg[0]);
     document.title = "CS Revision · Code practice";
-    main.appendChild(h("div", { class: "topic-head", html: '<div class="crumbs"><a href="#/">Home</a> › Code practice</div><h1>Code practice</h1><p class="muted">Write real Python and check it against automatic tests, like Paper 1 Section B. Some tests are hidden, so make your program work in general, not just for the example. Python runs inside your browser: nothing is sent anywhere.</p>' }));
+    main.appendChild(h("div", { class: "topic-head", html: '<div class="crumbs"><a href="#/">Home</a> › Code practice</div><h1>Code practice</h1><p class="muted">Write real Python and check it against automatic tests, like Paper 1 Section B. Some tests are hidden, so make your program work in general, not just for the example. Only what you <code>print</code> is checked: put prompts inside <code>input("…")</code> rather than printing them separately. Python runs inside your browser: nothing is sent anywhere.</p>' }));
     const all = list();
     if (!all.length) {
       main.appendChild(h("div", { class: "card", text: "No coding problems yet." }));

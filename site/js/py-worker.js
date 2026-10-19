@@ -55,8 +55,10 @@ def _cs_run(src, stdin_text, extra, files_json):
     error = ""
     try:
         exec(compile(program, "<your code>", "exec"), {"__name__": "__main__"})
-    except SystemExit:
-        pass
+    except SystemExit as e:
+        # like a real Python process: exit() / exit(0) is fine, anything else is a failure
+        if e.code not in (None, 0):
+            error = "The program exited with " + (repr(e.code) if not isinstance(e.code, int) else "status %d" % e.code)
     except SyntaxError as e:
         error = "SyntaxError on %s: %s" % (_cs_where(e.lineno or 0, n_src), e.msg)
     except BaseException as e:

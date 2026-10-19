@@ -37,6 +37,8 @@ jobs:
         run: node scripts/check_ids.js
       - name: Unit-test the cloud-sync progress merge
         run: node scripts/check_sync_merge.js
+      - name: Run every coding problem's model answer against its tests
+        run: python3 scripts/check_problems.py
 
   deploy:
     needs: check
