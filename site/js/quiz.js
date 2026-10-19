@@ -412,6 +412,7 @@
           scheme.appendChild(d);
         });
         if (q.points && q.points.length) scheme.appendChild(h("div", { html: "<p><b>Indicative content</b> (what a top answer mentions):</p><ul>" + q.points.map((p) => "<li>" + CS.markdown.inline(p) + "</li>").join("") + "</ul>" }));
+        if (q.exemplars && q.exemplars.length) scheme.appendChild(h("p", { class: "small", html: "🎯 Not sure which level you're in? <a href='#/levels/" + q.id + "'>Mark three example answers for this question</a> in the extended-answer trainer." }));
       } else {
         const pts = q.scheme || q.points || [];
         scheme.appendChild(h("p", { html: "<b>Mark scheme</b> — tick each point you made. " + (q.maxPoints && q.maxPoints < pts.length ? "Any <b>" + q.marks + "</b> of these for full marks." : "") + (q.guidance ? "<br>" + CS.markdown.inline(q.guidance) : "") }));

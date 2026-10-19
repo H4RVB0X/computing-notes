@@ -525,3 +525,19 @@ figure.code.numbered code .ln { display: inline-block; width: 2.2em; color: #5c6
 .report-link { margin-left: auto; background: none; border: 0; padding: 2px 4px; font: inherit; font-size: 0.75rem; font-weight: 600; color: var(--text-3); cursor: pointer; text-transform: none; letter-spacing: 0; }
 .report-link:hover { color: var(--accent); text-decoration: underline; }
 .row .report-link { margin-left: 0; }
+
+/* extended-answer trainer (levels.js) */
+.exemplar-text { margin-top: 8px; padding: 12px 14px; background: var(--bg-2, var(--bg)); border-left: 3px solid var(--border-2); border-radius: 8px; font-size: 0.95rem; }
+.exemplar-text p:last-child { margin-bottom: 0; }
+
+/* code practice (code.js) */
+.code-editor { display: flex; border: 1px solid var(--border-2); border-radius: var(--radius); background: var(--surface); overflow: hidden; font-family: var(--font-mono); font-size: 0.9rem; line-height: 1.5; }
+.code-editor .gutter { padding: 10px 8px; min-width: 2.6em; text-align: right; color: var(--text-3); background: var(--bg-3); white-space: pre; user-select: none; }
+.code-editor textarea { flex: 1; min-width: 0; border: 0; border-radius: 0; padding: 10px 12px; font: inherit; line-height: inherit; resize: none; overflow: hidden; white-space: pre; overflow-x: auto; tab-size: 4; background: transparent; color: var(--text); box-shadow: none; }
+.code-editor textarea:focus { outline: none; }
+.code-editor:focus-within { border-color: var(--accent); }
+.code-output { margin: 0 0 10px; padding: 10px 12px; border-radius: 8px; background: var(--bg-3); font-family: var(--font-mono); font-size: 0.85rem; white-space: pre-wrap; word-break: break-word; max-height: 360px; overflow: auto; }
+textarea.stdin { font-family: var(--font-mono); font-size: 0.85rem; }
+.test-row { margin-bottom: 6px; }
+.test-row.ok > summary { color: var(--ok); }
+.test-row.bad > summary { color: var(--bad); }

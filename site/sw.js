@@ -8,11 +8,11 @@ const CACHE = "cs-revision-v1";
 const SHELL = [
   "./", "index.html", "manifest.webmanifest", "css/style.css",
   "js/config.js", "js/core.js", "js/highlight.js", "js/markdown.js", "js/quiz.js", "js/flashcards.js",
-  "js/trace.js", "js/review.js", "js/search.js", "js/app.js",
+  "js/trace.js", "js/review.js", "js/levels.js", "js/code.js", "js/py-worker.js", "js/search.js", "js/app.js",
   "content/sections.js", "content/manifest.js",
   "icons/icon-192.png", "icons/icon-512.png", "icons/apple-touch-icon.png",
 ];
-const EXTRA = ["js/code.js", "js/py-worker.js", "js/levels.js", "js/sync.js"]; // optional: may not exist in every version
+const EXTRA = ["js/sync.js"]; // optional: may not exist in every version
 const PYODIDE = "https://cdn.jsdelivr.net/pyodide/";
 const TIMEOUT = 4000; // ms to wait for the network before using the saved copy
 

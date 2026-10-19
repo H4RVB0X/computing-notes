@@ -214,6 +214,7 @@
     if (lastMeta) actions.appendChild(h("a", { class: "btn primary", href: "#/topic/" + last, text: "Continue: " + last + " " + lastMeta.title }));
     actions.appendChild(h("a", { class: "btn", href: "#/mock", text: "🎲 Mixed mock" }));
     actions.appendChild(h("a", { class: "btn", href: "#/mistakes", text: "🔁 My mistakes" }));
+    actions.appendChild(h("a", { class: "btn", href: "#/code", text: "💻 Code practice" }));
     actions.appendChild(h("a", { class: "btn", href: "#/flashcards", text: "🃏 Flashcards" }));
     actions.appendChild(h("a", { class: "btn", href: "#/tools", text: "🧰 Tools (" + nTools + ")" }));
     actions.appendChild(h("a", { class: "btn", href: "#/checklist", text: "✅ Spec checklist" }));
@@ -405,6 +406,10 @@
     if (ne) grid.appendChild(card("#/exam/" + id, "📝", "Exam-style questions", ne + " questions with mark schemes"));
     if (nf) grid.appendChild(card("#/flashcards/" + id, "🃏", "Flashcards", nf + " cards, spaced repetition"));
     if (nt) grid.appendChild(card("#/trace/" + id, "🔍", "Trace challenges", nt + " code-tracing tasks"));
+    const np = Object.values(CS.problems || {}).filter((p) => p.topic === id).length;
+    if (np) grid.appendChild(card("#/code", "💻", "Code practice", np + " Python problem" + (np === 1 ? "" : "s") + " with automatic tests"));
+    const nl = (CS.exams[id] || []).filter((q) => q.levels && q.exemplars).length;
+    if (nl) grid.appendChild(card("#/levels/" + (CS.exams[id] || []).find((q) => q.levels && q.exemplars).id, "🎯", "Extended answers", "mark example answers to " + nl + " levelled question" + (nl === 1 ? "" : "s")));
     grid.appendChild(card("#/mock", "🎲", "Mixed mock", "random questions across topics"));
     wrap.appendChild(grid);
     const resetRow = h("div", { class: "row small", style: "justify-content:flex-end;margin-top:8px" });
