@@ -184,7 +184,7 @@ print("Password accepted")
 2. Player 2 has **6 lives** and guesses one letter at a time (prompt \`Guess a letter: \`).
    - If the guess is not exactly one lower-case letter \`a\`–\`z\`, output \`Enter one letter\` (no life lost).
    - If the letter has been guessed before, output \`Already guessed\` (no life lost).
-   - Otherwise it is a new guess. If the letter is not in the word, lose a life and output \`Wrong! Lives left: <lives>\`. Then output the word with every unguessed letter shown as \`_\` (no spaces), e.g. \`_a_\`.
+   - Otherwise it is a new guess. If the letter is not in the word, lose a life and output \`Wrong! Lives left: <lives>\`. Then, for every new guess (right or wrong), output the word with every unguessed letter shown as \`_\` (no spaces), e.g. \`_a_\`.
 3. After a new guess, if every letter has been revealed output \`You win!\` and stop; if lives reach 0, output \`You lose! The word was <word>\` and stop.
 
 \`\`\`text

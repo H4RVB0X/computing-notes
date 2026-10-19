@@ -198,7 +198,8 @@ else:
 
 **Common mistakes**
 - Only checking \`% 4\`, which wrongly makes 1900 a leap year.
-- Missing brackets. In Python \`and\` binds tighter than \`or\`, so the brackets here are optional, but writing them shows the examiner your intention.`
+
+**Brackets.** In Python \`and\` binds tighter than \`or\`, so the brackets here are optional, but writing them shows the examiner your intention.`
   },
   {
     id: "validated-age",
@@ -267,7 +268,7 @@ else:
 **Boundaries.** Test 0, 120, −1 and 121 as well as normal values; 13 and 17/18 are the boundaries of the categories. \`age < 13\` then \`elif age < 18\` handles them without overlapping.
 
 **Common mistakes**
-- Putting the range check outside \`try\`, or catching every exception with a bare \`except:\` (hides real bugs).
+- Converting with \`int()\` outside the \`try\`, so text still crashes the program; or catching every exception with a bare \`except:\` (hides real bugs).
 - Writing \`if 0 < age < 120\` — that rejects the valid boundaries 0 and 120.`
   },
   {

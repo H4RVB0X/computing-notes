@@ -368,7 +368,7 @@ print(t.get("act"))           # 2
     task: `Write a program that counts how often each word appears in a sentence, using a **dictionary**.
 
 - Ask for a sentence (prompt \`Enter a sentence: \`).
-- Convert it to lower case and remove these punctuation characters: \`. , ! ? ; :\`. Words are separated by spaces.
+- Convert it to lower case and remove these punctuation characters: \`. , ! ? ; :\`. Words are separated by one or more spaces.
 - If there are no words, output \`No words\`.
 - Otherwise output each different word with its count as \`<word>: <count>\`, **in the order the words first appear**, then \`Most common: <word>\`. If several words share the highest count, choose the one that appeared first.
 
@@ -423,6 +423,6 @@ else:
 
 **\`split()\` vs \`split(" ")\`.** \`split()\` with no argument splits on any run of whitespace and never produces empty strings; \`split(" ")\` would turn the double space into an empty "word".
 
-**Exam link.** This is the spec's own example of a dictionary application: counting word frequencies in a document. It's also the first step of dictionary-based compression and of building a Huffman tree.`
+**Exam link.** This is the spec's own example of a dictionary application (information retrieval): counting how often each word appears in a document. A dictionary of the distinct words is also the idea behind dictionary-based compression, where each word is replaced by a shorter code.`
   }
 ]);

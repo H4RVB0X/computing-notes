@@ -8,7 +8,7 @@ CS.registerProblems([
     difficulty: 1,
     task: `Write a function \`linear_search(items, target)\` that checks the items of the list **one at a time, from the start**, and returns the index of the **first** item equal to \`target\`, or \`-1\` if it isn't there.
 
-Don't use \`in\`, \`.index()\` or \`.find()\`. Your code should only define the function.
+Don't use the \`in\` operator to search (as in \`target in items\`), \`.index()\` or \`.find()\`; a \`for\` loop is fine. Your code should only define the function.
 
 \`\`\`python
 print(linear_search([5, 3, 9, 3], 3))    # 1
@@ -464,7 +464,7 @@ def shortest_path(graph, start, goal):
 `,
     explain: `**Approach.** Dijkstra's algorithm repeatedly takes the closest unvisited vertex: its distance is now final, because every other route would have to go through a vertex that is already at least as far away (this is why weights must not be negative). Then it *relaxes* each edge out of that vertex, improving neighbours' distances where possible.
 
-**Tracing from A.** A(0) → C(2): B becomes 3, D 10, E 12 → B(3): D becomes 8 → D(8): E becomes 10, F 14 → E(10): F becomes 12 → F(12). Note the direct edge A–B (4) loses to A–C–B (3).
+**Tracing from A.** A(0): B becomes 4, C 2 → C(2): B becomes 3, D 10, E 12 → B(3): D becomes 8 → D(8): E becomes 10, F 14 → E(10): F becomes 12 → F(12). Note the direct edge A–B (4) loses to A–C–B (3).
 
 **Recording the path.** Store the \`previous\` vertex whenever a distance improves; following it backwards from the goal rebuilds the route.
 
@@ -483,7 +483,7 @@ def shortest_path(graph, start, goal):
 - Process the tokens left to right. A number is pushed on to the stack. An operator pops the top two values (the first popped is the **right-hand** operand), applies the operator and pushes the result.
 - After processing **each** token, output \`Stack: \` followed by the stack as a Python list, bottom first, e.g. \`Stack: [5, 3]\` (that's what \`print("Stack:", stack)\` gives).
 - At the end, if exactly one value is left, output \`Result: <value>\`.
-- Output \`Invalid expression\` and stop if an operator needs two values but there are fewer, if a token isn't a number or an operator, or if the stack does not end with exactly one value.
+- Output \`Invalid expression\` and stop if an operator needs two values but there are fewer, if a token isn't a number or an operator, or if the stack does not end with exactly one value. No \`Stack:\` line is output for the token that caused the error.
 
 \`\`\`text
 Enter an RPN expression: 6 2 - 3 *

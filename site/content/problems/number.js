@@ -355,7 +355,7 @@ else:
 
 **Worked example.** 978030640615: 9 + 21 + 8 + 0 + 3 + 0 + 6 + 12 + 0 + 18 + 1 + 15 = 93. 93 MOD 10 = 3, 10 − 3 = 7 = the 13th digit ✓.
 
-**Exam link.** Check digits detect most single-digit errors and many transpositions (two adjacent digits swapped), because swapped digits get different weights. They do not *correct* errors, and they say nothing about whether the ISBN belongs to a real book.
+**Exam link.** The ISBN-13 check digit detects every single-digit error and most transpositions (two adjacent digits swapped, unless they differ by 5), because swapped digits get different weights. They do not *correct* errors, and they say nothing about whether the ISBN belongs to a real book.
 
 **Common mistake.** Forgetting the final \`% 10\`, so a total ending in 0 needs a "check digit" of 10.`
   },
@@ -411,7 +411,7 @@ print(" x ".join(factors))
 **Efficiency (extension).** You can stop once \`divisor * divisor > number\`; whatever is left (if more than 1) is itself prime. That makes large primes much faster.
 
 **Common mistakes**
-- Using \`if\` instead of \`while\` for the division, so 12 gives \`2 x 3 x 2\` or misses repeated factors.
+- Moving on to the next divisor straight after a successful division, so 12 gives \`2 x 3\` and misses the repeated factor 2.
 - \`/\` instead of \`//\`: the number becomes a float and output shows \`2.0\`.
 - Printing \`" x "\` after every factor, leaving a trailing \` x \`.`
   }

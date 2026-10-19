@@ -149,7 +149,7 @@ print(a.get_balance())    # 50
 - \`get_name()\` returns the name.
 - \`pay(hours)\` returns the pay for that many hours: the hourly rate for each of the first 40 hours, and **double** the hourly rate for every hour over 40.
 
-**\`Manager\`** — a subclass of \`Employee\` (it must **inherit** from it).
+**\`Manager\`** — a subclass of \`Employee\` (it must **inherit** from it, including \`get_name()\`, which it should not define again).
 - \`Manager(name, hourly_rate, bonus)\` also stores a weekly bonus. Use \`super().__init__(...)\` for the shared attributes.
 - \`pay(hours)\` **overrides** the parent method: it returns the normal employee pay plus the bonus. Call the parent's \`pay\` with \`super()\` rather than repeating the overtime rule.
 
