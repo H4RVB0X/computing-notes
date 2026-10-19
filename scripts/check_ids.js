@@ -5,7 +5,9 @@
  * with identical text in one topic would collide. Progress, the mistakes deck and reports all key on these ids.
  * Fix a collision by giving one of the questions an explicit `id: "<topic>/q-something"`.
  *
- * Usage:  node scripts/check_ids.js      exit code 1 on any duplicate
+ * Also fails questions that lean on "the previous question", the notes, or a table/diagram they don't show.
+ *
+ * Usage:  node scripts/check_ids.js      exit code 1 on any duplicate or non-self-contained question
  */
 const vm = require("vm"), fs = require("fs"), path = require("path");
 const root = path.join(__dirname, "..", "site");
@@ -29,4 +31,20 @@ for (const reg of [ctx.CS.quizzes, ctx.CS.exams])
       } else seen.set(q.id, q);
     });
 console.log(`${total} questions, ${seen.size} unique ids, ${dupes} duplicate(s)`);
-process.exit(dupes ? 1 : 0);
+
+/* Each question must stand alone: quizzes are shuffled and mixed into mocks one question at a time, so a
+ * question can't lean on "the previous question", the notes page, or a table/diagram it doesn't include. */
+const leans = /\bprevious questions?\b|\b(in|from|on) the notes\b|\b(?:table|tables|diagram|graph|tree|code|program|FSM|database|grammar|figure)\s+(?:above|below)\b/i;
+let lonely = 0;
+for (const reg of [ctx.CS.quizzes, ctx.CS.exams])
+  for (const qs of Object.values(reg))
+    qs.forEach((q) => {
+      const text = String(q.q);
+      const shows = q.code || /\n\s*\|.*\|/.test(text) || /```/.test(text);
+      if (leans.test(text) && !(shows && !/previous question|the notes/i.test(text))) {
+        lonely++;
+        console.log(`NOT SELF-CONTAINED ${q.id}: "${text.slice(0, 100)}"`);
+      }
+    });
+console.log(`${lonely} question(s) refer to something they don't show`);
+process.exit(dupes || lonely ? 1 : 0);
