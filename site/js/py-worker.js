@@ -1,10 +1,12 @@
 /* =====================================================================
    py-worker.js — runs students' Python in a Web Worker with Pyodide
    (a background thread, so an infinite loop can be stopped without freezing the page)
-   Message in:  { id, code, input, extra, files }   (one run)
+   Message in:  { id, code, input, extra, files, eofOk }   (one run)
    Messages out: { type: "ready" } once Python has loaded, then { type: "result", id, out, transcript, error }
    Test semantics match scripts/check_problems.py: input() reads the next line of `input` and its prompt
    is not part of the checked output; `extra` (a test's check code) runs after the program.
+   With eofOk (skeleton-program tasks, whose game never ends on its own) running out of input
+   ends the program cleanly instead of raising EOFError.
    ===================================================================== */
 const PYODIDE = "https://cdn.jsdelivr.net/pyodide/v0.26.4/full/";
 importScripts(PYODIDE + "pyodide.js");
@@ -12,13 +14,14 @@ importScripts(PYODIDE + "pyodide.js");
 const HARNESS = `
 import sys, io, builtins, os, json, shutil, traceback
 
-_CS_DIR = "/home/pyodide/run"
+_CS_HOME = os.getcwd()  # /home/pyodide in the browser
+_CS_DIR = os.path.join(_CS_HOME, "run")
 
 def _cs_where(lineno, n_src):
     return "line %d" % lineno if lineno <= n_src else "the test's check code"
 
-def _cs_run(src, stdin_text, extra, files_json):
-    os.chdir("/home/pyodide")
+def _cs_run(src, stdin_text, extra, files_json, eof_ok=False):
+    os.chdir(_CS_HOME)
     shutil.rmtree(_CS_DIR, ignore_errors=True)
     os.makedirs(_CS_DIR)
     os.chdir(_CS_DIR)
@@ -44,6 +47,9 @@ def _cs_run(src, stdin_text, extra, files_json):
         try:
             v = next(feed)
         except StopIteration:
+            if eof_ok:
+                transcript.write("\\n[input ran out: the test stops here]\\n")
+                raise SystemExit(0)
             raise EOFError("the program asked for more input than was given")
         transcript.write(v + "\\n")
         return v
@@ -67,7 +73,7 @@ def _cs_run(src, stdin_text, extra, files_json):
         error = "%s%s: %s" % (type(e).__name__, where, e)
     finally:
         sys.stdout, builtins.input = saved
-        os.chdir("/home/pyodide")
+        os.chdir(_CS_HOME)
     return json.dumps({"out": out.getvalue(), "transcript": transcript.getvalue(), "error": error})
 `;
 
@@ -82,7 +88,7 @@ self.onmessage = async (e) => {
   const m = e.data;
   const py = await ready;
   try {
-    const res = JSON.parse(py.globals.get("_cs_run")(m.code, m.input || "", m.extra || "", JSON.stringify(m.files || {})));
+    const res = JSON.parse(py.globals.get("_cs_run")(m.code, m.input || "", m.extra || "", JSON.stringify(m.files || {}), !!m.eofOk));
     self.postMessage(Object.assign({ type: "result", id: m.id }, res));
   } catch (err) {
     self.postMessage({ type: "result", id: m.id, out: "", transcript: "", error: String(err) });

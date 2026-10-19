@@ -39,6 +39,8 @@ jobs:
         run: node scripts/check_sync_merge.js
       - name: Run every coding problem's model answer against its tests
         run: python3 scripts/check_problems.py
+      - name: Check the in-browser Python harness (py-worker.js) under real Python
+        run: python3 scripts/check_worker_harness.py
 
   deploy:
     needs: check

@@ -39,7 +39,7 @@
     readyPromise = null;
   }
   /** run once: resolves {out, transcript, error, timedOut} */
-  function runOnce(code, input, extra, files) {
+  function runOnce(code, input, extra, files, eofOk) {
     return (worker ? readyPromise : startWorker()).then(
       () =>
         new Promise((resolve) => {
@@ -54,7 +54,7 @@
             delete waiting[id];
             resolve(m);
           };
-          worker.postMessage({ id: id, code: code, input: input, extra: extra, files: files });
+          worker.postMessage({ id: id, code: code, input: input, extra: extra, files: files, eofOk: !!eofOk });
         })
     );
   }
@@ -106,10 +106,10 @@
     const nSolved = all.filter((p) => s[p.id]).length;
     main.appendChild(h("div", { class: "card", style: "margin-bottom:14px", html: '<div class="stat-row"><div class="stat"><div class="v">' + nSolved + "/" + all.length + '</div><div class="l">solved</div></div>' + [1, 2, 3].map((d) => '<div class="stat"><div class="v">' + all.filter((p) => p.difficulty === d && s[p.id]).length + "/" + all.filter((p) => p.difficulty === d).length + '</div><div class="l">' + DIFF[d] + "</div></div>").join("") + "</div>" + (location.protocol === "file:" ? "<p class='small' style='margin:10px 0 0'>⚠️ Code practice needs the live website (or a local server such as <code>python3 -m http.server</code> in the <code>site</code> folder): browsers don't run background Python from a file.</p>" : "") }));
     const filter = h("div", { class: "row small", style: "margin-bottom:10px" });
-    let level = 0;
+    let level = 0; // 0 all, 1-3 difficulty, "pot" skeleton-program (Section D) tasks
     const table = h("div", { class: "table-wrap" });
     const draw = () => {
-      const rows = all.filter((p) => !level || p.difficulty === level);
+      const rows = all.filter((p) => (level === "pot" ? p.topic === "P.5" : !level || p.difficulty === level));
       table.innerHTML =
         "<table><thead><tr><th></th><th>Problem</th><th>Topic</th><th>Level</th></tr></thead><tbody>" +
         rows
@@ -120,7 +120,9 @@
           .join("") +
         "</tbody></table>";
     };
-    [[0, "All"], [1, "Warm-up"], [2, "Standard"], [3, "Stretch"]].forEach(([v, t]) => {
+    const filters = [[0, "All"], [1, "Warm-up"], [2, "Standard"], [3, "Stretch"]];
+    if (all.some((p) => p.topic === "P.5")) filters.push(["pot", "Paper 1 skeleton (Section D)"]);
+    filters.forEach(([v, t]) => {
       const b = h("button", { type: "button", class: "btn sm" + (v === 0 ? " primary" : ""), text: t });
       b.addEventListener("click", () => {
         level = v;
@@ -186,7 +188,7 @@
       try {
         await ensurePython();
         status.textContent = "Running…";
-        const r = await runOnce(editor.value(), stdin.value, "", (visible[0] && visible[0].files) || p.files || {});
+        const r = await runOnce(editor.value(), stdin.value, "", (visible[0] && visible[0].files) || p.files || {}, p.eofOk);
         output.style.display = "";
         output.textContent = r.transcript + (r.error ? (r.transcript && !r.transcript.endsWith("\n") ? "\n" : "") + "⚠ " + r.error : "") || "(no output)";
         status.textContent = r.error ? "Your program stopped with an error." : "Finished.";
@@ -204,7 +206,7 @@
         for (let i = 0; i < p.tests.length; i++) {
           status.textContent = "Running test " + (i + 1) + " of " + p.tests.length + "…";
           const t = p.tests[i];
-          const r = await runOnce(editor.value(), t.input || "", t.code || "", t.files || p.files || {});
+          const r = await runOnce(editor.value(), t.input || "", t.code || "", t.files || p.files || {}, p.eofOk);
           rows.push({ t: t, r: r, ok: !r.error && passes(t, p.match, r.out) });
         }
         const nOk = rows.filter((x) => x.ok).length;
@@ -240,7 +242,10 @@
       hintBtn.disabled = shown >= p.hints.length;
     });
     const solution = h("div", { style: solved()[id] ? "" : "display:none" });
-    solution.innerHTML = "<h3>Model answer</h3>" + CS.markdown.render("```python\n" + p.solution + "\n```", {}) + (p.explain ? md(p.explain) : "");
+    // skeleton tasks show just the changed code; the full program is one click away
+    solution.innerHTML = p.answer
+      ? "<h3>Model answer</h3>" + md(p.answer) + "<details class='collapse'><summary>The whole modified program</summary><div class='collapse-body'>" + CS.markdown.render("```python\n" + p.solution + "\n```", {}) + "</div></details>" + (p.explain ? md(p.explain) : "")
+      : "<h3>Model answer</h3>" + CS.markdown.render("```python\n" + p.solution + "\n```", {}) + (p.explain ? md(p.explain) : "");
     if (CS.enhance) CS.enhance(solution);
     const peek = h("button", { type: "button", class: "btn sm ghost", text: "Show the model answer" });
     peek.addEventListener("click", () => {

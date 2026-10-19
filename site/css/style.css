@@ -531,8 +531,8 @@ figure.code.numbered code .ln { display: inline-block; width: 2.2em; color: #5c6
 .exemplar-text p:last-child { margin-bottom: 0; }
 
 /* code practice (code.js) */
-.code-editor { display: flex; border: 1px solid var(--border-2); border-radius: var(--radius); background: var(--surface); overflow: hidden; font-family: var(--font-mono); font-size: 0.9rem; line-height: 1.5; }
-.code-editor .gutter { padding: 10px 8px; min-width: 2.6em; text-align: right; color: var(--text-3); background: var(--bg-3); white-space: pre; user-select: none; }
+.code-editor { display: flex; align-items: flex-start; max-height: 75vh; overflow: auto; border: 1px solid var(--border-2); border-radius: var(--radius); background: var(--surface); font-family: var(--font-mono); font-size: 0.9rem; line-height: 1.5; }
+.code-editor .gutter { align-self: stretch; padding: 10px 8px; min-width: 2.6em; text-align: right; color: var(--text-3); background: var(--bg-3); white-space: pre; user-select: none; }
 .code-editor textarea { flex: 1; min-width: 0; border: 0; border-radius: 0; padding: 10px 12px; font: inherit; line-height: inherit; resize: none; overflow: hidden; white-space: pre; overflow-x: auto; tab-size: 4; background: transparent; color: var(--text); box-shadow: none; }
 .code-editor textarea:focus { outline: none; }
 .code-editor:focus-within { border-color: var(--accent); }
