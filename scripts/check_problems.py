@@ -9,7 +9,9 @@
      - a fresh Python process per test, working directory containing exactly the problem's `files`;
      - builtins.input is replaced: each call returns the next line of test.input (split on "\\n";
        a trailing newline does not create an extra empty line); prompts are swallowed (not output);
-       running out of lines raises EOFError;
+       running out of lines raises EOFError, except that with `eofOk: true` (skeleton-program tasks,
+       whose game never ends on its own) it ends the program cleanly, exactly like sys.exit(0), and the
+       test is judged on the output so far;
      - program = solution + "\\n" + test.code (if present); 2-second time limit;
      - "lines" (default): stdout and expect split into lines, each rstripped, trailing empty lines
        dropped, then compared exactly; "contains": each non-empty expect line must appear in stdout,
@@ -58,7 +60,7 @@ console.log(JSON.stringify(out));
 # The wrapper that runs one program with input() patched. Kept in sync with the browser runner.
 WRAPPER = r'''
 import builtins, sys
-prog_path, input_path = sys.argv[1], sys.argv[2]
+prog_path, input_path, eof_ok = sys.argv[1], sys.argv[2], sys.argv[3] == "1"
 with open(input_path, encoding="utf-8") as f:
     data = f.read()
 lines = [] if data == "" else data.split("\n")
@@ -69,6 +71,8 @@ def _input(prompt=""):
     try:
         return next(_it)
     except StopIteration:
+        if eof_ok:
+            raise SystemExit(0)  # eofOk: running out of input ends the program cleanly
         raise EOFError("EOF when reading a line (the program asked for more input than the test provides)")
 builtins.input = _input
 with open(prog_path, encoding="utf-8") as f:
@@ -78,7 +82,7 @@ exec(compile(src, "main.py", "exec"), {"__name__": "__main__", "__builtins__": b
 '''
 
 ID_RE = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
-PROBLEM_KEYS = {"id", "title", "topic", "difficulty", "task", "starter", "tests", "files", "match", "hints", "solution", "explain"}
+PROBLEM_KEYS = {"id", "title", "topic", "difficulty", "task", "starter", "tests", "files", "match", "hints", "solution", "explain", "answer", "eofOk"}
 REQUIRED = ["id", "title", "topic", "difficulty", "task", "tests", "hints", "solution", "explain"]
 TEST_KEYS = {"name", "input", "code", "expect", "hidden"}
 ALLOWED_IMPORTS = {"math", "random", "string"}
@@ -111,7 +115,7 @@ def clip(s, n=400):
     return r if len(r) <= n else r[:n] + "... (%d characters)" % len(s)
 
 
-def run_one(code, test, files, workroot):
+def run_one(code, test, files, workroot, eof_ok=False):
     """Run `code` (+ test.code) for one test. Returns (passed, detail)."""
     program = code + ("\n" + test["code"] if test.get("code") else "")
     with tempfile.TemporaryDirectory(dir=workroot) as base:
@@ -124,7 +128,7 @@ def run_one(code, test, files, workroot):
         wrapper = base / "wrapper.py"; wrapper.write_text(WRAPPER, encoding="utf-8")
         env = dict(os.environ, PYTHONIOENCODING="utf-8", PYTHONHASHSEED="0")
         try:
-            r = subprocess.run([sys.executable, "-I", str(wrapper), str(prog), str(inp)], cwd=cwd,
+            r = subprocess.run([sys.executable, "-I", str(wrapper), str(prog), str(inp), "1" if eof_ok else "0"], cwd=cwd,
                                capture_output=True, text=True, timeout=TIME_LIMIT, env=env)
         except subprocess.TimeoutExpired:
             return False, "timed out (over %.0f s)" % TIME_LIMIT
@@ -145,11 +149,13 @@ def check_schema(p, where, topics, err, warn):
     pid = p.get("id")
     if not isinstance(pid, str) or not ID_RE.match(pid):
         err(f"{where}: id {pid!r} must be lowercase kebab-case (a-z, 0-9, hyphens, no dots)")
-    for k in ["title", "task", "solution", "explain"]:
+    for k in ["title", "task", "solution", "explain", "answer"]:
         if k in p and (not isinstance(p[k], str) or not p[k].strip()):
             err(f"{where}: '{k}' must be a non-empty string")
     if "starter" in p and not isinstance(p["starter"], str):
         err(f"{where}: 'starter' must be a string")
+    if "eofOk" in p and not isinstance(p["eofOk"], bool):
+        err(f"{where}: 'eofOk' must be true or false")
     if p.get("topic") not in topics:
         err(f"{where}: topic {p.get('topic')!r} is not in sections.js")
     if p.get("difficulty") not in (1, 2, 3):
@@ -251,7 +257,7 @@ def main():
     t0 = time.time()
     workroot = tempfile.mkdtemp(prefix="check_problems_")
     with ThreadPoolExecutor(max_workers=max(2, (os.cpu_count() or 2))) as ex:
-        results = list(ex.map(lambda j: (j, run_one(j[1][j[0]], j[3], j[1].get("files"), workroot)), jobs))
+        results = list(ex.map(lambda j: (j, run_one(j[1][j[0]], j[3], j[1].get("files"), workroot, j[1].get("eofOk") is True)), jobs))
     try:
         os.rmdir(workroot)
     except OSError:
