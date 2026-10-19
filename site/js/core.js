@@ -34,11 +34,30 @@
     if (!meta || !meta.id) throw new Error("registerTopic needs meta.id");
     CS.topics[meta.id] = { meta: meta, md: extractComment(body) };
   };
+  /** Give every question a stable id that survives reordering: topic + kind + hash of the question text
+   *  (and code). Options are left out so rebalancing the MCQ wording keeps the id. An explicit `id` wins. */
+  function stampIds(topicId, questions, kind) {
+    questions.forEach((q) => {
+      if (!q.id) q.id = topicId + "/" + kind + "-" + CS.util.hash(String(q.q || "") + "\n" + String(q.code || ""));
+      q.topicId = topicId;
+    });
+    return questions;
+  }
   CS.registerQuiz = function (topicId, questions) {
-    CS.quizzes[topicId] = (CS.quizzes[topicId] || []).concat(questions);
+    CS.quizzes[topicId] = (CS.quizzes[topicId] || []).concat(stampIds(topicId, questions, "q"));
   };
   CS.registerExam = function (topicId, questions) {
-    CS.exams[topicId] = (CS.exams[topicId] || []).concat(questions);
+    CS.exams[topicId] = (CS.exams[topicId] || []).concat(stampIds(topicId, questions, "e"));
+  };
+  CS.problems = {};      // problemId -> coding problem (code practice)
+  CS.registerProblems = function (problems) {
+    problems.forEach((p) => (CS.problems[p.id] = p));
+  };
+  /** look up any quiz or exam question by its stable id */
+  CS.findQuestion = function (id) {
+    const topicId = String(id).split("/")[0];
+    const list = (/\/e-/.test(id) ? CS.exams : CS.quizzes)[topicId] || [];
+    return list.find((q) => q.id === id) || null;
   };
   CS.registerFlashcards = function (topicId, cards) {
     CS.flashcards[topicId] = (CS.flashcards[topicId] || []).concat(cards);
@@ -186,6 +205,7 @@
       ((meta && meta.specPoints) || []).forEach((p) => CS.store.remove("checklist." + p.id));
       (CS.tracesByTopic[id] || []).forEach((t) => CS.store.remove("trace." + t));
       if (CS.flash) CS.flash.cardsFor(id).forEach((c) => CS.store.remove("flash." + c.id));
+      if (CS.mistakes) CS.mistakes.forgetTopic(id);
       if (CS.store.get("lastTopic") === id) CS.store.remove("lastTopic");
     },
     markViewed(id) {
@@ -237,6 +257,25 @@
     untried() {
       return CS.allTopicIds().filter((id) => CS.progress.topic(id).quizBest == null);
     },
+  };
+
+  /** Older versions keyed exam scores and answers by question position (0, 1, "1_pts"…). Re-key them by
+   *  stable question id. Safe to run on every boot and after an import: only position keys are touched. */
+  CS.migrateStore = function () {
+    Object.keys(CS.exams).forEach((t) => {
+      const qs = CS.exams[t];
+      [["exam." + t, /^(\d+)(_pts)?$/], ["examAnswers." + t, /^(\d+)()$/]].forEach(([path, re]) => {
+        const old = CS.store.get(path, null);
+        if (!old || typeof old !== "object" || !Object.keys(old).some((k) => re.test(k))) return;
+        const out = {};
+        Object.keys(old).forEach((k) => {
+          const m = k.match(re);
+          if (!m) out[k] = old[k];
+          else if (qs[+m[1]]) out[qs[+m[1]].id + (m[2] || "")] = old[k];
+        });
+        CS.store.set(path, out);
+      });
+    });
   };
 
   /* ---------- small utilities ---------- */

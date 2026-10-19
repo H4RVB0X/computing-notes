@@ -520,3 +520,8 @@ figure.code.numbered code .ln { display: inline-block; width: 2.2em; color: #5c6
   .topic-body.quick > :not([data-quick]) { display: block; }
 }
 .compact .topic-body p, .compact .topic-body li { line-height: 1.45; }
+
+/* report-a-mistake link (review.js) */
+.report-link { margin-left: auto; background: none; border: 0; padding: 2px 4px; font: inherit; font-size: 0.75rem; font-weight: 600; color: var(--text-3); cursor: pointer; text-transform: none; letter-spacing: 0; }
+.report-link:hover { color: var(--accent); text-decoration: underline; }
+.row .report-link { margin-left: 0; }

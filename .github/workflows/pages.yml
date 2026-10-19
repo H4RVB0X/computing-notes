@@ -33,6 +33,8 @@ jobs:
         run: python3 scripts/run_python_snippets.py
       - name: Check multiple-choice answers don't give themselves away by length
         run: node scripts/check_quiz_balance.js
+      - name: Check every question has a unique stable id
+        run: node scripts/check_ids.js
 
   deploy:
     needs: check
