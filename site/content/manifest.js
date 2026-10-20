@@ -423,6 +423,7 @@ CS.manifest = [
   "content/problems/lists.js",
   "content/problems/number.js",
   "content/problems/oop.js",
+  "content/problems/pot-section-d.js",
   "content/problems/simulation.js",
   "content/problems/strings.js",
   "content/problems/subroutines.js",

@@ -124,6 +124,8 @@ Try each one in your IDE before opening anything. Open **Hint 1** only when stuc
 Modify `__GetChoice` so lowercase input is accepted and anything that isn't B, D, T or S shows "That is not a valid menu option" and asks again.
 
 > In the console above, open **Modifications** and switch on **menu** to see the intended behaviour before you write any code.
+>
+> ✔ **Auto-check it:** [write it in the browser and run the tests](#/code/pot-d-menu)
 
 :::collapse Hint 1
 `.upper()` on the input fixes the case problem.
@@ -173,6 +175,8 @@ Player 1, you had two matching A tiles; your score has increased by 2
 When a file fails to load, the default game should start with MaxScore 10 and empty lists, not with whatever `LoadGame` returned.
 
 > In the console above, open **Modifications** and switch on **loadfix** to see the intended behaviour before you write any code.
+>
+> ✔ **Auto-check it:** [write it in the browser and run the tests](#/code/pot-d-loadfix)
 
 :::collapse Hint 1
 The problem is the unpacking line in `Main`: the default values are overwritten even when loading fails.
@@ -221,6 +225,8 @@ Player 2: has a score of 0
 Modify `__ChoosePile` so it keeps asking until the user enters two whole numbers that are both between 1 and the grid size. Show a suitable message for each kind of error.
 
 > In the console above, open **Modifications** and switch on **validate** to see the intended behaviour before you write any code.
+>
+> ✔ **Auto-check it:** [write it in the browser and run the tests](#/code/pot-d-validate)
 
 :::collapse Hint 1
 You need a loop around both inputs, plus `try/except ValueError` to catch letters.
@@ -280,6 +286,8 @@ Player 1, you had two matching A tiles; your score has increased by 2
 Replace the end-of-game check so it works for any number of players and prints "It is a draw between …" when the highest score is shared.
 
 > In the console above, open **Modifications** and switch on **winner** to see the intended behaviour before you write any code.
+>
+> ✔ **Auto-check it:** [write it in the browser and run the tests](#/code/pot-d-winner)
 
 :::collapse Hint 1
 Two passes: find the highest score, then collect every player who has it.
@@ -345,6 +353,8 @@ It is a draw between Amy and Ben on 2 points
 A player who finds a matching pair takes another turn, with a message saying so.
 
 > In the console above, open **Modifications** and switch on **extra** to see the intended behaviour before you write any code.
+>
+> ✔ **Auto-check it:** [write it in the browser and run the tests](#/code/pot-d-extra)
 
 :::collapse Hint 1
 Track whether this turn found a match with a local Boolean, reset at the start of every turn.
@@ -403,6 +413,8 @@ Player 1 found a pair and takes another turn
 Use `TurnsSinceMatch`: if 10 turns pass with no match, print a message and end the game.
 
 > In the console above, open **Modifications** and switch on **stalemate** to see the intended behaviour before you write any code.
+>
+> ✔ **Auto-check it:** [write it in the browser and run the tests](#/code/pot-d-stalemate)
 
 :::collapse Hint 1
 The counter already works (it is incremented every turn and reset on a match). You only need to act on it.
@@ -447,6 +459,8 @@ Player 1 has won!
 When a matching pair is found, add the bonus of both piles to the score increase.
 
 > In the console above, open **Modifications** and switch on **bonus** to see the intended behaviour before you write any code.
+>
+> ✔ **Auto-check it:** [write it in the browser and run the tests](#/code/pot-d-bonus)
 
 :::collapse Hint 1
 `Pile` has no way to read `_Bonus` from outside, so add a getter first.
@@ -495,6 +509,8 @@ Boris, you had two matching A tiles; your score has increased by 4
 Add menu option P. The player chooses a pile and is shown its top symbol, at a cost of 1 point. Refuse if they have less than 1 point; don't charge for an empty pile.
 
 > In the console above, open **Modifications** and switch on **peek** to see the intended behaviour before you write any code.
+>
+> ✔ **Auto-check it:** [write it in the browser and run the tests](#/code/pot-d-peek)
 
 :::collapse Hint 1
 New private method `__Peek` in `Game`; reuse `__ChoosePile`.
@@ -580,6 +596,8 @@ Player 2: has a score of 2
 Add menu option V that asks for a filename and saves the game in the same format as game1.txt, so it can be loaded again.
 
 > In the console above, open **Modifications** and switch on **save** to see the intended behaviour before you write any code.
+>
+> ✔ **Auto-check it:** [write it in the browser and run the tests](#/code/pot-d-save)
 
 :::collapse Hint 1
 Each pile line is the bonus, then symbol,points from the top tile down. A `Pile` method that builds this string keeps the protected data inside `Pile`.
@@ -684,6 +702,8 @@ Poppy: has a score of 0
 *Likely size: Q15-size · ~13 marks* · spec point `P.5-computer`
 
 Create a `ComputerPlayer` subclass of `Player`. It remembers every symbol revealed in a non-matching turn. On its turn it picks a known pair if it has one, otherwise two random non-empty piles. Player 2 in the default game should be the computer.
+
+> ✔ **Auto-check it:** [write it in the browser and run the tests](#/code/pot-d-computer)
 
 :::collapse Hint 1
 Inherit with `class ComputerPlayer(Player)` and call `super().__init__`. A dictionary of pile index → symbol is a good memory.
@@ -867,6 +887,8 @@ Random choices differ without the seed. The marks are for the computer playing a
 
 A tile with symbol `*` in a file is a wild tile that matches any symbol. Create a `WildTile` subclass of `Tile` and change the matching so it uses a polymorphic `Matches` method.
 
+> ✔ **Auto-check it:** [write it in the browser and run the tests](#/code/pot-d-wild)
+
 :::collapse Hint 1
 Give `Tile` a `Matches(OtherTile)` method; `WildTile` **overrides** it to always return True. That's where the polymorphism marks are.
 :::
@@ -968,6 +990,8 @@ These go beyond the prep page. Same routine: attempt, hints, model answer, test.
 
 Change the rules so two tiles only match if they have the same symbol **and** the same points value (U1 no longer matches U5). When there is no match, show the points of both tiles as well as their symbols.
 
+> ✔ **Auto-check it:** [write it in the browser and run the tests](#/code/pot-d-points)
+
 :::collapse Hint 1
 `Pile` can only tell you the top tile's symbol. Add a matching getter for its points.
 :::
@@ -1025,6 +1049,8 @@ Poppy, you had two matching A tiles; your score has increased by 2
 *Likely size: Q12-size · ~4 marks* · spec point `P.5-penalty`
 
 If a player chooses an empty pile, they lose 1 point, but a score can never go below 0. Show a message saying which happened.
+
+> ✔ **Auto-check it:** [write it in the browser and run the tests](#/code/pot-d-penalty)
 
 :::collapse Hint 1
 Only the `else` branch that prints "You chose an empty pile" needs to change.
@@ -1108,6 +1134,8 @@ Ben: has a score of 1
 
 In the default game, ask how many players there are (2 to 4, validated) and then ask for each player's name (not blank) instead of using "Player 1" and "Player 2".
 
+> ✔ **Auto-check it:** [write it in the browser and run the tests](#/code/pot-d-players)
+
 :::collapse Hint 1
 Replace the two `Players.append(...)` lines in `Main` with a validation loop for the count, then a FOR loop for the names.
 :::
@@ -1175,6 +1203,8 @@ Cal: has a score of 0
 *Likely size: Q13-size · ~7 marks* · spec point `P.5-matched`
 
 When scores are displayed, also show the symbols of the pairs each player has matched, e.g. "Pairs matched: A, A", or "No pairs matched yet".
+
+> ✔ **Auto-check it:** [write it in the browser and run the tests](#/code/pot-d-matched)
 
 :::collapse Hint 1
 This data belongs to the player, so add a list attribute to `Player` (in the constructor) with a method to add to it and a getter.
@@ -1245,6 +1275,8 @@ Player 2: has a score of 4
 
 When the discard is displayed, show the symbols in alphabetical order. Write your own sort (insertion or bubble); do not use `sort()` or `sorted()`. The order of the discard list itself must not change.
 
+> ✔ **Auto-check it:** [write it in the browser and run the tests](#/code/pot-d-sortdiscard)
+
 :::collapse Hint 1
 Copy the symbols into a new list first, so you sort strings and leave `__Discard` alone.
 :::
@@ -1298,6 +1330,8 @@ Discard: A, A, A, A, B, B
 *Likely size: Q14-size · ~9 marks* · spec point `P.5-symbols`
 
 Add menu option C that displays how many tiles of each symbol are still on the board, one symbol per line in alphabetical order.
+
+> ✔ **Auto-check it:** [write it in the browser and run the tests](#/code/pot-d-symbols)
 
 :::collapse Hint 1
 `Pile` keeps its tiles protected, so add a method that returns a list of the symbols in the pile.
@@ -1403,6 +1437,8 @@ U: 2
 
 A pile's bonus is only awarded to the player whose match **empties** that pile. Show a message when a bonus is won.
 
+> ✔ **Auto-check it:** [write it in the browser and run the tests](#/code/pot-d-bonusempty)
+
 :::collapse Hint 1
 You still need the `GetBonus` getter from the bonus task.
 :::
@@ -1471,6 +1507,8 @@ Ben, you had two matching B tiles; your score has increased by 2
 
 `__DisplayBoard` prints every count and axis label as a single character, so a pile of 10+ tiles or a grid wider than 9 misaligns. Rewrite it so every column has the same width.
 
+> ✔ **Auto-check it:** [write it in the browser and run the tests](#/code/pot-d-align)
+
 :::collapse Hint 1
 Work out a column width first: the number of digits in the grid size or in the biggest pile, whichever is larger.
 :::
@@ -1534,6 +1572,8 @@ Player 2, enter your choice: B
 
 `Pile` uses `insert(0, …)` and `pop(0)`, which shift every element (O(n)). Rewrite it to use the **end** of the list as the top of the stack, without changing how anything outside `Pile` behaves.
 
+> ✔ **Auto-check it:** [write it in the browser and run the tests](#/code/pot-d-endtop)
+
 :::collapse Hint 1
 Only `Add`, `GetSymbolOfTopTile` and `Remove` touch the position of the top. `Empty` and `GetNumberOfTiles` don't care.
 :::
@@ -1590,6 +1630,8 @@ This is a refactoring task, so the evidence is that the output is **identical** 
 *Likely size: Q14-size · ~8 marks* · spec point `P.5-shuffle`
 
 Add menu option X. If the current player has at least 2 points, take 2 points and shuffle the positions of the piles on the board; otherwise refuse with a message.
+
+> ✔ **Auto-check it:** [write it in the browser and run the tests](#/code/pot-d-shuffle)
 
 :::collapse Hint 1
 `random.shuffle(list)` shuffles a list in place. You need `import random` at the top.
