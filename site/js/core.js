@@ -173,6 +173,13 @@
         }
       } catch (e) {}
     },
+    /** record when a piece of text (an answer, a code draft) was last edited, so the newest edit wins when
+     *  devices sync. path is the text's full store path, e.g. "codeDrafts.digit-sum". */
+    stampText(path) {
+      const m = CS.store.get("textAt", {});
+      m[path] = Date.now();
+      CS.store.set("textAt", m);
+    },
     update(path, fn, fallback) {
       const v = CS.store.get(path, fallback);
       CS.store.set(path, fn(v));
@@ -185,11 +192,11 @@
       saveStore();
     },
     reset() {
-      memStore = { syncEpoch: Date.now() }; /* a full reset also wins over older copies in the cloud (sync.js) */
-      if (CS.store.onChange) CS.store.onChange();
-      try {
-        localStorage.removeItem(KEY);
-      } catch (e) {}
+      /* a full reset also wins over older copies in the cloud (sync.js); keep which account this device syncs with */
+      const meta = loadStore().syncMeta;
+      memStore = { syncEpoch: Date.now() };
+      if (meta) memStore.syncMeta = meta;
+      saveStore(); /* written straight away, so a reload before the upload can't bring the old progress back */
     },
     exportJSON() {
       return JSON.stringify(loadStore(), null, 2);

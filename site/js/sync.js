@@ -11,21 +11,29 @@
   const h = (t, a, c) => U.el(t, a, c);
   const SDK = "https://www.gstatic.com/firebasejs/10.14.1/";
   const PUSH_DELAY = 1500; // ms after the last change before uploading
-  const LOCAL_ONLY = ["prefs"]; // per-device settings that are never synced
+  const LOCAL_ONLY = ["prefs", "syncMeta"]; // per-device settings, never synced (syncMeta: which account this copy last synced with)
 
   /* ---------------- merging two copies of the progress store ----------------
      Rules: best score / furthest reading (max), ticks and "done" flags (or), the flashcard state
      with the most reviews, mistakes by newest change (with "gone" markers so graduated ones stay
-     gone), histories combined. Text (exam answers, code drafts): when uploading, this device's wins
-     unless it's empty; when a live update arrives (preferRemoteText), the incoming text wins, because it
-     is the newer edit. A full reset stamps syncEpoch; the copy with the newer epoch wins outright. */
-  function merge(local, remote, preferRemoteText) {
+     gone), histories combined. Text (exam answers, code drafts, your own answers) carries an edit time in
+     textAt, and the newest edit wins, including clearing it; text with no edit time falls back to this
+     device's (or, for a live update, the incoming one) unless it's empty.
+     A full reset (or an import) stamps syncEpoch: the copy with the newer epoch wins outright, but only
+     between copies that have synced with this account before, so a device that never synced (or worked
+     while signed out) is merged, not wiped. opts: { uid, preferRemoteText } (a bare boolean is
+     preferRemoteText). */
+  function merge(local, remote, opts) {
+    if (typeof opts !== "object" || !opts) opts = { preferRemoteText: !!opts };
     local = local || {};
     remote = remote || {};
     const le = local.syncEpoch || 0,
       re = remote.syncEpoch || 0;
-    if (le !== re) return clone(le > re ? local : remote, true, le > re ? null : local);
-    const out = mergeValue(local, remote, "", !!preferRemoteText);
+    const syncedBefore = opts.uid === undefined || !!(local.syncMeta && local.syncMeta.uid === opts.uid);
+    if (le !== re && syncedBefore) return clone(le > re ? local : remote, true, le > re ? null : local);
+    const ctx = { pr: !!opts.preferRemoteText, lt: local.textAt || {}, rt: remote.textAt || {} };
+    const out = mergeValue(local, remote, "", ctx);
+    if (le !== re) out.syncEpoch = Math.max(le, re);
     // mistakes: newest entry wins; an entry is dropped if it left the deck after its last change
     const gone = mergeValue(local.mistakesGone || {}, remote.mistakesGone || {}, "mistakesGone");
     const lm = local.mistakes || {},
@@ -47,7 +55,8 @@
     if (keepLocal && localSrc) LOCAL_ONLY.forEach((k) => (localSrc[k] !== undefined ? (out[k] = localSrc[k]) : delete out[k]));
     return out;
   }
-  function mergeValue(a, b, path, preferRemoteText) {
+  function mergeValue(a, b, path, ctx) {
+    ctx = ctx || { lt: {}, rt: {} };
     if (a === undefined) return b;
     if (b === undefined) return a;
     if (path && LOCAL_ONLY.includes(path)) return a;
@@ -55,12 +64,17 @@
     if (a && b && typeof a === "object" && typeof b === "object") {
       if (/^flash\./.test(path) && "box" in a && "box" in b) return (a.seen || 0) > (b.seen || 0) || ((a.seen || 0) === (b.seen || 0) && (a.due || 0) >= (b.due || 0)) ? a : b;
       const out = {};
-      new Set(Object.keys(a).concat(Object.keys(b))).forEach((k) => (out[k] = mergeValue(a[k], b[k], path ? path + "." + k : k, preferRemoteText)));
+      new Set(Object.keys(a).concat(Object.keys(b))).forEach((k) => (out[k] = mergeValue(a[k], b[k], path ? path + "." + k : k, ctx)));
       return out;
     }
     if (typeof a === "number" && typeof b === "number") return Math.max(a, b);
     if (typeof a === "boolean" && typeof b === "boolean") return a || b;
-    if (typeof a === "string" && typeof b === "string") return preferRemoteText ? (b.trim() ? b : a) : a.trim() ? a : b;
+    if (typeof a === "string" && typeof b === "string") {
+      const ta = ctx.lt[path] || 0,
+        tb = ctx.rt[path] || 0;
+      if (ta !== tb) return ta > tb ? a : b; // the newer edit wins, even if it cleared the text
+      return ctx.pr ? (b.trim() ? b : a) : a.trim() ? a : b;
+    }
     return a;
   }
   function mergeArray(a, b) {
@@ -124,15 +138,24 @@
   }
   const userDoc = () => fb.firestore().collection("users").doc(user.uid);
 
+  let starting = false;
   async function start() {
+    if (starting || fb) return;
+    starting = true;
     setState("loading");
     try {
       if (!window.firebase) {
         await loadScript(SDK + "firebase-app-compat.js");
         await Promise.all([loadScript(SDK + "firebase-auth-compat.js"), loadScript(SDK + "firebase-firestore-compat.js")]);
       }
-      fb = window.firebase;
-      if (!fb.apps.length) fb.initializeApp({ apiKey: cfg.apiKey, authDomain: cfg.authDomain, projectId: cfg.projectId, appId: cfg.appId });
+      const firebase = window.firebase;
+      if (!firebase.apps.length) firebase.initializeApp({ apiKey: cfg.apiKey, authDomain: cfg.authDomain, projectId: cfg.projectId, appId: cfg.appId });
+      fb = firebase;
+      await applyPersistence();
+      // a redirect sign-in (used when popups are blocked) reports its errors here
+      Promise.resolve()
+        .then(() => fb.auth().getRedirectResult())
+        .catch((e) => setState("signed-out", "Sign-in failed: " + e.message + (/storage|partition|missing initial state/i.test(e.message) ? " Try again in Safari (not the Home Screen app), or allow pop-ups." : "")));
       fb.auth().onAuthStateChanged(async (u) => {
         if (u && cfg.allowedDomain && !String(u.email || "").toLowerCase().endsWith("@" + cfg.allowedDomain.toLowerCase())) {
           await fb.auth().signOut();
@@ -146,10 +169,33 @@
         listen();
       });
     } catch (e) {
-      setState("error", "Accounts are unavailable right now (" + e.message + "). Your progress is still saved on this device.");
+      setState("error", "Accounts are unavailable right now (" + e.message + "). Your progress is still saved on this device, and sync will retry when you're back online.");
     }
+    starting = false;
   }
+  /** with "Save my progress on this device" off (a shared computer), stay signed in only until the tab closes */
+  async function applyPersistence() {
+    if (!fb) return;
+    try {
+      const P = fb.auth.Auth.Persistence;
+      await fb.auth().setPersistence(CS.store.isSaving() ? P.LOCAL : P.SESSION);
+    } catch (e) {} // if it can't be set, Firebase keeps its default (stay signed in)
+  }
+  CS.sync.applyPersistence = applyPersistence;
+  // recover after being offline: load Firebase if it never loaded, otherwise catch up and reconnect
+  window.addEventListener("online", () => {
+    if (!fb) return start();
+    if (!user) return;
+    pull();
+    if (!unlisten) listen();
+  });
 
+  /** merge a cloud copy into this device's, remembering which account this copy now belongs to */
+  function mergeIn(remote, preferRemoteText) {
+    const merged = merge(CS.store.all(), remote, { uid: user.uid, preferRemoteText: preferRemoteText });
+    merged.syncMeta = { uid: user.uid };
+    return merged;
+  }
   /** download, merge with this device, save both ways */
   async function pull() {
     if (!user || pulling) return;
@@ -159,7 +205,7 @@
       const snap = await userDoc().get();
       const remote = snap.exists && snap.data().data ? JSON.parse(snap.data().data) : null;
       const before = JSON.stringify(CS.store.all());
-      const merged = merge(CS.store.all(), remote);
+      const merged = mergeIn(remote, false);
       const data = JSON.stringify(withoutLocal(merged));
       if (!remote || data !== JSON.stringify(withoutLocal(remote))) await userDoc().set({ data: data, updated: fb.firestore.FieldValue.serverTimestamp() });
       setState("synced");
@@ -182,13 +228,16 @@
         const remote = JSON.parse(snap.data().data);
         const before = JSON.stringify(CS.store.all());
         // a change waiting to upload on this device is newer than anything arriving, so keep its text
-        const merged = merge(CS.store.all(), remote, !pushTimer);
+        const merged = mergeIn(remote, !pushTimer);
         if (JSON.stringify(merged) === before) return;
         replaceQuietly(merged);
         CS.prefs.apply();
         softRefresh();
       },
-      (e) => setState("error", "Live sync stopped: " + e.message + ". Reload the page to reconnect.")
+      (e) => {
+        unlisten = null; // reconnects when the browser comes back online (see below)
+        setState("error", "Live sync stopped: " + e.message + ". It will retry when you're back online, or reload the page.");
+      }
     );
   }
   /** show newly arrived progress without disturbing what you're doing: summary pages redraw in place,
@@ -217,7 +266,7 @@
       await fb.firestore().runTransaction(async (tx) => {
         const snap = await tx.get(userDoc());
         const remote = snap.exists && snap.data().data ? JSON.parse(snap.data().data) : null;
-        const merged = merge(CS.store.all(), remote);
+        const merged = mergeIn(remote, false);
         tx.set(userDoc(), { data: JSON.stringify(withoutLocal(merged)), updated: fb.firestore.FieldValue.serverTimestamp() });
         replaceQuietly(merged);
       });
@@ -306,7 +355,7 @@
       if (!brand) return;
       brand.insertAdjacentElement("afterend", b);
     }
-    const first = user && (user.displayName || user.email || "").split(/[ @]/)[0];
+    const first = user && ((user.displayName || user.email || "").split(/[ @]/)[0] || "you");
     b.className = "pill " + (state === "synced" ? "ok" : state === "error" ? "bad" : "");
     b.textContent = user ? (state === "syncing" ? "⟳ Syncing…" : state === "error" ? "⚠ Sync problem" : "☁ Synced · " + first) : state === "loading" ? "…" : state === "error" ? "☁ Sync unavailable" : "👤 Sign in to sync";
     b.title = message || (user ? "Progress is synced across your devices. Click for account settings." : "Sign in with Google to keep your progress on every device");

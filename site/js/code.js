@@ -37,9 +37,15 @@
     if (worker) worker.terminate();
     worker = null;
     readyPromise = null;
+    // any other run still waiting on this worker would never be answered: tell it to try again
+    Object.keys(waiting).forEach((k) => waiting[k]({ out: "", transcript: "", error: "Python was restarted (another program ran for too long). Run it again.", restarted: true }));
   }
-  /** run once: resolves {out, transcript, error, timedOut} */
+  /** run once: resolves {out, transcript, error, timedOut}. If Python was restarted under it (another
+      program hit the time limit), it's simply run again on the fresh worker. */
   function runOnce(code, input, extra, files, eofOk) {
+    return runRaw(code, input, extra, files, eofOk).then((r) => (r.restarted ? runRaw(code, input, extra, files, eofOk) : r));
+  }
+  function runRaw(code, input, extra, files, eofOk) {
     return (worker ? readyPromise : startWorker()).then(
       () =>
         new Promise((resolve) => {
@@ -152,9 +158,15 @@
     if (CS.enhance) CS.enhance(task);
 
     // editor
-    const editor = makeEditor(drafts()[id] != null ? drafts()[id] : p.starter || "");
-    editor.onChange(U.debounce((v) => CS.store.update("codeDrafts", (d) => Object.assign(d, { [id]: v }), {}), 400));
+    // an empty draft means "start again": it's stored (with its edit time) so the reset reaches other devices
+    const saveDraft = (v) => {
+      CS.store.update("codeDrafts", (d) => Object.assign(d, { [id]: v }), {});
+      CS.store.stampText("codeDrafts." + id);
+    };
+    const editor = makeEditor(drafts()[id] || p.starter || "");
+    editor.onChange(U.debounce(() => saveDraft(editor.value()), 400)); // reads the editor when it fires, so a reset can't be overwritten
     main.appendChild(editor.el);
+    main.appendChild(h("p", { class: "small muted", style: "margin:4px 0 0", text: "Tab indents (4 spaces). To move on with the keyboard, press Esc then Tab." }));
 
     const visible = p.tests.filter((t) => !t.hidden);
     const stdin = h("textarea", { class: "mono stdin", rows: 3, spellcheck: "false", "aria-label": "Input for Run" });
@@ -205,6 +217,7 @@
         await ensurePython();
         const rows = [];
         for (let i = 0; i < p.tests.length; i++) {
+          if (!editor.el.isConnected) return; // left the page: stop running this problem's tests
           status.textContent = "Running test " + (i + 1) + " of " + p.tests.length + "…";
           const t = p.tests[i];
           const r = await runOnce(editor.value(), t.input || "", t.code || "", t.files || p.files || {}, p.eofOk);
@@ -227,7 +240,7 @@
     resetBtn.addEventListener("click", () => {
       if (!confirm("Replace your code with the starting code?")) return;
       editor.set(p.starter || "");
-      CS.store.update("codeDrafts", (d) => (delete d[id], d), {});
+      saveDraft("");
     });
 
     // hints, then the model answer
@@ -282,7 +295,7 @@
   function makeEditor(initial) {
     const wrap = h("div", { class: "code-editor" });
     const gutter = h("div", { class: "gutter", "aria-hidden": "true" });
-    const ta = h("textarea", { spellcheck: "false", autocapitalize: "off", autocomplete: "off", "aria-label": "Your Python code" });
+    const ta = h("textarea", { spellcheck: "false", autocapitalize: "off", autocomplete: "off", autocorrect: "off", "aria-label": "Your Python code. Tab indents; press Escape then Tab to move on." });
     ta.value = initial;
     wrap.append(gutter, ta);
     const listeners = [];
@@ -302,8 +315,11 @@
       }
       if (back) ta.selectionStart = ta.selectionEnd = ta.selectionEnd - back;
     };
+    let escaped = false; // Escape then Tab leaves the editor (otherwise Tab indents)
     ta.addEventListener("keydown", (e) => {
-      if (e.key === "Tab" && !e.shiftKey && !e.ctrlKey && !e.metaKey) {
+      const leaving = escaped;
+      escaped = e.key === "Escape";
+      if (e.key === "Tab" && !e.shiftKey && !e.ctrlKey && !e.metaKey && !leaving) {
         e.preventDefault();
         insert("    ");
       } else if (e.key === "Enter" && !e.shiftKey) {

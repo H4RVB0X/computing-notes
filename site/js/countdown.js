@@ -32,8 +32,9 @@
     if (d >= 1) return d + (d === 1 ? " day " : " days ") + hrs + " h";
     return hrs + " h " + min + " min";
   }
-  // always shown in UK time: the exams are in the UK whatever the device's clock is set to
-  const when = (at) => new Date(at).toLocaleString("en-GB", { timeZone: "Europe/London", weekday: "short", day: "numeric", month: "short", year: "numeric", hour: "numeric", minute: "2-digit" });
+  // AQA papers are shown in UK time whatever the device's clock says; your own in the time you entered them
+  const zone = (e) => (e.fixed ? { timeZone: "Europe/London" } : {});
+  const when = (e) => new Date(e.at).toLocaleString("en-GB", Object.assign({ weekday: "short", day: "numeric", month: "short", year: "numeric", hour: "numeric", minute: "2-digit" }, zone(e)));
 
   /** the strip at the top of the dashboard */
   function strip() {
@@ -43,10 +44,10 @@
     list.forEach((e) => {
       const weeks = Math.floor((e.at - Date.now()) / (7 * DAY));
       box.appendChild(
-        h("div", { class: "countdown" + (e.at - Date.now() < 14 * DAY ? " soon" : ""), title: when(e.at) + (e.detail ? " · " + e.detail : "") }, [
+        h("div", { class: "countdown" + (e.at - Date.now() < 14 * DAY ? " soon" : ""), title: when(e) + (e.detail ? " · " + e.detail : "") }, [
           h("div", { class: "cd-v", text: until(e.at) }),
           h("div", { class: "cd-l", text: e.name }),
-          h("div", { class: "cd-d", text: new Date(e.at).toLocaleDateString("en-GB", { timeZone: "Europe/London", day: "numeric", month: "short" }) + (weeks >= 2 ? " · " + weeks + " weeks of revision" : "") }),
+          h("div", { class: "cd-d", text: new Date(e.at).toLocaleDateString("en-GB", Object.assign({ day: "numeric", month: "short" }, zone(e))) + (weeks >= 2 ? " · " + weeks + " weeks of revision" : "") }),
         ])
       );
     });
@@ -65,7 +66,7 @@
     c.appendChild(h("h3", { style: "margin-top:0", text: "⏳ Exam countdowns" }));
     const ul = h("ul", { class: "cd-list" });
     all().forEach((e) => {
-      const li = h("li", null, [h("b", { text: e.name }), h("span", { class: "muted small", text: " · " + when(e.at) + (e.at < Date.now() ? " (done)" : " · " + until(e.at)) })]);
+      const li = h("li", null, [h("b", { text: e.name }), h("span", { class: "muted small", text: " · " + when(e) + (e.at < Date.now() ? " (done)" : " · " + until(e.at)) })]);
       if (e.fixed && e.detail) li.appendChild(h("div", { class: "small muted", text: e.detail }));
       if (!e.fixed) {
         const del = h("button", { type: "button", class: "btn sm ghost", text: "Remove", "aria-label": "Remove " + e.name });

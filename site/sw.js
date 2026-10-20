@@ -52,10 +52,12 @@ self.addEventListener("fetch", (e) => {
 });
 
 async function cacheFirst(req) {
-  const hit = await caches.match(req);
+  const hit = await caches.match(req.url);
   if (hit) return hit;
-  const res = await fetch(req);
-  if (res.ok) (await caches.open(CACHE)).put(req, res.clone());
+  // fetch with CORS (jsDelivr allows it): the worker's importScripts asks without CORS, which gives an
+  // unreadable "opaque" response that can't be checked, so pyodide.js would never be saved for offline use
+  const res = await fetch(req.url, { mode: "cors", credentials: "omit" });
+  if (res.ok) (await caches.open(CACHE)).put(req.url, res.clone());
   return res;
 }
 
