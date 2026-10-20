@@ -15,12 +15,12 @@ A complete, interactive revision website for the AQA A-Level Computer Science sp
 | **1,585 quiz questions** | Multiple choice, short answer, true/false, ordering and spot-the-bug, all with explanations |
 | **595 exam-style questions** | Self-marked against mark schemes, including 33 levelled 6/9/12-mark questions |
 | **Extended-answer trainer** | For each levelled question, mark three example answers yourself, then see the examiner's level, mark and comment, and write your own |
-| **60 Python coding problems** | Paper 1 Section B style, run in the browser with Pyodide against 373 visible and hidden tests, with hints and model answers |
+| **105 Python coding problems** | Run in the browser with Pyodide against 597 visible and hidden tests, with hints and model answers: 60 Section B-style problems, 24 from my class's programming booklet, and all 21 Piles O' Tiles Section D modifications auto-checked by playing scripted games against your edited skeleton program |
 | **My mistakes** | Every wrong answer comes back after 1, 3 and 7 days until you've got it right each time |
 | **700+ flashcards** | Spaced repetition (Leitner boxes) |
 | **89 trace-table challenges** | Checked cell by cell |
 | **41 interactive tools** | Including an AQA assembly simulator, fetch–decode–execute stepper, logic-gate simulator, Boolean simplifier, SQL playground, floating-point explorer, Dijkstra/A* visualiser, Turing machine, FSM and regex tools, subnet calculator and a TLS handshake demo |
-| **Paper 1 skeleton section** | For the 2027 "Piles O' Tiles" program: a method-by-method code tour, 18 documented bugs, 58 Section C questions, 21 Section D modification tasks with tested model answers, and a faithful in-browser port of the game |
+| **Paper 1 skeleton section** | For the 2027 "Piles O' Tiles" program: a method-by-method code tour, 18 documented bugs, 58 Section C questions, 21 Section D modification tasks (auto-checked in the browser) with tested model answers, and a faithful in-browser port of the game |
 | **Study tools** | Progress tracking, weakest-topic suggestions, a timed mixed mock, a spec checklist, search, dark/light mode, mobile layout, per-page reset and a "don't save on this device" mode |
 | **Installable and offline** | Add to Home Screen on a phone; a service worker saves the whole site for offline use |
 | **Accounts (optional)** | Google sign-in with Firebase; progress is merged across devices. Off until configured ([docs/SETUP.md](docs/SETUP.md)) |
@@ -49,7 +49,7 @@ This project is mainly an exercise in **directing AI agents to build something l
   - The skeleton-program console was **differentially tested** against the real Python program: 61 scripted runs with identical output.
   - Every coding problem's model answer passes its tests in real Python *and* in the in-browser runner, and a separate agent solved each problem from the task wording alone to catch unclear tasks.
   - The cloud-sync merge rules have their own unit tests.
-  - A Playwright smoke test opens all 475 routes (desktop and mobile) and fails on any console error, missing tool or horizontal scroll.
+  - A Playwright smoke test opens all 557 routes (desktop and mobile) and fails on any console error, missing tool or horizontal scroll.
 - **Independent review.** Every page was re-checked by a separate reviewer agent that hadn't written it. About 25 errors were caught and fixed, for example a wrong Amdahl's-law figure, AQA's definition of image resolution, and a logic puzzle with two answers.
 - **Source correction.** Mistakes found in the original notes (textbook, slides, online resources) are corrected on the pages and flagged for students.
 - **Continuous checks.** A GitHub Actions workflow re-runs the validators on every push before deploying.
@@ -57,6 +57,7 @@ This project is mainly an exercise in **directing AI agents to build something l
 **What went wrong, and how it was caught**
 - **The quizzes gave answers away.** Using the site, I noticed the correct option was often just the longest one, a known habit of AI-written multiple choice. I had it measured: a correct option more than 15% longer than every wrong one counts as a giveaway, and the share of questions where the answer is the longest option should stay near chance (25%). 281 questions were rewritten, options are now shuffled every time, and CI fails if the bias comes back. The same rule shaped the extended-answer examples: in over half the questions a lower-level answer is at least as long as the top one, so length never signals the level.
 - **A bug that had been there since the start.** While testing a data migration, the exam page's "self-marked total" turned out to join numbers together as text once a mark-scheme box was ticked. It was fixed and covered by a test.
+- **Questions that leaned on things they didn't show.** A classmate hit an SQL question about a database the question never displayed. A review of all 2,180 questions found 48 that depended on the notes or a previous question. Each now carries its own table, code or diagram, and CI rejects any question that says "previous question" or "the table above" without showing it.
 - **Over-confident facts.** An independent review of the extended-answer examples tightened several legal claims (what the PSTI Act and the Automated Vehicles Act actually say), corrected a timeline and moved one example answer that had been put in the wrong level.
 
 ## Tech
@@ -111,7 +112,7 @@ See [docs/DEVELOPING.md](docs/DEVELOPING.md) for how to add pages, questions and
 
 - Switch on accounts for the class (the code is built; it needs a Firebase project, see [docs/SETUP.md](docs/SETUP.md)).
 - A native iOS app (Capacitor) with daily "mistakes due" notifications.
-- More code-practice problems, especially Paper 1 Section D-style changes to a provided program.
+- More code-practice problems.
 
 ## Notes
 
