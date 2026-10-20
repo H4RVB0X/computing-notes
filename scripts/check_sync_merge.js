@@ -59,6 +59,19 @@ t("a reset on another device wins over this device's older data", () => {
   const m = plain(merge({ topics: { "1.1": { quizBest: 90 } }, prefs: { theme: "dark" } }, { syncEpoch: 50 }));
   assert.deepStrictEqual(m, { syncEpoch: 50, prefs: { theme: "dark" } });
 });
+t("live update: incoming text wins", () => {
+  assert.deepStrictEqual(plain(merge({ codeDrafts: { a: "old", b: "mine" } }, { codeDrafts: { a: "new", b: "" } }, true)).codeDrafts, { a: "new", b: "mine" });
+});
+t("live update still keeps best scores from this device", () => {
+  assert.strictEqual(plain(merge({ topics: { x: { quizBest: 90 } } }, { topics: { x: { quizBest: 60 } } }, true)).topics.x.quizBest, 90);
+});
+t("merging is stable: merging the result again changes nothing", () => {
+  const a = { topics: { x: { quizBest: 50, read: 1 } }, checklist: { p: true }, codeDrafts: { d: "x" } };
+  const b = { topics: { x: { quizBest: 70 } }, checklist: { q: true }, codeDrafts: { d: "y" }, mistakes: { m: { box: 1, at: 5 } } };
+  const m = plain(merge(a, b));
+  assert.deepStrictEqual(plain(merge(m, b)), m);
+  assert.deepStrictEqual(plain(merge(m, m)), m);
+});
 t("merge with nothing in the cloud keeps everything", () => {
   const local = { topics: { "1.1": { quizBest: 10 } }, mistakes: { q: { box: 1, at: 1 } } };
   assert.deepStrictEqual(plain(merge(local, null)).topics, local.topics);
