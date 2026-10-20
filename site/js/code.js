@@ -106,10 +106,10 @@
     const nSolved = all.filter((p) => s[p.id]).length;
     main.appendChild(h("div", { class: "card", style: "margin-bottom:14px", html: '<div class="stat-row"><div class="stat"><div class="v">' + nSolved + "/" + all.length + '</div><div class="l">solved</div></div>' + [1, 2, 3].map((d) => '<div class="stat"><div class="v">' + all.filter((p) => p.difficulty === d && s[p.id]).length + "/" + all.filter((p) => p.difficulty === d).length + '</div><div class="l">' + DIFF[d] + "</div></div>").join("") + "</div>" + (location.protocol === "file:" ? "<p class='small' style='margin:10px 0 0'>⚠️ Code practice needs the live website (or a local server such as <code>python3 -m http.server</code> in the <code>site</code> folder): browsers don't run background Python from a file.</p>" : "") }));
     const filter = h("div", { class: "row small", style: "margin-bottom:10px" });
-    let level = 0; // 0 all, 1-3 difficulty, "pot" skeleton-program (Section D) tasks
+    let level = 0; // 0 all, 1-3 difficulty, "pot" skeleton-program (Section D) tasks, "bk" programming booklet
     const table = h("div", { class: "table-wrap" });
     const draw = () => {
-      const rows = all.filter((p) => (level === "pot" ? p.topic === "P.5" : !level || p.difficulty === level));
+      const rows = all.filter((p) => (level === "pot" ? p.topic === "P.5" : level === "bk" ? /^bk-/.test(p.id) : !level || p.difficulty === level));
       table.innerHTML =
         "<table><thead><tr><th></th><th>Problem</th><th>Topic</th><th>Level</th></tr></thead><tbody>" +
         rows
@@ -122,6 +122,7 @@
     };
     const filters = [[0, "All"], [1, "Warm-up"], [2, "Standard"], [3, "Stretch"]];
     if (all.some((p) => p.topic === "P.5")) filters.push(["pot", "Paper 1 skeleton (Section D)"]);
+    if (all.some((p) => /^bk-/.test(p.id))) filters.push(["bk", "Programming booklet"]);
     filters.forEach(([v, t]) => {
       const b = h("button", { type: "button", class: "btn sm" + (v === 0 ? " primary" : ""), text: t });
       b.addEventListener("click", () => {
