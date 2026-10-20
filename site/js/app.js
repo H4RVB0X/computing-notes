@@ -82,6 +82,7 @@
     }
   }
 
+  CS.refreshSidebar = () => updateSidebarProgress();
   function updateSidebarProgress() {
     document.querySelectorAll(".nav-topics a").forEach((a) => {
       const id = a.getAttribute("data-topic");

@@ -10,21 +10,22 @@
   const U = CS.util;
   const h = (t, a, c) => U.el(t, a, c);
   const SDK = "https://www.gstatic.com/firebasejs/10.14.1/";
-  const PUSH_DELAY = 4000; // ms after the last change before uploading
+  const PUSH_DELAY = 1500; // ms after the last change before uploading
   const LOCAL_ONLY = ["prefs"]; // per-device settings that are never synced
 
   /* ---------------- merging two copies of the progress store ----------------
      Rules: best score / furthest reading (max), ticks and "done" flags (or), the flashcard state
      with the most reviews, mistakes by newest change (with "gone" markers so graduated ones stay
-     gone), histories combined, text (exam answers, code drafts) from this device unless it's empty.
-     A full reset stamps syncEpoch; the copy with the newer epoch wins outright. */
-  function merge(local, remote) {
+     gone), histories combined. Text (exam answers, code drafts): when uploading, this device's wins
+     unless it's empty; when a live update arrives (preferRemoteText), the incoming text wins, because it
+     is the newer edit. A full reset stamps syncEpoch; the copy with the newer epoch wins outright. */
+  function merge(local, remote, preferRemoteText) {
     local = local || {};
     remote = remote || {};
     const le = local.syncEpoch || 0,
       re = remote.syncEpoch || 0;
     if (le !== re) return clone(le > re ? local : remote, true, le > re ? null : local);
-    const out = mergeValue(local, remote, "");
+    const out = mergeValue(local, remote, "", !!preferRemoteText);
     // mistakes: newest entry wins; an entry is dropped if it left the deck after its last change
     const gone = mergeValue(local.mistakesGone || {}, remote.mistakesGone || {}, "mistakesGone");
     const lm = local.mistakes || {},
@@ -46,7 +47,7 @@
     if (keepLocal && localSrc) LOCAL_ONLY.forEach((k) => (localSrc[k] !== undefined ? (out[k] = localSrc[k]) : delete out[k]));
     return out;
   }
-  function mergeValue(a, b, path) {
+  function mergeValue(a, b, path, preferRemoteText) {
     if (a === undefined) return b;
     if (b === undefined) return a;
     if (path && LOCAL_ONLY.includes(path)) return a;
@@ -54,12 +55,12 @@
     if (a && b && typeof a === "object" && typeof b === "object") {
       if (/^flash\./.test(path) && "box" in a && "box" in b) return (a.seen || 0) > (b.seen || 0) || ((a.seen || 0) === (b.seen || 0) && (a.due || 0) >= (b.due || 0)) ? a : b;
       const out = {};
-      new Set(Object.keys(a).concat(Object.keys(b))).forEach((k) => (out[k] = mergeValue(a[k], b[k], path ? path + "." + k : k)));
+      new Set(Object.keys(a).concat(Object.keys(b))).forEach((k) => (out[k] = mergeValue(a[k], b[k], path ? path + "." + k : k, preferRemoteText)));
       return out;
     }
     if (typeof a === "number" && typeof b === "number") return Math.max(a, b);
     if (typeof a === "boolean" && typeof b === "boolean") return a || b;
-    if (typeof a === "string" && typeof b === "string") return a.trim() ? a : b;
+    if (typeof a === "string" && typeof b === "string") return preferRemoteText ? (b.trim() ? b : a) : a.trim() ? a : b;
     return a;
   }
   function mergeArray(a, b) {
@@ -83,7 +84,9 @@
     state = "off", // off | loading | signed-out | syncing | synced | error
     message = "",
     pushTimer = null,
-    pulling = false;
+    pulling = false,
+    unlisten = null, // stops the live listener
+    lastToast = 0;
 
   CS.sync = {
     merge: merge,
@@ -136,8 +139,11 @@
           return setState("signed-out", "Only " + cfg.allowedDomain + " accounts can sign in here. Choose your school account.");
         }
         user = u;
+        if (unlisten) unlisten();
+        unlisten = null;
         if (!u) return setState("signed-out");
         await pull();
+        listen();
       });
     } catch (e) {
       setState("error", "Accounts are unavailable right now (" + e.message + "). Your progress is still saved on this device.");
@@ -161,15 +167,50 @@
         // only redraw when something actually arrived from another device
         replaceQuietly(merged);
         CS.prefs.apply();
-        if (CS.route) CS.route();
+        softRefresh();
       }
     } catch (e) {
       setState("error", "Sync failed: " + e.message);
     }
     pulling = false;
   }
+  /** live sync: whenever the cloud copy changes (another device uploaded), merge it in straight away */
+  function listen() {
+    unlisten = userDoc().onSnapshot(
+      (snap) => {
+        if (snap.metadata.hasPendingWrites || !snap.exists || !snap.data().data) return; // our own upload echoing back
+        const remote = JSON.parse(snap.data().data);
+        const before = JSON.stringify(CS.store.all());
+        // a change waiting to upload on this device is newer than anything arriving, so keep its text
+        const merged = merge(CS.store.all(), remote, !pushTimer);
+        if (JSON.stringify(merged) === before) return;
+        replaceQuietly(merged);
+        CS.prefs.apply();
+        softRefresh();
+      },
+      (e) => setState("error", "Live sync stopped: " + e.message + ". Reload the page to reconnect.")
+    );
+  }
+  /** show newly arrived progress without disturbing what you're doing: summary pages redraw in place,
+      everything else (notes, a quiz in progress, an answer being typed) picks it up on the next page */
+  function softRefresh() {
+    if (CS.refreshSidebar) CS.refreshSidebar();
+    const parts = location.hash.replace(/^#\/?/, "").split("/");
+    const page = parts[0] || "home";
+    const typing = document.activeElement && /^(input|textarea|select)$/i.test(document.activeElement.tagName);
+    if (!typing && parts.length === 1 && ["home", "progress", "mistakes", "flashcards", "checklist", "levels", "code"].includes(page)) {
+      const y = window.scrollY;
+      CS.route();
+      window.scrollTo(0, y);
+    }
+    if (Date.now() - lastToast > 20000) {
+      lastToast = Date.now();
+      CS.toast("☁ Progress updated from your other device");
+    }
+  }
   /** upload after local changes; merges with the cloud copy first so another device's work isn't lost */
   async function push() {
+    pushTimer = null;
     if (!user) return;
     setState("syncing");
     try {
@@ -234,6 +275,8 @@
     }
   }
   async function signOut() {
+    if (unlisten) unlisten();
+    unlisten = null;
     if (pushTimer) {
       clearTimeout(pushTimer);
       await push();
@@ -243,6 +286,8 @@
   async function deleteData() {
     if (!confirm("Delete your progress from the cloud and sign out? Progress on this device stays.")) return;
     try {
+      if (unlisten) unlisten();
+      unlisten = null;
       await userDoc().delete();
       user = null;
       await fb.auth().signOut();
@@ -279,7 +324,7 @@
       card.appendChild(b);
       card.appendChild(h("p", { class: "small muted", style: "margin:10px 0 0", text: "Your progress is stored against an account id. The site's owner can see which Google accounts have signed in, but other students can't see anything of yours. You can delete your cloud data at any time." }));
     } else {
-      card.appendChild(h("p", { class: "small", html: "Signed in as <b>" + U.esc(user.email || user.displayName || "you") + "</b>. " + (state === "synced" ? "Everything is synced." : state === "syncing" ? "Syncing…" : "") }));
+      card.appendChild(h("p", { class: "small", html: "Signed in as <b>" + U.esc(user.email || user.displayName || "you") + "</b>. " + (state === "synced" ? "Everything is synced. Changes on any of your devices appear on the others within a few seconds." : state === "syncing" ? "Syncing…" : "") }));
       const row = h("div", { class: "row" });
       const now = h("button", { type: "button", class: "btn", text: "⟳ Sync now" });
       now.addEventListener("click", pull);
