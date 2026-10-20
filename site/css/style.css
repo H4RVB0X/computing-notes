@@ -541,3 +541,17 @@ textarea.stdin { font-family: var(--font-mono); font-size: 0.85rem; }
 .test-row { margin-bottom: 6px; }
 .test-row.ok > summary { color: var(--ok); }
 .test-row.bad > summary { color: var(--bad); }
+
+/* exam countdowns (countdown.js) */
+.countdowns { display: flex; gap: 10px; flex-wrap: wrap; align-items: stretch; margin-bottom: 14px; }
+.countdowns:empty { display: none; }
+.countdown { flex: 1; min-width: 150px; background: var(--surface); border: 1px solid var(--border); border-left: 4px solid var(--accent); border-radius: 12px; padding: 10px 14px; box-shadow: var(--shadow-sm); }
+.countdown.soon { border-left-color: var(--bad); }
+.countdown .cd-v { font-size: 1.35rem; font-weight: 800; letter-spacing: -0.02em; }
+.countdown .cd-l { font-weight: 700; }
+.countdown .cd-d { font-size: 0.78rem; color: var(--text-3); }
+.cd-edit { align-self: center; font-size: 0.85rem; font-weight: 600; white-space: nowrap; }
+.cd-list { list-style: none; padding: 0; margin: 0; }
+.cd-list li { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; padding: 6px 0; border-bottom: 1px solid var(--border); }
+.cd-list li .btn { margin-left: auto; }
+.cd-list li > div { flex-basis: 100%; }
