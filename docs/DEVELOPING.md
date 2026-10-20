@@ -13,7 +13,7 @@ repetition, trace-table challenges and interactive tools — all in plain HTML/C
 | Quiz questions (MCQ, short answer, true/false, ordering, spot-the-error) | 1,585 |
 | Exam-style questions with self-marking mark schemes | 595 |
 | Levelled (6/9/12-mark) questions with example answers per level | 33 |
-| Python coding problems / automatic tests | 60 / 373 |
+| Python coding problems / automatic tests (incl. 21 auto-checked Section D tasks, 24 from the class booklet) | 105 / 597 |
 | Flashcards (plus every key term automatically) | 700 |
 | Trace-table challenges | 89 |
 | Interactive tools | 41 |

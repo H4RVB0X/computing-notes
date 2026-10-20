@@ -418,6 +418,10 @@ CS.manifest = [
   // problems
   "content/problems/algorithms.js",
   "content/problems/basics.js",
+  "content/problems/booklet-arrays.js",
+  "content/problems/booklet-numbers.js",
+  "content/problems/booklet-section-b.js",
+  "content/problems/booklet-strings.js",
   "content/problems/data-structures.js",
   "content/problems/files.js",
   "content/problems/lists.js",
