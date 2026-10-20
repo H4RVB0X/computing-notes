@@ -22,10 +22,10 @@ CS.config = {
      switched off. Paste the firebaseConfig object from the Firebase console here — it is not a secret.
      See docs/SETUP.md for the 15-minute setup. */
   firebase: {
-    apiKey: "",
-    authDomain: "",
-    projectId: "",
-    appId: "",
+    apiKey: "AIzaSyDhFPqMddvUUk2gdpquYGUWF3U-62WtoJ8",
+    authDomain: "cs-revision-e2e4a.firebaseapp.com",
+    projectId: "cs-revision-e2e4a",
+    appId: "1:899579933016:web:e194ae5c51d63e860bb52d",
     // optional: only allow Google accounts from this email domain, e.g. "myschool.org.uk"
     allowedDomain: "",
   },
