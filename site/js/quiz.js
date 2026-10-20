@@ -265,6 +265,7 @@
       };
       draw();
       tick = setInterval(() => {
+        if (!wrap.isConnected) return clearInterval(tick); // left the page: abandon this timed run
         remaining--;
         draw();
         if (remaining <= 0) {
@@ -393,7 +394,13 @@
       }
       const ta = h("textarea", { placeholder: "Write your answer here…", "aria-label": "Your answer" });
       ta.value = CS.store.get("examAnswers." + id, {})[q.id] || "";
-      ta.addEventListener("input", U.debounce(() => CS.store.update("examAnswers." + id, (all) => Object.assign(all, { [q.id]: ta.value }), {}), 400));
+      ta.addEventListener(
+        "input",
+        U.debounce(() => {
+          CS.store.update("examAnswers." + id, (all) => Object.assign(all, { [q.id]: ta.value }), {});
+          CS.store.stampText("examAnswers." + id + "." + q.id); // newest edit wins across devices
+        }, 400)
+      );
       box.appendChild(ta);
       const reveal = h("button", { type: "button", class: "btn sm", text: "Reveal mark scheme", style: "margin-top:8px" });
       box.appendChild(reveal);
@@ -517,7 +524,7 @@
     const hist = CS.store.get("mocks", []);
     if (hist.length) {
       const hc = h("div", { class: "card", style: "margin-top:14px" });
-      hc.innerHTML = "<h3 style='margin-top:0'>Previous mocks</h3>" + '<div class="table-wrap"><table><thead><tr><th>Date</th><th>Topics</th><th>Score</th></tr></thead><tbody>' + hist.slice(-8).reverse().map((m) => "<tr><td>" + U.fmtDate(m.t) + "</td><td>" + m.topics + "</td><td>" + m.score + "/" + m.total + " (" + m.pct + "%)</td></tr>").join("") + "</tbody></table></div>";
+      hc.innerHTML = "<h3 style='margin-top:0'>Previous mocks</h3>" + '<div class="table-wrap"><table><thead><tr><th>Date</th><th>Topics</th><th>Score</th></tr></thead><tbody>' + hist.slice(-8).reverse().map((m) => "<tr><td>" + U.fmtDate(m.t) + "</td><td>" + U.esc(m.topics) + "</td><td>" + Number(m.score) + "/" + Number(m.total) + " (" + Number(m.pct) + "%)</td></tr>").join("") + "</tbody></table></div>";
       main.appendChild(hc);
     }
     start.addEventListener("click", () => {

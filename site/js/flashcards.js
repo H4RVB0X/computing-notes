@@ -137,7 +137,10 @@
         };
       };
       document.removeEventListener("keydown", area._globalKeys || (() => {}));
-      area._globalKeys = (e) => area._keys && area._keys(e);
+      area._globalKeys = (e) => {
+        if (!area.isConnected) return document.removeEventListener("keydown", area._globalKeys); // left the page
+        if (area._keys) area._keys(e);
+      };
       document.addEventListener("keydown", area._globalKeys);
       render();
     };

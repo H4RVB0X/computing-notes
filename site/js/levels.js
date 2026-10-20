@@ -43,7 +43,7 @@
       qs
         .map((q) => {
           const r = s[q.id];
-          const status = r && r.t ? '<span class="pill ' + (r.levelHits === r.n ? "ok" : r.levelHits ? "warn" : "bad") + '">' + r.levelHits + "/" + r.n + " levels right</span>" : '<span class="muted small">not tried</span>';
+          const status = r && r.t ? '<span class="pill ' + (r.levelHits === r.n ? "ok" : r.levelHits ? "warn" : "bad") + '">' + Number(r.levelHits) + "/" + Number(r.n) + " levels right</span>" : '<span class="muted small">not tried</span>';
           const first = U.esc(String(q.q).replace(/[*_`]/g, "").slice(0, 110)) + (q.q.length > 110 ? "…" : "");
           return "<tr><td><a href='#/topic/" + q.topicId + "'>" + q.topicId + "</a></td><td><a href='#/levels/" + q.id + "'>" + first + "</a></td><td>" + q.marks + "</td><td>" + status + "</td></tr>";
         })
@@ -153,7 +153,13 @@
     main.appendChild(h("p", { class: "muted small", text: "Aim for the Level " + q.levels[q.levels.length - 1].band + " descriptor. In the exam you'd have about " + Math.round(q.marks * 1.5) + " minutes for this (papers are 100 marks in 2½ hours)." }));
     const ta = h("textarea", { rows: 12, placeholder: "Your answer…", "aria-label": "Your answer" });
     ta.value = (prev.own && prev.own.text) || "";
-    ta.addEventListener("input", U.debounce(() => remember(q.id, { own: Object.assign({}, saved()[q.id].own, { text: ta.value }) }), 400));
+    ta.addEventListener(
+      "input",
+      U.debounce(() => {
+        remember(q.id, { own: Object.assign({}, saved()[q.id].own, { text: ta.value }) });
+        CS.store.stampText(KEY + "." + q.id + ".own.text"); // newest edit wins across devices
+      }, 400)
+    );
     main.appendChild(ta);
     const box = h("div", { class: "card", style: "margin-top:12px" });
     box.appendChild(h("p", { html: "<b>Tick the indicative content you covered</b> (a top answer doesn't need all of it, but it must be applied and reach a justified conclusion):" }));

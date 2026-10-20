@@ -72,6 +72,38 @@ t("merging is stable: merging the result again changes nothing", () => {
   assert.deepStrictEqual(plain(merge(m, b)), m);
   assert.deepStrictEqual(plain(merge(m, m)), m);
 });
+t("a device that never synced with this account is merged, not wiped by an old reset", () => {
+  const m = plain(merge({ topics: { a: { quizBest: 90 } } }, { syncEpoch: 50, topics: { b: { quizBest: 70 } } }, { uid: "u1" }));
+  assert.deepStrictEqual(m.topics, { a: { quizBest: 90 }, b: { quizBest: 70 } });
+  assert.strictEqual(m.syncEpoch, 50);
+});
+t("a reset elsewhere still wins over a device that has synced with this account", () => {
+  const m = plain(merge({ syncMeta: { uid: "u1" }, topics: { a: { quizBest: 90 } } }, { syncEpoch: 50 }, { uid: "u1" }));
+  assert.deepStrictEqual(m, { syncEpoch: 50, syncMeta: { uid: "u1" } });
+});
+t("a copy last synced with a different account is merged, not replaced", () => {
+  const m = plain(merge({ syncMeta: { uid: "other" }, topics: { a: { quizBest: 90 } } }, { syncEpoch: 50 }, { uid: "u1" }));
+  assert.strictEqual(m.topics.a.quizBest, 90);
+});
+t("the newest text edit wins, whichever device it's on", () => {
+  const local = { codeDrafts: { d: "old v1" }, textAt: { "codeDrafts.d": 100 } };
+  const remote = { codeDrafts: { d: "newer v2" }, textAt: { "codeDrafts.d": 200 } };
+  assert.strictEqual(plain(merge(local, remote)).codeDrafts.d, "newer v2");
+  assert.strictEqual(plain(merge(remote, local)).codeDrafts.d, "newer v2");
+});
+t("clearing a draft (start again) beats the older draft in the cloud", () => {
+  const m = plain(merge({ codeDrafts: { d: "" }, textAt: { "codeDrafts.d": 300 } }, { codeDrafts: { d: "my code" }, textAt: { "codeDrafts.d": 200 } }));
+  assert.strictEqual(m.codeDrafts.d, "");
+});
+t("exam answers use their full path for edit times", () => {
+  const path = "examAnswers.1.7.1.7/e-abc";
+  const local = { examAnswers: { 1: { 7: { "1.7/e-abc": "first try" } } }, textAt: { [path]: 1 } };
+  const remote = { examAnswers: { 1: { 7: { "1.7/e-abc": "better answer" } } }, textAt: { [path]: 2 } };
+  assert.strictEqual(plain(merge(local, remote)).examAnswers[1][7]["1.7/e-abc"], "better answer");
+});
+t("syncMeta never leaves the device", () => {
+  assert.deepStrictEqual(plain(merge({ syncMeta: { uid: "a" } }, { syncMeta: { uid: "b" } })).syncMeta, { uid: "a" });
+});
 t("merge with nothing in the cloud keeps everything", () => {
   const local = { topics: { "1.1": { quizBest: 10 } }, mistakes: { q: { box: 1, at: 1 } } };
   assert.deepStrictEqual(plain(merge(local, null)).topics, local.topics);

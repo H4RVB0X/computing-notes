@@ -300,7 +300,7 @@
     s.topics.forEach((t) => {
       const p = CS.progress.topic(t.id);
       const card = h("div", { class: "card" });
-      card.innerHTML = '<div class="row spread"><a href="#/topic/' + t.id + '" style="font-weight:800;font-size:1.05rem">' + t.id + " " + U.esc(t.title) + "</a>" + (p.quizBest != null ? '<span class="pill ' + (p.quizBest < 50 ? "bad" : p.quizBest < 75 ? "warn" : "ok") + '">quiz ' + p.quizBest + "%</span>" : "") + '</div><div class="progress-bar" style="margin:8px 0"><i style="width:' + Math.round(CS.progress.completion(t.id) * 100) + '%"></i></div><div class="row small"><a class="btn sm" href="#/topic/' + t.id + '">Read</a><a class="btn sm" href="#/quiz/' + t.id + '">Quiz</a><a class="btn sm" href="#/exam/' + t.id + '">Exam Qs</a><a class="btn sm" href="#/flashcards/' + t.id + '">Cards</a></div>';
+      card.innerHTML = '<div class="row spread"><a href="#/topic/' + t.id + '" style="font-weight:800;font-size:1.05rem">' + t.id + " " + U.esc(t.title) + "</a>" + (p.quizBest != null ? '<span class="pill ' + (p.quizBest < 50 ? "bad" : p.quizBest < 75 ? "warn" : "ok") + '">quiz ' + Number(p.quizBest) + "%</span>" : "") + '</div><div class="progress-bar" style="margin:8px 0"><i style="width:' + Math.round(CS.progress.completion(t.id) * 100) + '%"></i></div><div class="row small"><a class="btn sm" href="#/topic/' + t.id + '">Read</a><a class="btn sm" href="#/quiz/' + t.id + '">Quiz</a><a class="btn sm" href="#/exam/' + t.id + '">Exam Qs</a><a class="btn sm" href="#/flashcards/' + t.id + '">Cards</a></div>';
       grid.appendChild(card);
     });
     main.appendChild(grid);
@@ -687,7 +687,7 @@
         const p = CS.progress.topic(t.id);
         const pts = t.specPoints || [];
         const ticked = pts.filter((x) => CS.store.get("checklist." + x.id, false)).length;
-        html += "<tr><td><a href='#/topic/" + t.id + "'>" + t.id + " " + U.esc(t.title) + "</a></td><td>" + Math.round((p.read || 0) * 100) + "%</td><td>" + (p.quizBest != null ? p.quizBest + "%" : "—") + "</td><td>" + (p.quizAttempts || 0) + "</td><td>" + (pts.length ? ticked + "/" + pts.length : "—") + "</td><td><div class='progress-bar' style='width:90px'><i style='width:" + Math.round(CS.progress.completion(t.id) * 100) + "%'></i></div></td></tr>";
+        html += "<tr><td><a href='#/topic/" + t.id + "'>" + t.id + " " + U.esc(t.title) + "</a></td><td>" + Math.round((p.read || 0) * 100) + "%</td><td>" + (p.quizBest != null ? Number(p.quizBest) + "%" : "—") + "</td><td>" + Number(p.quizAttempts || 0) + "</td><td>" + (pts.length ? ticked + "/" + pts.length : "—") + "</td><td><div class='progress-bar' style='width:90px'><i style='width:" + Math.round(CS.progress.completion(t.id) * 100) + "%'></i></div></td></tr>";
       })
     );
     html += "</tbody></table>";
@@ -716,7 +716,13 @@
       const r = new FileReader();
       r.onload = () => {
         try {
-          CS.store.replace(JSON.parse(r.result));
+          const data = JSON.parse(r.result);
+          if (!data || typeof data !== "object" || Array.isArray(data)) throw new Error("not a progress file");
+          // an imported backup is a deliberate restore: stamp it so it wins over the cloud copy when signed in
+          data.syncEpoch = Date.now();
+          delete data.syncMeta;
+          if (CS.store.all().syncMeta) data.syncMeta = CS.store.all().syncMeta;
+          CS.store.replace(data);
           CS.migrateStore();
           CS.prefs.apply();
           CS.toast("Progress imported");
@@ -754,6 +760,7 @@
         return;
       }
       CS.store.setSaving(memBox.checked);
+      if (CS.sync && CS.sync.applyPersistence) CS.sync.applyPersistence(); // off = signed in only until the tab closes
       renderSaveBadge();
       CS.toast(memBox.checked ? "Progress will be saved on this device" : "Saving is off — progress lasts until you close the tab");
     });
