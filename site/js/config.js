@@ -12,8 +12,8 @@ CS.config = {
      their entry.123456 numbers. The person reporting types the third. See docs/SETUP.md. */
   report: {
     form: {
-      url: "", // e.g. "https://docs.google.com/forms/d/e/1FAIpQL.../viewform"
-      fields: { where: "", question: "" }, // e.g. "entry.1234567890"
+      url: "https://docs.google.com/forms/d/e/1FAIpQLSd2fpJeI-ORMJQ2_5yq54F5oTY3lV4ALzBwQt-CM4PKXv2FGg/viewform",
+      fields: { where: "entry.729118475", question: "entry.2069445263" }, // "What's wrong?" is typed by the reporter
     },
     github: "https://github.com/H4RVB0X/computing-notes/issues/new",
   },
