@@ -65,7 +65,8 @@ site/
 │   ├── code.js             code practice pages, test checking, the small code editor
 │   ├── py-worker.js        Web Worker that runs Python with Pyodide (same test rules as check_problems.py)
 │   ├── sync.js             optional Google sign-in + Firestore sync, and the progress merge rules
-│   ├── config.js           settings: report form, Firebase project (see docs/SETUP.md)
+│   ├── countdown.js        exam countdowns on the dashboard (AQA dates in config.js, plus your own)
+│   ├── config.js           settings: report form, exam dates, Firebase project (see docs/SETUP.md)
 │   └── search.js           site-wide search
 ├── sw.js                   service worker: saves the site for offline use (network first)
 ├── manifest.webmanifest    makes the site installable; icons in icons/
