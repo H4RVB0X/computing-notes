@@ -246,6 +246,7 @@
       right.appendChild(wl);
     }
     hero.append(left, right);
+    if (CS.countdown) main.appendChild(CS.countdown.strip());
     main.appendChild(hero);
 
     if (CS.loadErrors) {

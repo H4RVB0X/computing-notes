@@ -18,6 +18,13 @@ CS.config = {
     github: "https://github.com/H4RVB0X/computing-notes/issues/new",
   },
 
+  /* Exam countdowns on the dashboard (js/countdown.js). Times are UK time (BST = +01:00).
+     Source: AQA's timetable for the June 2027 series, provisional until AQA confirms it. */
+  exams: [
+    { name: "Paper 1 (on screen)", date: "2027-06-07T13:30:00+01:00", detail: "7517/1 · Monday 7 June 2027, afternoon · 2 h 30 min · Piles O' Tiles skeleton" },
+    { name: "Paper 2 (written)", date: "2027-06-15T09:00:00+01:00", detail: "7517/2 · Tuesday 15 June 2027, morning · 2 h 30 min" },
+  ],
+
   /* Accounts and cross-device sync (Firebase + Google sign-in). Leave `apiKey` empty to keep accounts
      switched off. Paste the firebaseConfig object from the Firebase console here — it is not a secret.
      See docs/SETUP.md for the 15-minute setup. */
