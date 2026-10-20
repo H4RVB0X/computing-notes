@@ -31,7 +31,7 @@ An interactive revision site covering the whole AQA A-Level Computer Science spe
 **Around it**
 - **Exam countdowns** for both papers, plus your own: mocks, the NEA deadline, other subjects.
 - **Accounts with live sync.** Sign in with Google, and progress on your phone appears on your laptop within seconds.
-- **Installable app.** Add to Home Screen; the whole site works offline.
+- **Installable app.** Add to Home Screen; the whole site works offline, including code practice after its first use.
 - **Report a mistake** on every question and page. It goes to a Google Form, so no account is needed.
 - **Dark mode, a mobile layout, adjustable text size, per-page progress reset** and a "don't save on this device" mode for shared PCs.
 
@@ -65,7 +65,7 @@ The project is mainly an exercise in **getting AI agents to build something larg
     - every model answer passes its tests in real Python *and* in the browser runner;
     - every starting template fails at least one test;
     - a separate agent solved all 60 core problems using only the question wording, to find unclear tasks.
-  - **Sync:** the merge rules have their own unit tests.
+  - **Sync:** the merge rules have 23 unit tests, and the whole flow was tested against the real Firebase project (upload, a second device picking it up live, the newest edit winning, resets, and the security rules refusing access to another user's data).
   - **The whole site:** a browser test opens all 557 pages on desktop and mobile, and fails on any error or sideways scrolling.
 - **Continuous checks.** GitHub Actions runs seven validators on every push and only deploys if they all pass.
 
@@ -77,7 +77,17 @@ The project is mainly an exercise in **getting AI agents to build something larg
 - **Questions that leaned on things they didn't show.** A classmate hit an SQL question about a database the question never displayed. A review of all 2,180 questions found 48 like it. Each now includes its own table, code or diagram, and CI rejects any question that refers to "the previous question" or "the table above" without showing it.
 - **A bug that had been there from the start.** The exam pages' self-marked total joined numbers together as text once a box was ticked. It was found while testing a data migration, and fixed.
 - **Over-confident facts.** An independent review of the extended-answer examples tightened legal claims (what the PSTI Act and the Automated Vehicles Act actually say), corrected a timeline and moved one answer that had been put in the wrong level.
+- **A full code review before calling it finished.** A separate agent reviewed the newer code and found 15 problems that every test had passed. The worst were three ways sync could lose work: an old reset wiping a device that had never synced, an out-of-date draft overwriting a newer one, and a restored backup being thrown away. There was also a shared school PC staying signed in to your account. All 15 were fixed, and the sync fixes were re-tested against the live Firebase project.
 - **My own slip.** One edit broke the browser's Python runner through a single escaped character. Now a CI check runs that code under real Python on every push, and it catches exactly that mistake.
+
+## Privacy
+
+- Progress is saved in your browser. If you sign in, a copy is kept in Firestore in a single document that only your account can read or write.
+- That copy holds your scores, ticks, flashcard boxes, mistakes deck, countdowns, and anything you type (exam answers, code drafts).
+- Settings such as theme and text size stay on the device.
+- Mistake reports go to a Google Form, or to Firestore if you're signed in. They include the page, the question and your message.
+- The site's owner can see who has signed in and can see the data in the Firebase console. Other students can't see anything of yours.
+- "Delete my cloud data" on the Progress page removes your copy from Firestore.
 
 ## Tech
 
