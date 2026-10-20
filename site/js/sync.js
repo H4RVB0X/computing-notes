@@ -355,7 +355,7 @@
       if (!brand) return;
       brand.insertAdjacentElement("afterend", b);
     }
-    const first = user && (user.displayName || user.email || "").split(/[ @]/)[0];
+    const first = user && ((user.displayName || user.email || "").split(/[ @]/)[0] || "you");
     b.className = "pill " + (state === "synced" ? "ok" : state === "error" ? "bad" : "");
     b.textContent = user ? (state === "syncing" ? "⟳ Syncing…" : state === "error" ? "⚠ Sync problem" : "☁ Synced · " + first) : state === "loading" ? "…" : state === "error" ? "☁ Sync unavailable" : "👤 Sign in to sync";
     b.title = message || (user ? "Progress is synced across your devices. Click for account settings." : "Sign in with Google to keep your progress on every device");
