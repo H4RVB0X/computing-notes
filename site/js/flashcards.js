@@ -24,16 +24,31 @@
     out.forEach((c) => (c.id = U.hash(topicId + "|" + c.front)));
     return out;
   }
+  const NEW_BATCH = 20; // new cards per "learn" session
+  const stored = (id) => CS.store.get("flash." + id, null);
   function state(id) {
-    return CS.store.get("flash." + id, { box: 1, due: 0 });
+    return stored(id) || { box: 1, due: 0 };
   }
+  /** never seen: not "due" yet, it is waiting to be learned */
+  const isNew = (id) => !stored(id);
+  /** seen before, and its review date has come round */
   function isDue(id) {
-    return state(id).due <= Date.now();
+    const s = stored(id);
+    return !!s && s.due <= Date.now();
   }
+  /** topics you have opened: new cards are only offered from these */
+  const openedTopics = () => CS.allTopicIds().filter((t) => CS.progress.topic(t).viewed);
   function dueCount(topicId) {
     const ids = topicId ? [topicId] : CS.allTopicIds();
     let n = 0;
     ids.forEach((t) => cardsFor(t).forEach((c) => isDue(c.id) && n++));
+    return n;
+  }
+  /** new cards in one topic, or (no argument) across the topics you have opened */
+  function newCount(topicId) {
+    const ids = topicId ? [topicId] : openedTopics();
+    let n = 0;
+    ids.forEach((t) => cardsFor(t).forEach((c) => isNew(c.id) && n++));
     return n;
   }
   function grade(card, ok) {
@@ -42,40 +57,48 @@
     const due = Date.now() + INTERVALS[box] * DAY;
     CS.store.set("flash." + card.id, { box: box, due: due, seen: (s.seen || 0) + 1 });
   }
-  CS.flash = { cardsFor, dueCount, state, grade };
+  CS.flash = { cardsFor, dueCount, newCount, isNew, state, grade };
 
   CS.views.flashcards = function (main, arg) {
     const topicId = arg[0];
     if (!topicId) return deckList(main);
-    const meta = topicId === "due" ? { title: "All cards due today" } : CS.topicMeta(topicId);
+    const special = topicId === "due" || topicId === "new";
+    const meta = topicId === "due" ? { title: "Cards due for review" } : topicId === "new" ? { title: "New cards from topics you've opened" } : CS.topicMeta(topicId);
     if (!meta) return CS.views.notfound(main);
-    document.title = "CS Revision · Flashcards " + (topicId === "due" ? "" : topicId);
-    main.appendChild(h("div", { class: "topic-head", html: '<div class="crumbs"><a href="#/">Home</a> › <a href="#/flashcards">Flashcards</a>' + (topicId !== "due" ? ' › <a href="#/topic/' + topicId + '">' + topicId + "</a>" : "") + "</div><h1>Flashcards: " + U.esc(meta.title) + "</h1>" }));
-    let cards = topicId === "due" ? CS.allTopicIds().flatMap(cardsFor).filter((c) => isDue(c.id)) : cardsFor(topicId);
+    document.title = "CS Revision · Flashcards " + (special ? "" : topicId);
+    main.appendChild(h("div", { class: "topic-head", html: '<div class="crumbs"><a href="#/practise">Practise</a> › <a href="#/flashcards">Flashcards</a>' + (!special ? ' › <a href="#/topic/' + topicId + '">' + topicId + "</a>" : "") + "</div><h1>Flashcards: " + U.esc(meta.title) + "</h1>" }));
+    let cards = topicId === "due" ? CS.allTopicIds().flatMap(cardsFor).filter((c) => isDue(c.id)) : topicId === "new" ? openedTopics().flatMap(cardsFor).filter((c) => isNew(c.id)) : cardsFor(topicId);
     if (!cards.length) {
-      main.appendChild(h("div", { class: "card", text: topicId === "due" ? "Nothing is due. Nice." : "No flashcards for this topic yet." }));
+      const nNew = newCount();
+      main.appendChild(h("div", { class: "card", html: topicId === "due" ? "<p style='margin:0'><b>Nothing is due for review.</b> " + (nNew ? "You have <a href='#/flashcards/new'>" + nNew + " new card" + (nNew === 1 ? "" : "s") + "</a> to learn from topics you've opened." : "Cards you've learned come back here when their review date arrives.") + "</p>" : topicId === "new" ? "<p style='margin:0'><b>No new cards.</b> You've seen every card from the topics you've opened. Open another topic in <a href='#/notes'>Notes</a> to unlock its cards.</p>" : "No flashcards for this topic yet." }));
       return;
     }
     const due = cards.filter((c) => isDue(c.id));
+    const fresh = cards.filter((c) => isNew(c.id));
     const wrap = h("div", { class: "flash-wrap" });
     main.appendChild(wrap);
     const boxes = h("div", { class: "leitner" });
     const drawBoxes = () => {
       boxes.innerHTML = "";
+      boxes.appendChild(h("div", { class: "box", html: "<b>" + cards.filter((c) => isNew(c.id)).length + "</b>New" }));
       for (let b = 1; b <= 5; b++) {
-        const n = cards.filter((c) => state(c.id).box === b).length;
+        const n = cards.filter((c) => !isNew(c.id) && state(c.id).box === b).length;
         boxes.appendChild(h("div", { class: "box", html: "<b>" + n + "</b>Box " + b + (b === 1 ? " (daily)" : " (" + INTERVALS[b] + "d)") }));
       }
     };
     drawBoxes();
     wrap.appendChild(boxes);
-    const info = h("p", { class: "small muted", text: due.length + " of " + cards.length + " cards are due now. Cards you know move up a box and come back less often; cards you miss drop to box 1." });
+    const info = h("p", { class: "small muted", text: (topicId === "new" ? fresh.length + " cards you haven't seen yet, " + NEW_BATCH + " at a time. " : due.length + " due for review and " + fresh.length + " new, of " + cards.length + " cards. ") + "Cards you know move up a box and come back less often; cards you miss drop to box 1." });
     wrap.appendChild(info);
     const modeRow = h("div", { class: "row", style: "margin-bottom:12px" });
-    const startDue = h("button", { type: "button", class: "btn primary", text: "Review due cards (" + due.length + ")" });
+    const startDue = h("button", { type: "button", class: "btn" + (due.length ? " primary" : ""), text: "Review due cards (" + due.length + ")" });
+    const startNew = h("button", { type: "button", class: "btn" + (!due.length && fresh.length ? " primary" : ""), text: fresh.length > NEW_BATCH ? "Learn " + NEW_BATCH + " new cards" : "Learn new cards (" + fresh.length + ")" });
     const startAll = h("button", { type: "button", class: "btn", text: "Practise all cards" });
     startDue.disabled = !due.length;
-    modeRow.append(startDue, startAll);
+    startNew.disabled = !fresh.length;
+    if (topicId === "new") modeRow.append(startNew);
+    else if (topicId === "due") modeRow.append(startDue, startAll);
+    else modeRow.append(startDue, startNew, startAll);
     wrap.appendChild(modeRow);
     const area = h("div");
     wrap.appendChild(area);
@@ -89,7 +112,7 @@
       const render = () => {
         area.innerHTML = "";
         if (i >= queue.length) {
-          area.appendChild(h("div", { class: "card quiz-summary", html: '<div class="big">' + got + "/" + queue.length + "</div><p>Cards you knew. " + (missed ? missed + " went back to box 1 — they'll show up again next session." : "Everything moved up a box.") + '</p><p><a class="btn primary" href="#/flashcards">Back to decks</a> ' + (topicId !== "due" ? '<a class="btn" href="#/topic/' + topicId + '">Back to notes</a>' : "") + "</p>" }));
+          area.appendChild(h("div", { class: "card quiz-summary", html: '<div class="big">' + got + "/" + queue.length + "</div><p>Cards you knew. " + (missed ? missed + " went back to box 1 — they'll show up again next session." : "Everything moved up a box.") + '</p><p><a class="btn primary" href="#/flashcards">Back to decks</a> ' + (!special ? '<a class="btn" href="#/topic/' + topicId + '">Back to notes</a>' : "") + "</p>" }));
           drawBoxes();
           return;
         }
@@ -111,8 +134,8 @@
         area.appendChild(h("div", { class: "small muted", style: "text-align:center;margin-bottom:6px", text: "Card " + (i + 1) + " of " + queue.length + " · " + c.topic }));
         area.appendChild(fc);
         const ctr = h("div", { class: "flash-controls" });
-        const no = h("button", { type: "button", class: "btn danger", text: "✗ Not yet (1)" });
-        const yes = h("button", { type: "button", class: "btn ok", text: "✓ Got it (2)" });
+        const no = h("button", { type: "button", class: "btn danger", text: "Not yet (1)" });
+        const yes = h("button", { type: "button", class: "btn ok", text: "Got it (2)" });
         const flipBtn = h("button", { type: "button", class: "btn", text: "Flip (space)" });
         flipBtn.addEventListener("click", flip);
         no.addEventListener("click", () => {
@@ -145,15 +168,17 @@
       render();
     };
     startDue.addEventListener("click", () => session(due));
+    startNew.addEventListener("click", () => session(U.shuffle(fresh).slice(0, NEW_BATCH)));
     startAll.addEventListener("click", () => session(cards));
     if (arg[1] === "all") startAll.click();
   };
 
   function deckList(main) {
     document.title = "CS Revision · Flashcards";
-    main.appendChild(h("div", { class: "topic-head", html: '<div class="crumbs"><a href="#/">Home</a> › Flashcards</div><h1>Flashcards</h1><p class="muted">Spaced repetition using Leitner boxes. Review the due cards every day you revise; it takes a few minutes and it works.</p>' }));
+    main.appendChild(h("div", { class: "topic-head", html: '<div class="crumbs"><a href="#/practise">Practise</a> › Flashcards</div><h1>Flashcards</h1><p class="muted">Spaced repetition using Leitner boxes. Review the due cards every day you revise; it takes a few minutes and it works. New cards appear once you have opened their topic.</p>' }));
     const totalDue = dueCount();
-    main.appendChild(h("p", null, h("a", { class: "btn primary", href: "#/flashcards/due", text: "Review everything due today (" + totalDue + ")" })));
+    const totalNew = newCount();
+    main.appendChild(h("p", { class: "row" }, [h("a", { class: "btn" + (totalDue ? " primary" : ""), href: "#/flashcards/due", text: "Review everything due (" + totalDue + ")" }), h("a", { class: "btn" + (!totalDue && totalNew ? " primary" : ""), href: "#/flashcards/new", text: "Learn new cards from topics you've opened (" + totalNew + ")" })]));
     CS.sections.forEach((s) => {
       const decks = s.topics.map((t) => ({ t: t, cards: cardsFor(t.id) })).filter((d) => d.cards.length);
       if (!decks.length) return;
@@ -161,8 +186,9 @@
       const grid = h("div", { class: "deck-list" });
       decks.forEach((d) => {
         const due = d.cards.filter((c) => isDue(c.id)).length;
-        const mastered = d.cards.filter((c) => state(c.id).box >= 4).length;
-        grid.appendChild(h("a", { class: "action-card", href: "#/flashcards/" + d.t.id, html: '<div class="t">' + d.t.id + " " + U.esc(d.t.title) + '</div><div class="d">' + d.cards.length + " cards · " + due + " due · " + mastered + " mastered</div>" }));
+        const fresh = d.cards.filter((c) => isNew(c.id)).length;
+        const mastered = d.cards.filter((c) => !isNew(c.id) && state(c.id).box >= 4).length;
+        grid.appendChild(h("a", { class: "action-card", href: "#/flashcards/" + d.t.id, html: '<div class="t">' + d.t.id + " " + U.esc(d.t.title) + '</div><div class="d">' + d.cards.length + " cards · " + due + " due · " + fresh + " new · " + mastered + " mastered</div>" }));
       });
       main.appendChild(grid);
     });

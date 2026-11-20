@@ -103,7 +103,7 @@
 
   /** which top-level area each route belongs to (drives the top bar and the tab bar) */
   function navKey(page, arg) {
-    if (page === "flashcards") return arg[0] && arg[0] !== "due" ? "notes" : "practise";
+    if (page === "flashcards") return arg[0] && arg[0] !== "due" && arg[0] !== "new" ? "notes" : "practise";
     const map = { home: "home", notes: "notes", section: "notes", topic: "notes", quiz: "notes", exam: "notes", trace: "notes", problems: "notes", glossary: "notes", practise: "practise", mock: "practise", mistakes: "practise", levels: "practise", code: "practise", exams: "practise", traces: "practise", tools: "tools", tool: "tools", progress: "progress", checklist: "progress", search: "search" };
     return map[page] || "";
   }
@@ -243,7 +243,9 @@
     const mistakesDue = CS.mistakes ? CS.mistakes.dueCount() : 0;
     if (mistakesDue) due.push({ ico: "repeat", cls: "bad", t: "Retry your mistakes", d: mistakesDue + " question" + (mistakesDue === 1 ? " is" : "s are") + " due again", href: "#/mistakes", b: "Start" });
     const flashDue = CS.flash ? CS.flash.dueCount() : 0;
-    if (flashDue) due.push({ ico: "cards", cls: "", t: "Flashcards", d: flashDue + " card" + (flashDue === 1 ? " is" : "s are") + " due for review", href: "#/flashcards/due", b: "Review" });
+    if (flashDue) due.push({ ico: "cards", cls: "", t: "Flashcards to review", d: flashDue + " card" + (flashDue === 1 ? " is" : "s are") + " due again", href: "#/flashcards/due", b: "Review" });
+    const flashNew = CS.flash ? CS.flash.newCount() : 0;
+    if (flashNew) due.push({ ico: "cards", cls: "", t: "Learn new flashcards", d: flashNew + " new card" + (flashNew === 1 ? "" : "s") + " from topics you've opened, 20 at a time", href: "#/flashcards/new", b: "Learn" });
     CS.progress
       .weakest(2)
       .filter((w) => w.pct < 70)
@@ -746,10 +748,11 @@
     main.appendChild(pageHead("", "Practise", "Everything that tests you, in one place. Start with whatever is due."));
     const mDue = CS.mistakes ? CS.mistakes.dueCount() : 0;
     const fDue = CS.flash ? CS.flash.dueCount() : 0;
+    const fNew = CS.flash ? CS.flash.newCount() : 0;
     const dueNow = h("section", { class: "due-now" });
     dueNow.innerHTML =
       '<div class="dn"><div class="dn-n' + (mDue ? "" : " zero") + '">' + mDue + '</div><div class="dn-t"><b>Mistakes due</b><span>Questions you got wrong come back after 1, 3 and 7 days</span></div><a class="btn' + (mDue ? " primary" : "") + '" href="#/mistakes">' + (mDue ? "Retry" : "Open") + "</a></div>" +
-      '<div class="dn"><div class="dn-n' + (fDue ? "" : " zero") + '">' + fDue + '</div><div class="dn-t"><b>Flashcards due</b><span>Spaced repetition across every topic</span></div><a class="btn' + (fDue ? " primary" : "") + '" href="#/flashcards/due">Review</a></div>';
+      '<div class="dn"><div class="dn-n' + (fDue ? "" : " zero") + '">' + fDue + '</div><div class="dn-t"><b>Flashcards due</b><span>' + (fNew ? fNew + " new card" + (fNew === 1 ? "" : "s") + " to learn from topics you've opened" : "Cards come back when their review date arrives") + '</span></div>' + (fDue ? '<a class="btn primary" href="#/flashcards/due">Review</a>' : fNew ? '<a class="btn primary" href="#/flashcards/new">Learn new</a>' : '<a class="btn" href="#/flashcards">Open</a>') + "</div>";
     main.appendChild(dueNow);
 
     const nQ = Object.values(CS.quizzes).reduce((a, b) => a + b.length, 0);
@@ -768,7 +771,7 @@
     const modes = [
       ["dice", "Mixed mock", "Random quiz questions across the topics you pick, with an optional timer and a breakdown at the end.", "#/mock", nQ.toLocaleString("en-GB") + " questions"],
       ["repeat", "My mistakes", "Every question you get wrong, brought back until you get it right each time.", "#/mistakes", inDeck + " in your deck"],
-      ["cards", "Flashcards", "Key terms and facts for every topic, in Leitner boxes.", "#/flashcards", fDue + " due"],
+      ["cards", "Flashcards", "Key terms and facts for every topic, in Leitner boxes.", "#/flashcards", fDue + " due · " + fNew + " new"],
       ["code", "Code practice", "Python in the browser, checked against visible and hidden tests: Section B style, the programming booklet and the skeleton program's Section D.", "#/code", solvedN + " of " + probs.length + " solved"],
       ["pen", "Exam-style questions", "Questions with mark schemes for every topic. Write your answer, then mark it honestly.", "#/exams", nE + " questions"],
       ["target", "Extended-answer trainer", "Mark three example answers to a 6, 9 or 12-mark question, then compare with the examiner.", "#/levels", lvDone + " of " + lvQs.length + " done"],
