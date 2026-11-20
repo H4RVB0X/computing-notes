@@ -33,9 +33,9 @@
       if (CS.sync && CS.sync.report && CS.sync.report(ctx)) return; // signed in: report goes to the database
       window.open(reportUrl(ctx), "_blank", "noopener");
     },
-    /** a small "⚑ Report" link to drop into a question or page */
+    /** a small "Report" link to drop into a question or page */
     link(ctx, label) {
-      const a = h("button", { type: "button", class: "report-link", title: "Spotted a mistake? Tell the site's author", text: label || "⚑ Report a mistake" });
+      const a = h("button", { type: "button", class: "report-link", title: "Spotted a mistake? Tell the site's author", text: label || "Report a mistake" });
       a.addEventListener("click", (e) => {
         e.stopPropagation();
         CS.report.open(typeof ctx === "function" ? ctx() : ctx);
@@ -118,7 +118,7 @@
     const list = CS.mistakes.list();
     const due = list.filter(isDue);
     if (!list.length) {
-      main.appendChild(h("div", { class: "card", html: "<p><b>Nothing here yet.</b> Do a <a href='#/mock'>mixed mock</a> or any topic quiz: questions you miss are added automatically. On exam-question pages, use <b>➕ Add to My mistakes</b> under the mark scheme.</p>" }));
+      main.appendChild(h("div", { class: "card", html: "<p><b>Nothing here yet.</b> Do a <a href='#/mock'>mixed mock</a> or any topic quiz: questions you miss are added automatically. On exam-question pages, use <b>Add to My mistakes</b> under the mark scheme.</p>" }));
       return;
     }
     const top = h("div", { class: "card" });
@@ -235,7 +235,7 @@
   /** button for exam pages: put this question in the deck */
   CS.mistakes.addButton = function (q) {
     const b = h("button", { type: "button", class: "btn sm ghost" });
-    const draw = () => (b.textContent = CS.mistakes.has(q.id) ? "✓ In My mistakes" : "➕ Add to My mistakes");
+    const draw = () => (b.textContent = CS.mistakes.has(q.id) ? "✓ In My mistakes" : "Add to My mistakes");
     draw();
     b.addEventListener("click", () => {
       if (CS.mistakes.has(q.id)) CS.mistakes.remove(q.id);

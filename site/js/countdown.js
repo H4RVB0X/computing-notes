@@ -51,7 +51,7 @@
         ])
       );
     });
-    box.appendChild(h("a", { class: "cd-edit", href: "#/progress", text: "＋ add your own", title: "Add mocks, the NEA deadline or other exams on the Progress page" }));
+    box.appendChild(h("a", { class: "cd-edit", href: "#/progress", text: "Add your own", title: "Add mocks, the NEA deadline or other exams on the Progress page" }));
     // tick every minute while the dashboard is open
     const timer = setInterval(() => {
       if (!box.isConnected) return clearInterval(timer);
@@ -60,10 +60,31 @@
     return box;
   }
 
+  /** one line at the top of Home: "199 days to Paper 1 · 206 days to Paper 2 · Edit" */
+  function line() {
+    const list = upcoming().slice(0, 4);
+    const box = h("div", { class: "countdown-line" });
+    if (!list.length) return box;
+    box.insertAdjacentHTML("beforeend", CS.icon("clock"));
+    const vals = [];
+    list.forEach((e, i) => {
+      if (i) box.appendChild(h("span", { class: "sep", text: "·", "aria-hidden": "true" }));
+      const v = h("b", { text: until(e.at) });
+      vals.push(v);
+      box.appendChild(h("span", { class: e.at - Date.now() < 14 * DAY ? "soon" : "", title: when(e) + (e.detail ? " · " + e.detail : "") }, [v, document.createTextNode(" to " + e.name)]));
+    });
+    box.appendChild(h("a", { href: "#/progress", text: "Edit", title: "Add mocks, the NEA deadline or other exams on the Progress page" }));
+    const timer = setInterval(() => {
+      if (!box.isConnected) return clearInterval(timer);
+      vals.forEach((v, i) => (v.textContent = until(list[i].at)));
+    }, 60000);
+    return box;
+  }
+
   /** settings card: the AQA dates plus your own, with add/remove */
   function card() {
     const c = h("div", { class: "card", style: "margin-bottom:16px", id: "countdowns-card" });
-    c.appendChild(h("h3", { style: "margin-top:0", text: "⏳ Exam countdowns" }));
+    c.appendChild(h("h3", { style: "margin-top:0", text: "Exam countdowns" }));
     const ul = h("ul", { class: "cd-list" });
     all().forEach((e) => {
       const li = h("li", null, [h("b", { text: e.name }), h("span", { class: "muted small", text: " · " + when(e) + (e.at < Date.now() ? " (done)" : " · " + until(e.at)) })]);
@@ -95,6 +116,6 @@
     return c;
   }
 
-  CS.countdown = { strip: strip, card: card, all: all };
+  CS.countdown = { strip: strip, line: line, card: card, all: all };
   (CS.settingsCards = CS.settingsCards || []).push(card);
 })();

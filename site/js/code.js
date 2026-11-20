@@ -110,7 +110,7 @@
     }
     const s = solved();
     const nSolved = all.filter((p) => s[p.id]).length;
-    main.appendChild(h("div", { class: "card", style: "margin-bottom:14px", html: '<div class="stat-row"><div class="stat"><div class="v">' + nSolved + "/" + all.length + '</div><div class="l">solved</div></div>' + [1, 2, 3].map((d) => '<div class="stat"><div class="v">' + all.filter((p) => p.difficulty === d && s[p.id]).length + "/" + all.filter((p) => p.difficulty === d).length + '</div><div class="l">' + DIFF[d] + "</div></div>").join("") + "</div>" + (location.protocol === "file:" ? "<p class='small' style='margin:10px 0 0'>⚠️ Code practice needs the live website (or a local server such as <code>python3 -m http.server</code> in the <code>site</code> folder): browsers don't run background Python from a file.</p>" : "") }));
+    main.appendChild(h("div", { class: "card", style: "margin-bottom:14px", html: '<div class="stat-row"><div class="stat"><div class="v">' + nSolved + "/" + all.length + '</div><div class="l">solved</div></div>' + [1, 2, 3].map((d) => '<div class="stat"><div class="v">' + all.filter((p) => p.difficulty === d && s[p.id]).length + "/" + all.filter((p) => p.difficulty === d).length + '</div><div class="l">' + DIFF[d] + "</div></div>").join("") + "</div>" + (location.protocol === "file:" ? "<p class='small' style='margin:10px 0 0'>Code practice needs the live website (or a local server such as <code>python3 -m http.server</code> in the <code>site</code> folder): browsers don't run background Python from a file.</p>" : "") }));
     const filter = h("div", { class: "row small", style: "margin-bottom:10px" });
     let level = 0; // 0 all, 1-3 difficulty, "pot" skeleton-program (Section D) tasks, "bk" programming booklet
     const table = h("div", { class: "table-wrap" });
@@ -121,7 +121,7 @@
         rows
           .map((p) => {
             const m = CS.topicMeta(p.topic);
-            return "<tr><td>" + (s[p.id] ? "✅" : "") + "</td><td><a href='#/code/" + p.id + "'>" + U.esc(p.title) + "</a></td><td>" + U.esc(p.topic + (m ? " " + m.title : "")) + "</td><td><span class='diff diff-" + p.difficulty + "'>" + DIFF[p.difficulty] + "</span></td></tr>";
+            return "<tr><td>" + (s[p.id] ? "<span class='status done' title='Solved'>✓</span>" : "") + "</td><td><a href='#/code/" + p.id + "'>" + U.esc(p.title) + "</a></td><td>" + U.esc(p.topic + (m ? " " + m.title : "")) + "</td><td><span class='diff diff-" + p.difficulty + "'>" + DIFF[p.difficulty] + "</span></td></tr>";
           })
           .join("") +
         "</tbody></table>";
@@ -149,7 +149,7 @@
     if (!p) return CS.views.notfound(main);
     const meta = CS.topicMeta(p.topic);
     document.title = "CS Revision · " + p.title;
-    main.appendChild(h("div", { class: "topic-head", html: '<div class="crumbs"><a href="#/">Home</a> › <a href="#/code">Code practice</a> › ' + U.esc(p.title) + "</div><h1>" + U.esc(p.title) + '</h1><div class="row small"><span class="diff diff-' + p.difficulty + '">' + DIFF[p.difficulty] + "</span>" + (meta ? "<a class='pill' href='#/topic/" + p.topic + "'>" + p.topic + " " + U.esc(meta.title) + "</a>" : "") + (solved()[id] ? "<span class='pill ok'>✅ solved</span>" : "") + "</div>" }));
+    main.appendChild(h("div", { class: "topic-head", html: '<div class="crumbs"><a href="#/">Home</a> › <a href="#/code">Code practice</a> › ' + U.esc(p.title) + "</div><h1>" + U.esc(p.title) + '</h1><div class="row small"><span class="diff diff-' + p.difficulty + '">' + DIFF[p.difficulty] + "</span>" + (meta ? "<a class='pill' href='#/topic/" + p.topic + "'>" + p.topic + " " + U.esc(meta.title) + "</a>" : "") + (solved()[id] ? "<span class='pill ok'>solved</span>" : "") + "</div>" }));
     const task = h("div", { class: "card code-task" });
     task.innerHTML = md(p.task);
     if (p.files && Object.keys(p.files).length) task.insertAdjacentHTML("beforeend", "<p class='small muted'>Files available to your program: " + Object.keys(p.files).map((f) => "<code>" + U.esc(f) + "</code>").join(", ") + " (each test may use different contents).</p>");
@@ -172,7 +172,7 @@
     const stdin = h("textarea", { class: "mono stdin", rows: 3, spellcheck: "false", "aria-label": "Input for Run" });
     stdin.value = (visible.find((t) => t.input != null) || {}).input || "";
     const runBtn = h("button", { type: "button", class: "btn", text: "▶ Run" });
-    const checkBtn = h("button", { type: "button", class: "btn primary", text: "✔ Check against tests" });
+    const checkBtn = h("button", { type: "button", class: "btn primary", text: "Check against tests" });
     const resetBtn = h("button", { type: "button", class: "btn ghost sm", text: "↺ Start again" });
     main.appendChild(h("div", { class: "row", style: "margin:10px 0" }, [checkBtn, runBtn, h("span", { class: "grow" }), resetBtn]));
     stdin.style.marginBottom = "10px";
@@ -186,7 +186,7 @@
     const busy = (on) => (runBtn.disabled = checkBtn.disabled = on);
     const ensurePython = () => {
       if (location.protocol === "file:") {
-        status.innerHTML = "⚠️ Code practice needs the live website (or a local server: <code>python3 -m http.server</code> in the <code>site</code> folder). Browsers don't run background Python from a file.";
+        status.innerHTML = "Code practice needs the live website (or a local server: <code>python3 -m http.server</code> in the <code>site</code> folder). Browsers don't run background Python from a file.";
         return Promise.reject(new Error("file"));
       }
       if (!navigator.onLine && !worker) status.textContent = "You're offline. Python loads from the internet the first time (then it's saved), so this may fail.";
@@ -229,7 +229,7 @@
         if (nOk === rows.length) {
           const first = !solved()[id];
           CS.store.update("codeSolved", (s) => Object.assign(s, { [id]: Date.now() }), {});
-          if (first) CS.toast("Solved! ✅");
+          if (first) CS.toast("Solved!");
           solution.style.display = "";
           if (peek.isConnected) peek.remove();
         }
@@ -247,12 +247,12 @@
     const help = h("div", { class: "card", style: "margin-top:16px" });
     const hintBox = h("div");
     let shown = 0;
-    const hintBtn = h("button", { type: "button", class: "btn sm", text: "💡 Hint (" + (p.hints || []).length + ")" });
+    const hintBtn = h("button", { type: "button", class: "btn sm", text: "Hint (" + (p.hints || []).length + ")" });
     hintBtn.addEventListener("click", () => {
       if (shown >= p.hints.length) return;
       hintBox.appendChild(h("div", { class: "callout callout-tip", style: "margin:8px 0", html: "<div class='callout-body'><p><b>Hint " + (shown + 1) + ".</b> " + CS.markdown.inline(p.hints[shown]) + "</p></div>" }));
       shown++;
-      hintBtn.textContent = shown < p.hints.length ? "💡 Another hint" : "No more hints";
+      hintBtn.textContent = shown < p.hints.length ? "Another hint" : "No more hints";
       hintBtn.disabled = shown >= p.hints.length;
     });
     const solution = h("div", { style: solved()[id] ? "" : "display:none" });
@@ -275,12 +275,12 @@
 
   function showResults(box, p, rows) {
     const nOk = rows.filter((x) => x.ok).length;
-    box.appendChild(h("div", { class: "feedback " + (nOk === rows.length ? "ok" : "bad"), html: '<div class="fb-title">' + (nOk === rows.length ? "✅ All " + rows.length + " tests passed" : "❌ " + nOk + " of " + rows.length + " tests passed") + "</div>" + (nOk === rows.length ? "<p>Now compare with the model answer below: is yours as clear? Would it get the marks for the method, not just the output?</p>" : "") }));
+    box.appendChild(h("div", { class: "feedback " + (nOk === rows.length ? "ok" : "bad"), html: '<div class="fb-title">' + (nOk === rows.length ? "All " + rows.length + " tests passed" : "" + nOk + " of " + rows.length + " tests passed") + "</div>" + (nOk === rows.length ? "<p>Now compare with the model answer below: is yours as clear? Would it get the marks for the method, not just the output?</p>" : "") }));
     rows.forEach((x, i) => {
       const t = x.t;
       const d = h("details", { class: "collapse test-row " + (x.ok ? "ok" : "bad") });
       if (!x.ok && !t.hidden && !box.querySelector("details[open]")) d.open = true;
-      d.appendChild(h("summary", { html: (x.ok ? "✅" : "❌") + " Test " + (i + 1) + ": " + U.esc(t.name || "") + (t.hidden ? " <span class='pill'>hidden</span>" : "") }));
+      d.appendChild(h("summary", { html: (x.ok ? "✓" : "✗") + " Test " + (i + 1) + ": " + U.esc(t.name || "") + (t.hidden ? " <span class='pill'>hidden</span>" : "") }));
       const body = h("div", { class: "collapse-body small" });
       if (t.hidden) body.innerHTML = x.ok ? "<p>Passed.</p>" : "<p>This test is hidden. Check the edge cases in the question: empty input, boundary values, invalid input, the first and last items.</p>" + (x.r.error ? "<p><b>Error:</b> " + U.esc(x.r.error) + "</p>" : "");
       else {

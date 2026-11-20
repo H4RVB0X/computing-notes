@@ -20,7 +20,7 @@
     const box = h("div", { class: "quiz-q" });
     const diff = q.difficulty || 2;
     const head = h("div", { class: "qnum" }, [h("span", { text: "Question " + (index + 1) }), h("span", { class: "diff diff-" + diff, text: diff === 1 ? "warm-up" : diff === 2 ? "standard" : "stretch" }), q.topic ? h("span", { class: "pill", text: q.topic }) : null]);
-    if (CS.report) head.appendChild(CS.report.link({ where: "Quiz " + (q.topicId || q.topic || ""), id: q.id, text: q.q }, "⚑ Report"));
+    if (CS.report) head.appendChild(CS.report.link({ where: "Quiz " + (q.topicId || q.topic || ""), id: q.id, text: q.q }, "Report"));
     box.appendChild(head);
     const qtext = h("div", { class: "qtext" });
     qtext.innerHTML = md(q.q);
@@ -37,7 +37,7 @@
       if (answered) return;
       answered = true;
       fb.className = "feedback " + (correct ? "ok" : "bad");
-      fb.innerHTML = '<div class="fb-title">' + (correct ? "✅ Correct" : "❌ Not quite") + "</div>" + (extraHtml || "") + (q.explain ? md(q.explain) : "");
+      fb.innerHTML = '<div class="fb-title">' + (correct ? "Correct" : "Not quite") + "</div>" + (extraHtml || "") + (q.explain ? md(q.explain) : "");
       box.appendChild(fb);
       onAnswered(correct);
     };
@@ -323,16 +323,11 @@
         wrong.forEach((r, k) => {
           const d = h("div", { class: "quiz-q" });
           d.innerHTML = '<div class="qnum">' + (r.q.topic ? "<span class='pill'>" + U.esc(r.q.topic) + "</span>" : "") + '</div><div class="qtext">' + md(r.q.q) + "</div>" + answerHtml(r.q) + (r.q.explain ? '<div class="feedback ok" style="margin-top:8px">' + md(r.q.explain) + "</div>" : "");
-          if (CS.report) d.querySelector(".qnum").appendChild(CS.report.link({ where: "Quiz " + (r.q.topicId || ""), id: r.q.id, text: r.q.q }, "⚑ Report"));
+          if (CS.report) d.querySelector(".qnum").appendChild(CS.report.link({ where: "Quiz " + (r.q.topicId || ""), id: r.q.id, text: r.q.q }, "Report"));
           wrap.appendChild(d);
         });
       }
-      document.querySelectorAll(".nav-topics a").forEach((a) => {
-        if (a.getAttribute("data-topic") === opts.topicId) {
-          const c = CS.progress.completion(opts.topicId);
-          a.querySelector(".prog i").style.width = Math.round(c * 100) + "%";
-        }
-      });
+      if (CS.refreshSidebar) CS.refreshSidebar();
     };
     nextBtn.addEventListener("click", () => {
       nextBtn.style.display = "none";
@@ -419,7 +414,7 @@
           scheme.appendChild(d);
         });
         if (q.points && q.points.length) scheme.appendChild(h("div", { html: "<p><b>Indicative content</b> (what a top answer mentions):</p><ul>" + q.points.map((p) => "<li>" + CS.markdown.inline(p) + "</li>").join("") + "</ul>" }));
-        if (q.exemplars && q.exemplars.length) scheme.appendChild(h("p", { class: "small", html: "🎯 Not sure which level you're in? <a href='#/levels/" + q.id + "'>Mark three example answers for this question</a> in the extended-answer trainer." }));
+        if (q.exemplars && q.exemplars.length) scheme.appendChild(h("p", { class: "small", html: "Not sure which level you're in? <a href='#/levels/" + q.id + "'>Mark three example answers for this question</a> in the extended-answer trainer." }));
       } else {
         const pts = q.scheme || q.points || [];
         scheme.appendChild(h("p", { html: "<b>Mark scheme</b> — tick each point you made. " + (q.maxPoints && q.maxPoints < pts.length ? "Any <b>" + q.marks + "</b> of these for full marks." : "") + (q.guidance ? "<br>" + CS.markdown.inline(q.guidance) : "") }));
