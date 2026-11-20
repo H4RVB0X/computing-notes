@@ -137,7 +137,7 @@
         c.mark.disabled = true;
         c.verdict.className = "feedback " + (right ? "ok" : "bad");
         c.verdict.style.marginTop = "10px";
-        c.verdict.innerHTML = '<div class="fb-title">' + (right ? "✅ Right level" : "❌ Examiner: Level " + U.esc(c.ex.level)) + " · examiner's mark " + c.ex.mark + "/" + q.marks + " (you gave " + p.mark + ")</div>" + md(c.ex.comment);
+        c.verdict.innerHTML = '<div class="fb-title">' + (right ? "Right level" : "Examiner: Level " + U.esc(c.ex.level)) + " · examiner's mark " + c.ex.mark + "/" + q.marks + " (you gave " + p.mark + ")</div>" + md(c.ex.comment);
       });
       const avg = diff / cards.length;
       summary.innerHTML = '<div class="card quiz-summary"><div class="big">' + hits + "/" + cards.length + "</div><p>answers put in the right level · your marks were " + (avg < 0.05 ? "spot on" : "on average " + avg.toFixed(1) + " away from the examiner's") + ".</p><p class='small muted'>" + (hits === cards.length ? "You can tell the levels apart. Now write your own answer and hold it to the same standard." : "Read the comments on the ones you misplaced: they say what was missing for the next level up.") + "</p></div>";

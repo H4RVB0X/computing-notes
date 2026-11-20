@@ -254,7 +254,7 @@
     }
     if (Date.now() - lastToast > 20000) {
       lastToast = Date.now();
-      CS.toast("☁ Progress updated from your other device");
+      CS.toast("Progress updated from your other device");
     }
   }
   /** upload after local changes; merges with the cloud copy first so another device's work isn't lost */
@@ -350,19 +350,23 @@
   function renderBadge() {
     let b = document.getElementById("account-badge");
     if (!b) {
-      b = h("a", { id: "account-badge", class: "pill", href: "#/progress", style: "margin:0 8px 10px;align-self:flex-start" });
-      const brand = document.querySelector(".sidebar .brand");
-      if (!brand) return;
-      brand.insertAdjacentElement("afterend", b);
+      const slot = document.getElementById("account-slot");
+      if (!slot) return;
+      b = h("a", { id: "account-badge", class: "account", href: "#/progress" });
+      slot.appendChild(b);
     }
     const first = user && ((user.displayName || user.email || "").split(/[ @]/)[0] || "you");
-    b.className = "pill " + (state === "synced" ? "ok" : state === "error" ? "bad" : "");
-    b.textContent = user ? (state === "syncing" ? "⟳ Syncing…" : state === "error" ? "⚠ Sync problem" : "☁ Synced · " + first) : state === "loading" ? "…" : state === "error" ? "☁ Sync unavailable" : "👤 Sign in to sync";
+    const ico = user ? (state === "syncing" ? "sync" : state === "error" ? "alert" : "cloud") : state === "error" ? "alert" : "user";
+    const text = user ? (state === "syncing" ? "Syncing…" : state === "error" ? "Sync problem" : "Synced · " + first) : state === "loading" ? "…" : state === "error" ? "Sync unavailable" : "Sign in";
+    b.className = "account" + (state === "synced" && user ? " ok" : state === "error" ? " bad" : "");
+    b.innerHTML = CS.icon(ico) + '<span class="account-t"></span>';
+    b.querySelector(".account-t").textContent = text;
     b.title = message || (user ? "Progress is synced across your devices. Click for account settings." : "Sign in with Google to keep your progress on every device");
+    b.setAttribute("aria-label", text + (user ? "" : " to sync your progress"));
   }
   function accountCard() {
     const card = h("div", { class: "card account-card", style: "margin-bottom:16px" });
-    card.appendChild(h("h3", { style: "margin-top:0", text: "☁ Account and sync" }));
+    card.appendChild(h("h3", { style: "margin-top:0", text: "Account and sync" }));
     if (message) card.appendChild(h("p", { class: "small", style: "color:var(--bad)", text: message }));
     if (state === "loading") card.appendChild(h("p", { class: "small muted", text: "Loading…" }));
     else if (!user) {
@@ -375,7 +379,7 @@
     } else {
       card.appendChild(h("p", { class: "small", html: "Signed in as <b>" + U.esc(user.email || user.displayName || "you") + "</b>. " + (state === "synced" ? "Everything is synced. Changes on any of your devices appear on the others within a few seconds." : state === "syncing" ? "Syncing…" : "") }));
       const row = h("div", { class: "row" });
-      const now = h("button", { type: "button", class: "btn", text: "⟳ Sync now" });
+      const now = h("button", { type: "button", class: "btn", text: "Sync now" });
       now.addEventListener("click", pull);
       const out = h("button", { type: "button", class: "btn", text: "Sign out" });
       out.addEventListener("click", signOut);

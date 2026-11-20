@@ -1,11 +1,15 @@
 /* =====================================================================
-   app.js — boot, sidebar, router and page views
+   app.js — boot, top bar, router and page views
+   Layout: a top bar with five areas (Home, Notes, Practise, Tools, Progress), a bottom tab bar on
+   phones, and a "topic hub" for every notes page: a contents tree on the left, the topic header,
+   and tabs for its notes, quiz, exam questions, flashcards, trace tables and code problems.
    ===================================================================== */
 (function () {
   "use strict";
   const CS = (window.CS = window.CS || {});
   const U = CS.util;
   const h = (tag, attrs, children) => U.el(tag, attrs, children);
+  const icon = (name, cls) => CS.icon(name, cls);
 
   /* ---------------- boot: load content & tool files listed in manifest ---------------- */
   function loadScripts(paths, done) {
@@ -39,36 +43,42 @@
 
   function init() {
     CS.migrateStore();
-    renderSidebar();
+    renderSaveBadge();
     bindHeader();
     window.addEventListener("hashchange", route);
     route();
   }
 
-  /* ---------------- sidebar ---------------- */
-  function renderSidebar() {
-    const nav = document.getElementById("nav");
-    nav.innerHTML = "";
-    CS.sections.forEach((s) => {
-      const group = h("div", { class: "nav-group", "data-section": s.id, style: "--sc: var(--s" + s.id + ")" });
-      const btn = h("button", { class: "nav-section-btn", type: "button", "aria-expanded": "false" }, [h("span", { class: "dot" }), h("span", { class: "num", text: s.id === "R" ? "REF" : s.id === "P" ? "P1" : s.id }), h("span", { text: s.short || s.title }), h("span", { class: "chev", text: "▶" })]);
-      btn.addEventListener("click", () => {
-        group.classList.toggle("open");
-        btn.setAttribute("aria-expanded", group.classList.contains("open"));
-      });
-      const ul = h("ul", { class: "nav-topics" });
-      s.topics.forEach((t) => {
-        const a = h("a", { href: "#/topic/" + t.id, "data-topic": t.id }, [h("span", { class: "pid", text: t.id }), h("span", { text: t.title }), h("span", { class: "prog" }, h("i"))]);
-        ul.appendChild(h("li", null, a));
-      });
-      group.append(btn, ul);
-      nav.appendChild(group);
-    });
-    updateSidebarProgress();
-    renderSaveBadge();
+  /* ---------------- small shared helpers ---------------- */
+  const pct = (x) => Math.round(x * 100);
+  /** "Paper 1", "Paper 2" or "" for a section (from the blurb in sections.js) */
+  function paperOf(s) {
+    if (s.id === "P") return "Paper 1";
+    const m = /Paper ([12])\.\s*$/.exec(s.blurb || "");
+    return m ? "Paper " + m[1] : "";
   }
+  /** short label for a section number: 4.1 … 4.13, NEA, P1, Ref */
+  const secLabel = (s) => (s.spec ? s.spec : s.id === "P" ? "P1" : s.id === "R" ? "Ref" : s.id);
+  /** "done" (read), "half" (opened or partly read) or "" (not started) */
+  function topicStatus(id) {
+    const t = CS.progress.topic(id);
+    if ((t.read || 0) >= 0.9) return "done";
+    if (t.viewed || t.read) return "half";
+    return "";
+  }
+  const statusHtml = (id) => {
+    const s = topicStatus(id);
+    return '<span class="status ' + s + '" title="' + (s === "done" ? "Read" : s === "half" ? "In progress" : "Not started") + '">' + (s === "done" ? "✓" : "") + "</span>";
+  };
+  const quizPill = (best) => '<span class="pill ' + (best < 50 ? "bad" : best < 75 ? "warn" : "ok") + '">quiz ' + Number(best) + "%</span>";
+  const flashCount = (id) => (CS.flash ? CS.flash.cardsFor(id).length : (CS.flashcards[id] || []).length);
+  const problemsFor = (id) => Object.values(CS.problems || {}).filter((p) => p.topic === id);
+  const codeSolved = () => CS.store.get("codeSolved", {});
+  CS.paperOf = paperOf;
+  CS.topicStatus = topicStatus;
 
-  /* small sidebar notice when memory-only mode is on */
+  /* ---------------- top bar ---------------- */
+  /** small notice in the top bar when memory-only mode is on */
   function renderSaveBadge() {
     let b = document.getElementById("save-badge");
     if (CS.store.isSaving()) {
@@ -76,74 +86,59 @@
       return;
     }
     if (!b) {
-      b = h("a", { id: "save-badge", class: "pill warn", href: "#/progress", style: "margin:0 8px 10px;align-self:flex-start", title: "Progress is not being saved on this device. Click to change." , text: "⏸ Not saving progress" });
-      const brand = document.querySelector(".sidebar .brand");
-      if (brand) brand.insertAdjacentElement("afterend", b);
+      b = h("a", { id: "save-badge", class: "save-badge", href: "#/progress", title: "Progress is not being saved on this device. Click to change.", text: "Not saving" });
+      const slot = document.getElementById("account-slot");
+      if (slot) slot.insertBefore(b, slot.firstChild);
     }
   }
 
-  CS.refreshSidebar = () => updateSidebarProgress();
-  function updateSidebarProgress() {
-    document.querySelectorAll(".nav-topics a").forEach((a) => {
-      const id = a.getAttribute("data-topic");
-      const c = CS.progress.completion(id);
-      a.querySelector(".prog i").style.width = Math.round(c * 100) + "%";
+  /** refresh the read/in-progress marks in the contents tree after progress changes */
+  CS.refreshSidebar = () => updateTreeStatus();
+  function updateTreeStatus() {
+    document.querySelectorAll(".tree a[data-topic]").forEach((a) => {
+      const old = a.querySelector(".status");
+      if (old) old.outerHTML = statusHtml(a.getAttribute("data-topic"));
     });
   }
 
-  function setActiveNav(topicId, pageKey) {
-    document.querySelectorAll(".nav-topics a").forEach((a) => a.classList.toggle("active", a.getAttribute("data-topic") === topicId));
-    document.querySelectorAll(".nav-links a").forEach((a) => a.classList.toggle("active", a.getAttribute("data-page") === pageKey));
-    if (topicId) {
-      const sec = CS.sectionOf(topicId);
-      if (sec) {
-        const g = document.querySelector('.nav-group[data-section="' + sec.id + '"]');
-        if (g && !g.classList.contains("open")) {
-          g.classList.add("open");
-          g.querySelector(".nav-section-btn").setAttribute("aria-expanded", "true");
-        }
-        const a = document.querySelector('.nav-topics a[data-topic="' + topicId + '"]');
-        if (a && a.scrollIntoView) a.scrollIntoView({ block: "nearest" });
-      }
-    }
+  /** which top-level area each route belongs to (drives the top bar and the tab bar) */
+  function navKey(page, arg) {
+    if (page === "flashcards") return arg[0] && arg[0] !== "due" && arg[0] !== "new" ? "notes" : "practise";
+    const map = { home: "home", notes: "notes", section: "notes", topic: "notes", quiz: "notes", exam: "notes", trace: "notes", problems: "notes", glossary: "notes", practise: "practise", mock: "practise", mistakes: "practise", levels: "practise", code: "practise", exams: "practise", traces: "practise", tools: "tools", tool: "tools", progress: "progress", checklist: "progress", search: "search" };
+    return map[page] || "";
+  }
+  function setActiveNav(key) {
+    document.querySelectorAll("[data-nav]").forEach((a) => {
+      const on = a.getAttribute("data-nav") === key;
+      a.classList.toggle("active", on);
+      if (on) a.setAttribute("aria-current", "page");
+      else a.removeAttribute("aria-current");
+    });
   }
 
-  /* ---------------- header ---------------- */
   function bindHeader() {
-    const sidebar = document.getElementById("sidebar");
-    const backdrop = document.getElementById("sidebar-backdrop");
-    const closeSidebar = () => {
-      sidebar.classList.remove("open");
-      backdrop.classList.remove("show");
-    };
-    document.getElementById("menu-btn").addEventListener("click", () => {
-      sidebar.classList.toggle("open");
-      backdrop.classList.toggle("show", sidebar.classList.contains("open"));
-    });
-    backdrop.addEventListener("click", closeSidebar);
-    sidebar.addEventListener("click", (e) => {
-      if (e.target.closest("a")) closeSidebar();
-    });
     document.getElementById("theme-btn").addEventListener("click", CS.prefs.toggleTheme);
-    document.getElementById("font-up").addEventListener("click", () => CS.prefs.fontScale(0.1));
-    document.getElementById("font-down").addEventListener("click", () => CS.prefs.fontScale(-0.1));
     const form = document.getElementById("search-form");
+    const input = document.getElementById("search-input");
     form.addEventListener("submit", (e) => {
       e.preventDefault();
-      const q = form.querySelector("input").value.trim();
+      const q = input.value.trim();
       if (q) location.hash = "#/search/" + encodeURIComponent(q);
     });
     document.addEventListener("keydown", (e) => {
-      if (e.key === "/" && !/input|textarea|select/i.test(e.target.tagName)) {
+      if (e.key === "/" && !/input|textarea|select/i.test(e.target.tagName) && !e.target.isContentEditable) {
         e.preventDefault();
-        form.querySelector("input").focus();
+        if (input.offsetParent) input.focus();
+        else location.hash = "#/search"; // phones: the search box lives on its own page
       }
-      if (e.key === "Escape") closeSidebar();
     });
   }
 
   /* ---------------- router ---------------- */
   CS.views = CS.views || {};
+  // routes that show inside a topic's hub, and which tab they are
+  const HUB_TABS = { topic: "notes", quiz: "quiz", exam: "exam", flashcards: "flashcards", trace: "trace", problems: "code" };
+  let scrollHandler = null;
 
   function route() {
     const hash = location.hash || "#/";
@@ -152,17 +147,25 @@
     const arg = parts.slice(1).map(decodeURIComponent);
     const main = document.getElementById("content");
     main.className = "content";
+    main.removeAttribute("style");
     main.innerHTML = "";
+    // the reading tracker only runs on notes pages
+    if (scrollHandler) window.removeEventListener("scroll", scrollHandler);
+    scrollHandler = null;
+    const bar = document.getElementById("page-progress");
+    if (bar) bar.style.width = "0";
     window.scrollTo(0, 0);
     document.title = "CS Revision";
     const view = CS.views[page] || CS.views.notfound;
     try {
-      view(main, arg);
+      let target = main;
+      if (HUB_TABS[page] && arg[0] && CS.topicMeta(arg[0])) target = topicHub(main, arg[0], HUB_TABS[page]);
+      view(target, arg);
     } catch (err) {
       console.error(err);
       main.innerHTML = '<div class="card"><h2>Something went wrong rendering this page</h2><pre class="mono small">' + U.esc(err && err.stack ? err.stack : err) + "</pre></div>";
     }
-    if (page !== "topic") setActiveNav(null, page);
+    setActiveNav(navKey(page, arg));
   }
   CS.route = route;
   CS.navigate = (hash) => {
@@ -173,7 +176,7 @@
   CS.toast = function (msg) {
     let t = document.getElementById("toast");
     if (!t) {
-      t = h("div", { id: "toast", class: "toast" });
+      t = h("div", { id: "toast", class: "toast", role: "status" });
       document.body.appendChild(t);
     }
     t.textContent = msg;
@@ -183,173 +186,329 @@
   };
 
   CS.views.notfound = function (main) {
-    main.innerHTML = '<div class="card"><h2>Page not found</h2><p><a href="#/">Back to the dashboard</a></p></div>';
+    main.innerHTML = '<div class="card"><h2>Page not found</h2><p><a href="#/">Back to Home</a> or <a href="#/notes">browse the notes</a>.</p></div>';
   };
 
-  /* ---------------- HOME ---------------- */
-  CS.views.home = function (main) {
-    document.title = "CS Revision · Dashboard";
-    const ids = CS.allTopicIds();
-    const total = ids.length;
-    let completionSum = 0,
-      quizzed = 0,
-      read = 0;
-    ids.forEach((id) => {
-      completionSum += CS.progress.completion(id);
-      const t = CS.progress.topic(id);
-      if (t.quizBest != null) quizzed++;
-      if ((t.read || 0) >= 0.9) read++;
-    });
-    const due = CS.flash ? CS.flash.dueCount() : 0;
-    const last = CS.store.get("lastTopic", null);
-    const lastMeta = last ? CS.topicMeta(last) : null;
-    const nQ = Object.values(CS.quizzes).reduce((a, b) => a + b.length, 0);
-    const nTools = Object.keys(CS.tools).length;
-
-    const hero = h("div", { class: "hero" });
-    const left = h("div", { class: "card" });
-    left.innerHTML =
-      "<h1>AQA A-Level Computer Science</h1><p>Everything in the 7517 specification: notes, worked examples, quizzes, flashcards and interactive tools. Pick a section, or follow the suggestions on the right.</p>" +
-      '<div class="stat-row"><div class="stat"><div class="v">' + Math.round((completionSum / total) * 100) + '%</div><div class="l">overall progress</div></div><div class="stat"><div class="v">' + read + "/" + total + '</div><div class="l">pages read</div></div><div class="stat"><div class="v">' + quizzed + "/" + total + '</div><div class="l">quizzes tried</div></div><div class="stat"><div class="v">' + due + '</div><div class="l">flashcards due</div></div></div>';
-    const actions = h("div", { class: "row", style: "margin-top:14px" });
-    if (lastMeta) actions.appendChild(h("a", { class: "btn primary", href: "#/topic/" + last, text: "Continue: " + last + " " + lastMeta.title }));
-    actions.appendChild(h("a", { class: "btn", href: "#/mock", text: "🎲 Mixed mock" }));
-    actions.appendChild(h("a", { class: "btn", href: "#/mistakes", text: "🔁 My mistakes" }));
-    actions.appendChild(h("a", { class: "btn", href: "#/code", text: "💻 Code practice" }));
-    actions.appendChild(h("a", { class: "btn", href: "#/flashcards", text: "🃏 Flashcards" }));
-    actions.appendChild(h("a", { class: "btn", href: "#/tools", text: "🧰 Tools (" + nTools + ")" }));
-    actions.appendChild(h("a", { class: "btn", href: "#/checklist", text: "✅ Spec checklist" }));
-    left.appendChild(actions);
-
-    const right = h("div", { class: "card" });
-    right.innerHTML = "<h3 style='margin:0 0 6px'>What should I revise next?</h3>";
-    const list = h("ul", { class: "next-list" });
-    nextSuggestions().forEach((s) => {
-      if (s.custom) {
-        list.appendChild(h("li", null, [h("a", { href: s.href, text: s.label }), h("span", { class: "why", text: s.why })]));
-        return;
-      }
-      const m = CS.topicMeta(s.id);
-      if (!m) return;
-      list.appendChild(h("li", null, [h("a", { href: s.href || "#/topic/" + s.id, text: s.id + " " + m.title }), h("span", { class: "why", text: s.why })]));
-    });
-    right.appendChild(list);
-    const weak = CS.progress.weakest(5);
-    if (weak.length) {
-      right.appendChild(h("h3", { style: "margin:14px 0 6px", text: "Weakest topics (quiz best score)" }));
-      const wl = h("ul", { class: "next-list" });
-      weak.forEach((w) => {
-        const m = CS.topicMeta(w.id);
-        if (!m) return;
-        wl.appendChild(h("li", null, [h("a", { href: "#/quiz/" + w.id, text: w.id + " " + m.title }), h("span", { class: "pill " + (w.pct < 50 ? "bad" : w.pct < 75 ? "warn" : "ok"), text: w.pct + "%" })]));
-      });
-      right.appendChild(wl);
-    }
-    hero.append(left, right);
-    if (CS.countdown) main.appendChild(CS.countdown.strip());
-    main.appendChild(hero);
-
-    if (CS.loadErrors) {
-      main.appendChild(h("div", { class: "card", style: "border-color:var(--bad);margin-bottom:14px", html: "<b>Some content files failed to load:</b> " + CS.loadErrors.map(U.esc).join(", ") + ". Check <code>content/manifest.js</code>." }));
-    }
-
-    main.appendChild(h("h2", { text: "Specification sections", style: "margin:8px 0 10px" }));
-    const cards = h("div", { class: "section-cards" });
-    CS.sections.forEach((s) => {
-      const comp = s.topics.reduce((a, t) => a + CS.progress.completion(t.id), 0) / s.topics.length;
-      const a = h("a", { class: "section-card", href: "#/section/" + s.id, style: "--sc: var(--s" + s.id + ")" });
-      a.innerHTML = '<div class="num">' + (s.spec ? "Spec " + s.spec : s.id === "R" ? "Reference" : s.id === "P" ? "Paper 1 skeleton" : "") + '</div><div class="t">' + U.esc(s.title) + '</div><div class="progress-bar" style="margin:6px 0"><i style="width:' + Math.round(comp * 100) + '%"></i></div><div class="meta"><span>' + s.topics.length + " pages</span><span>" + Math.round(comp * 100) + "%</span></div>";
-      cards.appendChild(a);
-    });
-    main.appendChild(cards);
-    main.appendChild(h("p", { class: "muted small", style: "margin-top:18px", text: nQ + " quiz questions · " + Object.values(CS.exams).reduce((a, b) => a + b.length, 0) + " exam-style questions · " + Object.values(CS.flashcards).reduce((a, b) => a + b.length, 0) + " flashcards · " + nTools + " interactive tools. Press / to search." }));
-  };
-
-  function nextSuggestions() {
-    const out = [];
-    const ids = CS.allTopicIds();
-    const mistakesDue = CS.mistakes ? CS.mistakes.dueCount() : 0;
-    if (mistakesDue) out.push({ id: "mistakes", label: "Review My mistakes", href: "#/mistakes", why: mistakesDue + " question" + (mistakesDue === 1 ? " is" : "s are") + " due again", custom: true });
-    const dueCount = CS.flash ? CS.flash.dueCount() : 0;
-    if (dueCount) out.push({ id: "flash", label: "Review flashcards", href: "#/flashcards/due", why: dueCount + " cards are due for review", custom: true });
-    // weakest with attempts
-    const weak = CS.progress.weakest(3).filter((w) => w.pct < 70);
-    weak.forEach((w) => out.push({ id: w.id, href: "#/topic/" + w.id, why: "quiz best only " + w.pct + "% — reread then retry" }));
-    // read but not quizzed
-    ids.forEach((id) => {
-      if (out.length >= 6) return;
-      const t = CS.progress.topic(id);
-      if ((t.read || 0) >= 0.6 && t.quizBest == null) out.push({ id: id, href: "#/quiz/" + id, why: "you have read this but not tried the quiz" });
-    });
-    // untouched, in spec order
-    ids.forEach((id) => {
-      if (out.length >= 6) return;
-      const t = CS.progress.topic(id);
-      if (!t.viewed && !out.some((o) => o.id === id)) out.push({ id: id, why: "not started yet" });
-    });
-    return out.slice(0, 6);
+  /** page heading block used by most pages */
+  function pageHead(crumbs, title, intro, extraHtml) {
+    return h("div", { class: "page-head", html: (crumbs ? '<div class="crumbs">' + crumbs + "</div>" : "") + "<h1>" + title + "</h1>" + (intro ? '<p class="muted">' + intro + "</p>" : "") + (extraHtml || "") });
   }
 
-  /* ---------------- SECTION ---------------- */
+  /* ---------------- HOME: what to do today ---------------- */
+  CS.views.home = function (main) {
+    document.title = "CS Revision · Home";
+    const ids = CS.allTopicIds();
+    if (CS.countdown && CS.countdown.line) main.appendChild(CS.countdown.line());
+    if (CS.loadErrors) main.appendChild(h("div", { class: "card", style: "border-color:var(--bad);margin-bottom:16px", html: "<b>Some content files failed to load:</b> " + CS.loadErrors.map(U.esc).join(", ") + ". Check <code>content/manifest.js</code>." }));
+
+    const grid = h("div", { class: "home-grid" });
+    const left = h("div", { class: "home-main" });
+    const right = h("aside", { class: "home-side", "aria-label": "Your progress" });
+    grid.append(left, right);
+    main.appendChild(grid);
+
+    // continue where you left off (or start at the beginning)
+    const last = CS.store.get("lastTopic", null);
+    const lastMeta = last ? CS.topicMeta(last) : null;
+    const id = lastMeta ? last : ids.find((x) => !CS.progress.topic(x).viewed) || ids[0];
+    const m = CS.topicMeta(id);
+    if (m) {
+      const t = CS.progress.topic(id);
+      const read = pct(t.read || 0);
+      const nq = (CS.quizzes[id] || []).length;
+      const pts = m.specPoints || [];
+      const ticked = pts.filter((p) => CS.store.get("checklist." + p.id, false)).length;
+      const paper = paperOf(m.section);
+      const card = h("section", { class: "continue" });
+      const metaBits = [];
+      if (nq) metaBits.push(t.quizBest != null ? "Quiz best <b class='" + (t.quizBest < 50 ? "bad-t" : t.quizBest < 75 ? "warn-t" : "ok-t") + "'>" + Number(t.quizBest) + "%</b>" : "Quiz not tried yet");
+      if (pts.length) metaBits.push(ticked + " of " + pts.length + " spec points ticked");
+      if (t.quizAttempts) metaBits.push(t.quizAttempts + " quiz attempt" + (t.quizAttempts === 1 ? "" : "s"));
+      card.innerHTML =
+        '<div class="eyebrow">' + (lastMeta ? "Continue where you left off" : "Start here") + "</div>" +
+        '<div class="cont-row"><div><h1><a href="#/topic/' + id + '">' + U.esc(id + " " + m.title) + '</a></h1><p class="cont-sub">' + U.esc(m.section.title) + (paper ? " · " + paper : "") + "</p></div>" +
+        '<span class="ring" style="--p:' + read + '" role="img" aria-label="' + read + '% read"><b>' + read + "%</b><small>read</small></span></div>" +
+        (metaBits.length ? '<div class="cont-meta">' + metaBits.map((x) => "<span>" + x + "</span>").join("") + "</div>" : '<div style="height:16px"></div>');
+      const row = h("div", { class: "row" });
+      row.appendChild(h("a", { class: "btn primary", href: "#/topic/" + id, text: !lastMeta ? "Start reading" : read >= 90 ? "Read it again" : "Resume reading" }));
+      if (nq) row.appendChild(h("a", { class: "btn", href: "#/quiz/" + id, text: t.quizBest != null ? "Retry the quiz" : "Take the quiz" }));
+      const nxt = CS.prevNext(id).next;
+      if (lastMeta && read >= 90 && nxt) row.appendChild(h("a", { class: "btn", href: "#/topic/" + nxt, text: "Next: " + nxt + " " + CS.topicMeta(nxt).title }));
+      card.appendChild(row);
+      left.appendChild(card);
+    }
+
+    // due today
+    const due = [];
+    const mistakesDue = CS.mistakes ? CS.mistakes.dueCount() : 0;
+    if (mistakesDue) due.push({ ico: "repeat", cls: "bad", t: "Retry your mistakes", d: mistakesDue + " question" + (mistakesDue === 1 ? " is" : "s are") + " due again", href: "#/mistakes", b: "Start" });
+    const flashDue = CS.flash ? CS.flash.dueCount() : 0;
+    if (flashDue) due.push({ ico: "cards", cls: "", t: "Flashcards to review", d: flashDue + " card" + (flashDue === 1 ? " is" : "s are") + " due again", href: "#/flashcards/due", b: "Review" });
+    const flashNew = CS.flash ? CS.flash.newCount() : 0;
+    if (flashNew) due.push({ ico: "cards", cls: "", t: "Learn new flashcards", d: flashNew + " new card" + (flashNew === 1 ? "" : "s") + " from topics you've opened, 20 at a time", href: "#/flashcards/new", b: "Learn" });
+    CS.progress
+      .weakest(2)
+      .filter((w) => w.pct < 70)
+      .forEach((w) => due.push({ ico: "quiz", cls: "warn", t: w.id + " " + CS.topicMeta(w.id).title + " quiz", d: "Best score " + w.pct + "%. Reread the notes, then try again", href: "#/quiz/" + w.id, b: "Quiz" }));
+    const readNotQuizzed = ids.find((x) => {
+      const t = CS.progress.topic(x);
+      return (t.read || 0) >= 0.6 && t.quizBest == null && (CS.quizzes[x] || []).length;
+    });
+    if (readNotQuizzed) due.push({ ico: "quiz", cls: "", t: readNotQuizzed + " " + CS.topicMeta(readNotQuizzed).title + " quiz", d: "You've read this but haven't tried the quiz", href: "#/quiz/" + readNotQuizzed, b: "Quiz" });
+    const dueBlock = h("section", { class: "block" });
+    dueBlock.appendChild(h("div", { class: "block-h", html: "<h2>Due today</h2>" + (due.length ? '<span class="muted small">' + due.length + " thing" + (due.length === 1 ? "" : "s") + "</span>" : "") }));
+    if (due.length) {
+      const ul = h("ul", { class: "due" });
+      due.forEach((d) => ul.appendChild(h("li", { html: '<span class="due-ico ' + d.cls + '">' + icon(d.ico) + '</span><div class="due-t"><b>' + U.esc(d.t) + "</b><span>" + U.esc(d.d) + '</span></div><a class="btn sm" href="' + d.href + '">' + d.b + "</a>" })));
+      dueBlock.appendChild(ul);
+    } else dueBlock.appendChild(h("p", { class: "empty-note", html: "Nothing is due right now. Carry on reading, or try a <a href='#/mock'>mixed mock</a>." }));
+    left.appendChild(dueBlock);
+
+    // start something new
+    const fresh = [];
+    const nextAfter = lastMeta ? CS.prevNext(last).next : null;
+    if (nextAfter && !CS.progress.topic(nextAfter).viewed) fresh.push({ id: nextAfter, why: "Next after " + last });
+    ids.forEach((x) => {
+      if (fresh.length >= 3 || x === id || fresh.some((f) => f.id === x) || CS.progress.topic(x).viewed) return;
+      const s = CS.sectionOf(x);
+      fresh.push({ id: x, why: s ? s.short || s.title : "" });
+    });
+    if (fresh.length) {
+      const nb = h("section", { class: "block" });
+      nb.appendChild(h("div", { class: "block-h", html: '<h2>Start something new</h2><a class="small" href="#/notes">All notes</a>' }));
+      const row = h("div", { class: "new-row" });
+      fresh.forEach((f) => row.appendChild(h("a", { class: "new", href: "#/topic/" + f.id, html: '<span class="mono">' + U.esc(f.id) + "</span><b>" + U.esc(CS.topicMeta(f.id).title) + '</b><span class="muted small">' + U.esc(f.why) + "</span>" })));
+      nb.appendChild(row);
+      left.appendChild(nb);
+    }
+
+    // progress, split by paper
+    const prog = h("section", { class: "side-block" });
+    let html = "<h3>Progress</h3>";
+    ["Paper 1", "Paper 2"].forEach((p) => {
+      const tids = CS.sections.filter((s) => paperOf(s) === p).flatMap((s) => s.topics.map((t) => t.id));
+      if (!tids.length) return;
+      const c = pct(tids.reduce((a, x) => a + CS.progress.completion(x), 0) / tids.length);
+      html += '<div class="paper"><div class="paper-h"><span>' + p + "</span><b>" + c + '%</b></div><span class="bar"><i style="width:' + c + '%"></i></span><div class="paper-s">' + tids.length + " pages</div></div>";
+    });
+    const readN = ids.filter((x) => (CS.progress.topic(x).read || 0) >= 0.9).length;
+    const quizzed = ids.filter((x) => CS.progress.topic(x).quizBest != null).length;
+    const allPts = CS.sections.flatMap((s) => s.topics.flatMap((t) => t.specPoints || []));
+    const tickedAll = allPts.filter((p) => CS.store.get("checklist." + p.id, false)).length;
+    const probs = Object.keys(CS.problems || {});
+    const solvedN = probs.filter((p) => codeSolved()[p]).length;
+    const kv = [["Pages read", readN + " of " + ids.length], ["Quizzes tried", quizzed + " of " + ids.length]];
+    if (probs.length) kv.push(["Code problems solved", solvedN + " of " + probs.length]);
+    if (allPts.length) kv.push(["Spec points ticked", tickedAll + " of " + allPts.length]);
+    html += '<dl class="kv">' + kv.map((r) => "<div><dt>" + r[0] + "</dt><dd>" + r[1] + "</dd></div>").join("") + '</dl><a class="small" href="#/progress">Full breakdown</a>';
+    prog.innerHTML = html;
+    right.appendChild(prog);
+    const weak = CS.progress.weakest(4);
+    if (weak.length) {
+      const wb = h("section", { class: "side-block" });
+      wb.innerHTML = "<h3>Weakest topics</h3>";
+      const ol = h("ol", { class: "weak" });
+      weak.forEach((w) => {
+        const wm = CS.topicMeta(w.id);
+        if (wm) ol.appendChild(h("li", { html: '<a href="#/quiz/' + w.id + '">' + U.esc(w.id + " " + wm.title) + "</a>" + quizPill(w.pct).replace("quiz ", "") }));
+      });
+      wb.appendChild(ol);
+      right.appendChild(wb);
+    }
+
+    const nQ = Object.values(CS.quizzes).reduce((a, b) => a + b.length, 0);
+    const nE = Object.values(CS.exams).reduce((a, b) => a + b.length, 0);
+    main.appendChild(h("p", { class: "site-foot", html: nQ.toLocaleString("en-GB") + " quiz questions · " + nE + " exam-style questions · " + Object.keys(CS.tools).length + " interactive tools · " + ids.length + " pages of notes. Press <kbd>/</kbd> to search." }));
+  };
+
+  /* ---------------- NOTES: the whole specification as a syllabus ---------------- */
+  CS.views.notes = function (main) {
+    document.title = "CS Revision · Notes";
+    const ids = CS.allTopicIds();
+    main.appendChild(pageHead("", "Notes", "The whole AQA 7517 specification in spec order: " + ids.length + " pages across " + CS.sections.length + " sections.", '<div class="head-links"><a href="#/glossary">Glossary</a><a href="#/checklist">Spec checklist</a></div>'));
+    const filters = h("div", { class: "filters", role: "group", "aria-label": "Filter pages" });
+    const chips = [["all", "All"], ["Paper 1", "Paper 1"], ["Paper 2", "Paper 2"], ["half", "In progress"], ["none", "Not started"]];
+    let mode = "all";
+    chips.forEach(([v, t]) => {
+      const b = h("button", { type: "button", class: "chip" + (v === "all" ? " active" : ""), text: t, "aria-pressed": String(v === "all") });
+      b.addEventListener("click", () => {
+        mode = v;
+        filters.querySelectorAll(".chip").forEach((c) => {
+          c.classList.toggle("active", c === b);
+          c.setAttribute("aria-pressed", String(c === b));
+        });
+        draw();
+      });
+      filters.appendChild(b);
+    });
+    const q = h("input", { type: "search", placeholder: "Filter pages", "aria-label": "Filter pages by name" });
+    filters.appendChild(q);
+    main.querySelector(".page-head").appendChild(filters);
+    const list = h("div");
+    main.appendChild(list);
+    const closed = {};
+
+    function draw() {
+      list.innerHTML = "";
+      const text = U.normalise(q.value);
+      const filtering = mode !== "all" || text;
+      let shown = 0;
+      CS.sections.forEach((s) => {
+        const paper = paperOf(s);
+        if ((mode === "Paper 1" || mode === "Paper 2") && paper !== mode) return;
+        const topics = s.topics.filter((t) => {
+          const st = topicStatus(t.id);
+          if (mode === "half" && st !== "half") return false;
+          if (mode === "none" && st !== "") return false;
+          if (text && !U.normalise(t.id + " " + t.title).includes(text)) return false;
+          return true;
+        });
+        if (!topics.length) return;
+        shown++;
+        const read = s.topics.filter((t) => topicStatus(t.id) === "done").length;
+        const comp = pct(s.topics.reduce((a, t) => a + CS.progress.completion(t.id), 0) / s.topics.length);
+        const open = filtering || !closed[s.id];
+        const sec = h("section", { class: "syl" + (open ? " open" : "") });
+        const head = h("button", { type: "button", class: "syl-h", "aria-expanded": String(open), html: '<span class="syl-num">' + U.esc(secLabel(s)) + '</span><span class="syl-title">' + U.esc(s.title) + "</span>" + '<span class="tag">' + (paper || (s.id === "14" ? "NEA" : "Reference")) + '</span><span class="syl-p">' + read + " of " + s.topics.length + ' read</span><span class="bar sm"><i style="width:' + comp + '%"></i></span><span class="chev"></span>' });
+        head.addEventListener("click", () => {
+          const now = !sec.classList.contains("open");
+          sec.classList.toggle("open", now);
+          head.setAttribute("aria-expanded", String(now));
+          closed[s.id] = !now;
+        });
+        const body = h("div", { class: "syl-body" });
+        if (s.blurb && !filtering) body.appendChild(h("p", { class: "syl-blurb", text: s.blurb }));
+        const ul = h("ul", { class: "syl-list" });
+        topics.forEach((t) => {
+          const best = CS.progress.topic(t.id).quizBest;
+          ul.appendChild(h("li", { html: '<a href="#/topic/' + t.id + '">' + statusHtml(t.id) + '<span class="mono">' + t.id + '</span><span class="syl-t">' + U.esc(t.title) + "</span>" + (best != null ? quizPill(best) : "") + "</a>" }));
+        });
+        body.appendChild(ul);
+        body.appendChild(h("div", { class: "syl-foot", html: '<a href="#/section/' + s.id + '">Section overview</a>' }));
+        sec.append(head, body);
+        list.appendChild(sec);
+      });
+      if (!shown) list.appendChild(h("p", { class: "empty-note", text: "No pages match." }));
+    }
+    q.addEventListener("input", U.debounce(draw, 120));
+    draw();
+  };
+
+  /* ---------------- SECTION overview ---------------- */
   CS.views.section = function (main, arg) {
     const s = CS.sectionById(arg[0]);
     if (!s) return CS.views.notfound(main);
     document.title = "CS Revision · " + s.title;
-    main.appendChild(h("div", { class: "topic-head" }, [h("div", { class: "crumbs", html: '<a href="#/">Home</a> › Section ' + U.esc(s.id) }), h("h1", { text: s.title }), h("p", { class: "muted", text: s.blurb || "" })]));
-    const grid = h("div", { class: "grid cols-2" });
+    const paper = paperOf(s);
+    main.appendChild(pageHead('<a href="#/notes">Notes</a> › ' + U.esc(secLabel(s)), U.esc(s.title), U.esc(s.blurb || ""), paper ? '<div class="head-links"><span class="tag">' + paper + "</span></div>" : ""));
+    const ul = h("ul", { class: "topic-rows" });
     s.topics.forEach((t) => {
       const p = CS.progress.topic(t.id);
-      const card = h("div", { class: "card" });
-      card.innerHTML = '<div class="row spread"><a href="#/topic/' + t.id + '" style="font-weight:800;font-size:1.05rem">' + t.id + " " + U.esc(t.title) + "</a>" + (p.quizBest != null ? '<span class="pill ' + (p.quizBest < 50 ? "bad" : p.quizBest < 75 ? "warn" : "ok") + '">quiz ' + Number(p.quizBest) + "%</span>" : "") + '</div><div class="progress-bar" style="margin:8px 0"><i style="width:' + Math.round(CS.progress.completion(t.id) * 100) + '%"></i></div><div class="row small"><a class="btn sm" href="#/topic/' + t.id + '">Read</a><a class="btn sm" href="#/quiz/' + t.id + '">Quiz</a><a class="btn sm" href="#/exam/' + t.id + '">Exam Qs</a><a class="btn sm" href="#/flashcards/' + t.id + '">Cards</a></div>';
-      grid.appendChild(card);
+      const li = h("li");
+      let btns = '<a class="btn sm" href="#/topic/' + t.id + '">Read</a>';
+      if ((CS.quizzes[t.id] || []).length) btns += '<a class="btn sm" href="#/quiz/' + t.id + '">Quiz</a>';
+      if ((CS.exams[t.id] || []).length) btns += '<a class="btn sm" href="#/exam/' + t.id + '">Exam Qs</a>';
+      if (flashCount(t.id)) btns += '<a class="btn sm" href="#/flashcards/' + t.id + '">Cards</a>';
+      li.innerHTML = statusHtml(t.id) + '<span class="tr-t"><span class="mono">' + t.id + '</span><a href="#/topic/' + t.id + '">' + U.esc(t.title) + "</a></span>" + (p.quizBest != null ? quizPill(p.quizBest) : "") + '<span class="row">' + btns + "</span>";
+      ul.appendChild(li);
     });
-    main.appendChild(grid);
+    main.appendChild(ul);
   };
 
-  /* ---------------- TOPIC ---------------- */
-  let scrollHandler = null;
+  /* ---------------- TOPIC HUB: tree + header + tabs ---------------- */
+  function buildTree(activeId) {
+    const tree = h("nav", { class: "tree", "aria-label": "Contents" });
+    tree.appendChild(h("div", { class: "tree-h", text: "Contents" }));
+    const activeSec = CS.sectionOf(activeId);
+    CS.sections.forEach((s) => {
+      const open = activeSec && activeSec.id === s.id;
+      const g = h("div", { class: "tree-group" + (open ? " open" : "") });
+      const btn = h("button", { type: "button", class: "tree-sec", "aria-expanded": String(!!open), html: '<span class="mono">' + U.esc(secLabel(s)) + "</span><span>" + U.esc(s.short || s.title) + '</span><span class="chev"></span>' });
+      btn.addEventListener("click", () => {
+        g.classList.toggle("open");
+        btn.setAttribute("aria-expanded", String(g.classList.contains("open")));
+      });
+      const ul = h("ul");
+      s.topics.forEach((t) => ul.appendChild(h("li", { html: '<a href="#/topic/' + t.id + '" data-topic="' + t.id + '"' + (t.id === activeId ? ' class="active" aria-current="page"' : "") + ">" + statusHtml(t.id) + "<span>" + U.esc(t.id + " " + t.title) + "</span></a>" })));
+      g.append(btn, ul);
+      tree.appendChild(g);
+    });
+    return tree;
+  }
+
+  /** builds the hub around a topic page and returns the panel the tab's own view renders into */
+  function topicHub(main, id, tab) {
+    const meta = CS.topicMeta(id);
+    const sec = meta.section;
+    if (tab === "notes") CS.progress.markViewed(id);
+    main.classList.add("hub-page");
+    const tree = buildTree(id);
+    const hub = h("div", { class: "hub" });
+    const t = CS.progress.topic(id);
+    const paper = paperOf(sec);
+    const bits = [];
+    if (meta.spec && meta.spec.length) bits.push("Spec " + meta.spec.map((s) => '<span class="spec-badge">' + U.esc(s) + "</span>").join(" "));
+    if (paper) bits.push(paper);
+    if (t.read) bits.push(pct(t.read) + "% read");
+    if (t.quizBest != null) bits.push("Quiz best <b class='" + (t.quizBest < 50 ? "bad-t" : t.quizBest < 75 ? "warn-t" : "ok-t") + "'>" + Number(t.quizBest) + "%</b>");
+    hub.appendChild(h("div", { class: "hub-head", html: '<div class="crumbs"><a href="#/notes">Notes</a><span>›</span><a href="#/section/' + sec.id + '">' + U.esc(secLabel(sec) + " " + (sec.short || sec.title)) + "</a></div><h1>" + U.esc(id + " " + meta.title) + "</h1>" + (bits.length ? '<div class="hub-meta">' + bits.map((b) => "<span>" + b + "</span>").join("") + "</div>" : "") }));
+
+    const tabs = [
+      ["notes", "Notes", "#/topic/" + id, -1],
+      ["quiz", "Quiz", "#/quiz/" + id, (CS.quizzes[id] || []).length],
+      ["exam", "Exam questions", "#/exam/" + id, (CS.exams[id] || []).length],
+      ["flashcards", "Flashcards", "#/flashcards/" + id, CS.topics[id] || (CS.flashcards[id] || []).length ? flashCount(id) : 0],
+      ["trace", "Trace", "#/trace/" + id, (CS.tracesByTopic[id] || []).length],
+      ["code", "Code", "#/problems/" + id, problemsFor(id).length],
+    ];
+    const row = h("div", { class: "tabs-row" });
+    const nav = h("nav", { class: "hub-tabs", "aria-label": "This topic" });
+    tabs.forEach(([k, label, href, n]) => {
+      if (n === 0 && k !== tab) return;
+      nav.appendChild(h("a", { href: href, class: k === tab ? "active" : "", "aria-current": k === tab ? "page" : null, html: U.esc(label) + (n > 0 ? "<i>" + n + "</i>" : "") }));
+    });
+    row.appendChild(nav);
+    if (tab === "notes" && CS.topics[id]) {
+      const mode = CS.store.get("prefs.viewMode", "full");
+      const toggle = h("div", { class: "view-toggle", role: "group", "aria-label": "View mode" });
+      [["quick", "Quick"], ["full", "Full"]].forEach(([v, label]) => {
+        const b = h("button", { type: "button", class: mode === v ? "active" : "", text: label, "aria-pressed": String(mode === v), title: v === "quick" ? "Objectives, summary, key terms and recap only" : "Everything: explanations, worked examples and diagrams" });
+        b.addEventListener("click", () => {
+          CS.store.set("prefs.viewMode", v);
+          route();
+        });
+        toggle.appendChild(b);
+      });
+      row.appendChild(toggle);
+    }
+    hub.appendChild(row);
+    const panel = h("div", { class: "hub-panel" });
+    hub.appendChild(panel);
+    main.append(tree, hub);
+    const a = tree.querySelector("a.active");
+    if (a && a.scrollIntoView) setTimeout(() => a.scrollIntoView({ block: "nearest" }), 0);
+    return panel;
+  }
+  CS.topicHub = topicHub;
+
+  /* ---------------- TOPIC notes (the Notes tab) ---------------- */
   CS.views.topic = function (main, arg) {
     const id = arg[0];
     const meta = CS.topicMeta(id);
     const topic = CS.topics[id];
     if (!meta) return CS.views.notfound(main);
     document.title = "CS Revision · " + id + " " + meta.title;
-    setActiveNav(id, null);
-    CS.progress.markViewed(id);
-    const sec = meta.section;
-    main.style.setProperty("--sc", "var(--s" + sec.id + ")");
-
-    const head = h("div", { class: "topic-head" });
-    head.innerHTML = '<div class="crumbs"><a href="#/">Home</a> › <a href="#/section/' + sec.id + '">' + U.esc(sec.title) + "</a></div><h1><span class='pid'>" + U.esc(id) + "</span>" + U.esc(meta.title) + "</h1>" + (meta.spec ? '<div class="small muted">Specification: ' + meta.spec.map((s) => '<span class="spec-badge">' + U.esc(s) + "</span>").join(" ") + "</div>" : "");
-    main.appendChild(head);
-
     if (!topic) {
       main.appendChild(h("div", { class: "card", html: "<h3>Content not written yet</h3><p>This page has no content file. Add <code>content/topics/" + U.esc(id) + ".md.js</code> and list it in <code>content/manifest.js</code>.</p>" }));
       return;
     }
-
-    // tools row
     const mode = CS.store.get("prefs.viewMode", "full");
-    const toolsRow = h("div", { class: "topic-tools" });
-    const toggle = h("div", { class: "view-toggle", role: "group", "aria-label": "View mode" });
-    const bQuick = h("button", { type: "button", class: mode === "quick" ? "active" : "", text: "⚡ Quick view" });
-    const bFull = h("button", { type: "button", class: mode === "full" ? "active" : "", text: "📖 Full detail" });
-    toggle.append(bQuick, bFull);
-    toolsRow.appendChild(toggle);
-    const nq = (CS.quizzes[id] || []).length;
-    if (nq) toolsRow.appendChild(h("a", { class: "btn sm", href: "#/quiz/" + id, text: "Quiz (" + nq + ")" }));
-    if ((CS.exams[id] || []).length) toolsRow.appendChild(h("a", { class: "btn sm", href: "#/exam/" + id, text: "Exam questions" }));
-    if ((CS.flashcards[id] || []).length || topic) toolsRow.appendChild(h("a", { class: "btn sm", href: "#/flashcards/" + id, text: "Flashcards" }));
-    const pr = CS.progress.topic(id);
-    if (pr.quizBest != null) toolsRow.appendChild(h("span", { class: "pill " + (pr.quizBest < 50 ? "bad" : pr.quizBest < 75 ? "warn" : "ok"), text: "Quiz best " + pr.quizBest + "%" }));
-    main.appendChild(toolsRow);
-
     const layout = h("div", { class: "topic-layout" });
     const body = h("article", { class: "topic-body " + (mode === "quick" ? "quick" : "") });
     const ctx = { toc: [], keyterms: [] };
     body.innerHTML = CS.markdown.render(topic.md, ctx);
     topic.keyterms = ctx.keyterms;
-    if (mode === "quick") body.insertAdjacentHTML("afterbegin", '<div class="quick-notice" data-quick="1">⚡ <b>Quick view</b> shows the objectives, summary, key terms and recap only. Switch to <b>Full detail</b> for explanations, worked examples and diagrams.</div>');
+    if (mode === "quick") body.insertAdjacentHTML("afterbegin", '<div class="quick-notice" data-quick="1"><b>Quick view</b> shows the objectives, summary, key terms and recap only. Switch to <b>Full</b> for explanations, worked examples and diagrams.</div>');
 
     // footer actions inside article so they stay with content
     body.appendChild(renderTopicActions(id));
@@ -362,17 +521,9 @@
     toc.appendChild(h("div", { class: "toc-title", text: "On this page" }));
     ctx.toc.forEach((t) => toc.appendChild(h("a", { href: "#" + t.id, class: t.level === 3 ? "l3" : "", text: t.text, "data-target": t.id })));
     toc.appendChild(h("a", { href: "#topic-practice", text: "Practise this topic", "data-target": "topic-practice" }));
+    if ((CS.quizzes[id] || []).length) toc.appendChild(h("div", { class: "toc-next", html: '<span class="muted small">When you\'ve read it</span><a class="btn sm primary" href="#/quiz/' + id + '">Take the quiz →</a>' }));
     layout.appendChild(toc);
     main.appendChild(layout);
-
-    bQuick.addEventListener("click", () => {
-      CS.store.set("prefs.viewMode", "quick");
-      route();
-    });
-    bFull.addEventListener("click", () => {
-      CS.store.set("prefs.viewMode", "full");
-      route();
-    });
 
     enhance(body);
     mountEmbeds(body);
@@ -398,32 +549,32 @@
   function renderTopicActions(id) {
     const wrap = h("div", { id: "topic-practice", "data-quick": "1" });
     wrap.appendChild(h("h2", { text: "Practise this topic", style: "margin-top:2em" }));
-    const grid = h("div", { class: "topic-actions" });
+    const list = h("ul", { class: "topic-actions" });
     const nq = (CS.quizzes[id] || []).length;
     const ne = (CS.exams[id] || []).length;
-    const nf = (CS.flashcards[id] || []).length + ((CS.topics[id] && CS.topics[id].keyterms) || []).length;
+    const nf = flashCount(id);
     const nt = (CS.tracesByTopic[id] || []).length;
-    const card = (href, ico, t, d) => h("a", { class: "action-card", href: href, html: '<div class="ico">' + ico + '</div><div class="t">' + t + '</div><div class="d">' + d + "</div>" });
-    if (nq) grid.appendChild(card("#/quiz/" + id, "🧠", "Quiz", nq + " questions with instant feedback"));
-    if (ne) grid.appendChild(card("#/exam/" + id, "📝", "Exam-style questions", ne + " questions with mark schemes"));
-    if (nf) grid.appendChild(card("#/flashcards/" + id, "🃏", "Flashcards", nf + " cards, spaced repetition"));
-    if (nt) grid.appendChild(card("#/trace/" + id, "🔍", "Trace challenges", nt + " code-tracing tasks"));
-    const np = Object.values(CS.problems || {}).filter((p) => p.topic === id).length;
-    if (np) grid.appendChild(card("#/code", "💻", "Code practice", np + " Python problem" + (np === 1 ? "" : "s") + " with automatic tests"));
-    const nl = (CS.exams[id] || []).filter((q) => q.levels && q.exemplars).length;
-    if (nl) grid.appendChild(card("#/levels/" + (CS.exams[id] || []).find((q) => q.levels && q.exemplars).id, "🎯", "Extended answers", "mark example answers to " + nl + " levelled question" + (nl === 1 ? "" : "s")));
-    grid.appendChild(card("#/mock", "🎲", "Mixed mock", "random questions across topics"));
-    wrap.appendChild(grid);
+    const row = (href, ico, t, d) => list.appendChild(h("li", { html: '<a class="action-row" href="' + href + '"><span class="due-ico">' + icon(ico) + '</span><span class="t">' + t + '<br><span class="d">' + d + '</span></span><span class="chev"></span></a>' }));
+    if (nq) row("#/quiz/" + id, "quiz", "Quiz", nq + " questions with instant feedback");
+    if (ne) row("#/exam/" + id, "pen", "Exam-style questions", ne + " questions with mark schemes");
+    if (nf) row("#/flashcards/" + id, "cards", "Flashcards", nf + " cards, spaced repetition");
+    if (nt) row("#/trace/" + id, "trace", "Trace challenges", nt + " code-tracing tasks");
+    const np = problemsFor(id).length;
+    if (np) row("#/problems/" + id, "code", "Code practice", np + " Python problem" + (np === 1 ? "" : "s") + " with automatic tests");
+    const lv = (CS.exams[id] || []).filter((q) => q.levels && q.exemplars);
+    if (lv.length) row("#/levels/" + lv[0].id, "target", "Extended answers", "mark example answers to " + lv.length + " levelled question" + (lv.length === 1 ? "" : "s"));
+    row("#/mock", "dice", "Mixed mock", "random questions across topics");
+    wrap.appendChild(list);
     const resetRow = h("div", { class: "row small", style: "justify-content:flex-end;margin-top:8px" });
-    const resetBtn = h("button", { class: "btn sm ghost", type: "button", text: "↺ Reset my progress on this page", title: "Forget reading progress, quiz and exam scores, checklist ticks, trace results and flashcard boxes for this page only" });
+    const resetBtn = h("button", { class: "btn sm ghost", type: "button", text: "Reset my progress on this page", title: "Forget reading progress, quiz and exam scores, checklist ticks, trace results and flashcard boxes for this page only" });
     resetBtn.addEventListener("click", () => {
       if (!confirm("Reset your progress on " + id + " only? This forgets reading progress, quiz and exam scores, saved exam answers, checklist ticks, trace results, flashcard boxes and My mistakes entries for this page.")) return;
       CS.progress.resetTopic(id);
-      updateSidebarProgress();
+      updateTreeStatus();
       CS.toast("Progress on " + id + " reset");
       route();
     });
-    if (CS.report) resetRow.appendChild(CS.report.link({ where: "Notes page " + id }, "⚑ Report a mistake on this page"));
+    if (CS.report) resetRow.appendChild(CS.report.link({ where: "Notes page " + id }, "Report a mistake on this page"));
     resetRow.appendChild(resetBtn);
     wrap.appendChild(resetRow);
     return wrap;
@@ -432,7 +583,7 @@
   function renderChecklist(id, meta) {
     const points = meta.specPoints || [];
     const wrap = h("section", { class: "card", style: "margin:1.5em 0", "data-quick": "1" });
-    wrap.appendChild(h("h3", { style: "margin:0 0 6px", text: "Revision checklist — tick what you can do" }));
+    wrap.appendChild(h("h3", { style: "margin:0 0 6px", text: "Revision checklist: tick what you can do" }));
     if (!points.length) {
       wrap.appendChild(h("p", { class: "muted small", text: "No specification points are mapped to this page yet." }));
       return wrap;
@@ -447,7 +598,7 @@
       cb.addEventListener("change", () => {
         CS.store.set(key, cb.checked);
         li.classList.toggle("done", cb.checked);
-        updateSidebarProgress();
+        updateTreeStatus();
       });
       ul.appendChild(li);
     });
@@ -525,11 +676,11 @@
     const tool = CS.tools[id];
     el.innerHTML = "";
     if (!tool) {
-      el.innerHTML = '<div class="tool-missing">🧰 Interactive tool “' + U.esc(id) + "” is not available (file missing from manifest?).</div>";
+      el.innerHTML = '<div class="tool-missing">Interactive tool “' + U.esc(id) + "” is not available (file missing from manifest?).</div>";
       return;
     }
     const frame = h("div", { class: "tool-frame" });
-    const head = h("div", { class: "tool-frame-head" }, [h("span", { text: (tool.icon || "🧰") + " " + tool.title }), embedded ? h("a", { class: "btn sm ghost", href: "#/tool/" + id, text: "Open full page ↗" }) : null].filter(Boolean));
+    const head = h("div", { class: "tool-frame-head" }, [h("span", { text: tool.title }), embedded ? h("a", { class: "btn sm ghost", href: "#/tool/" + id, text: "Open full page ↗" }) : null].filter(Boolean));
     const body = h("div", { class: "tool-frame-body tool" });
     frame.append(head, body);
     el.appendChild(frame);
@@ -542,7 +693,6 @@
   };
 
   function bindTocScroll(toc, body, id) {
-    if (scrollHandler) window.removeEventListener("scroll", scrollHandler);
     const bar = document.getElementById("page-progress");
     const links = Array.from(toc.querySelectorAll("a[data-target]"));
     const targets = links.map((a) => document.getElementById(a.getAttribute("data-target"))).filter(Boolean);
@@ -554,7 +704,7 @@
       if (frac > maxRead) {
         maxRead = frac;
         CS.progress.markRead(id, frac >= 0.85 ? 1 : frac);
-        if (frac >= 0.85) updateSidebarProgress();
+        if (frac >= 0.85) updateTreeStatus();
       }
       let active = null;
       const y = window.scrollY + 120;
@@ -566,14 +716,123 @@
     window.addEventListener("scroll", scrollHandler, { passive: true });
     // short pages count as read
     setTimeout(() => {
-      if (document.documentElement.scrollHeight <= window.innerHeight + 40) CS.progress.markRead(id, 1);
+      if (document.documentElement.scrollHeight <= window.innerHeight + 40) {
+        CS.progress.markRead(id, 1);
+        updateTreeStatus();
+      }
     }, 300);
   }
+
+  /* ---------------- CODE tab: one topic's coding problems ---------------- */
+  CS.views.problems = function (main, arg) {
+    const id = arg[0];
+    const meta = CS.topicMeta(id);
+    if (!meta) return CS.views.notfound(main);
+    document.title = "CS Revision · Code practice " + id;
+    const list = problemsFor(id).sort((a, b) => a.difficulty - b.difficulty || a.title.localeCompare(b.title));
+    if (!list.length) {
+      main.appendChild(h("p", { class: "empty-note", html: "No coding problems for this topic. See <a href='#/code'>all code practice</a>." }));
+      return;
+    }
+    const s = codeSolved();
+    const DIFF = { 1: "warm-up", 2: "standard", 3: "stretch" };
+    const ul = h("ul", { class: "problem-list" });
+    list.forEach((p) => ul.appendChild(h("li", { html: '<span class="status ' + (s[p.id] ? "done" : "") + '" title="' + (s[p.id] ? "Solved" : "Not solved yet") + '">' + (s[p.id] ? "✓" : "") + '</span><a href="#/code/' + p.id + '">' + U.esc(p.title) + '</a><span class="diff diff-' + p.difficulty + '">' + (DIFF[p.difficulty] || "") + "</span>" })));
+    main.appendChild(ul);
+    main.appendChild(h("p", { class: "small muted", style: "margin-top:12px", html: "Python runs in your browser and is checked against visible and hidden tests. <a href='#/code'>All code practice</a>" }));
+  };
+
+  /* ---------------- PRACTISE: everything that tests you ---------------- */
+  CS.views.practise = function (main) {
+    document.title = "CS Revision · Practise";
+    main.appendChild(pageHead("", "Practise", "Everything that tests you, in one place. Start with whatever is due."));
+    const mDue = CS.mistakes ? CS.mistakes.dueCount() : 0;
+    const fDue = CS.flash ? CS.flash.dueCount() : 0;
+    const fNew = CS.flash ? CS.flash.newCount() : 0;
+    const dueNow = h("section", { class: "due-now" });
+    dueNow.innerHTML =
+      '<div class="dn"><div class="dn-n' + (mDue ? "" : " zero") + '">' + mDue + '</div><div class="dn-t"><b>Mistakes due</b><span>Questions you got wrong come back after 1, 3 and 7 days</span></div><a class="btn' + (mDue ? " primary" : "") + '" href="#/mistakes">' + (mDue ? "Retry" : "Open") + "</a></div>" +
+      '<div class="dn"><div class="dn-n' + (fDue ? "" : " zero") + '">' + fDue + '</div><div class="dn-t"><b>Flashcards due</b><span>' + (fNew ? fNew + " new card" + (fNew === 1 ? "" : "s") + " to learn from topics you've opened" : "Cards come back when their review date arrives") + '</span></div>' + (fDue ? '<a class="btn primary" href="#/flashcards/due">Review</a>' : fNew ? '<a class="btn primary" href="#/flashcards/new">Learn new</a>' : '<a class="btn" href="#/flashcards">Open</a>') + "</div>";
+    main.appendChild(dueNow);
+
+    const nQ = Object.values(CS.quizzes).reduce((a, b) => a + b.length, 0);
+    const nE = Object.values(CS.exams).reduce((a, b) => a + b.length, 0);
+    const probs = Object.keys(CS.problems || {});
+    const solvedN = probs.filter((p) => codeSolved()[p]).length;
+    const lvQs = CS.levelsTrainer ? CS.levelsTrainer.questions() : [];
+    const lvSaved = CS.store.get("levelsTrainer", {});
+    const lvDone = lvQs.filter((q) => lvSaved[q.id] && lvSaved[q.id].t).length;
+    const traceIds = Object.keys(CS.traces || {});
+    const traceDone = traceIds.filter((t) => {
+      const r = CS.store.get("trace." + t, null);
+      return r && r.total && r.ok === r.total;
+    }).length;
+    const inDeck = CS.mistakes ? CS.mistakes.list().length : 0;
+    const modes = [
+      ["dice", "Mixed mock", "Random quiz questions across the topics you pick, with an optional timer and a breakdown at the end.", "#/mock", nQ.toLocaleString("en-GB") + " questions"],
+      ["repeat", "My mistakes", "Every question you get wrong, brought back until you get it right each time.", "#/mistakes", inDeck + " in your deck"],
+      ["cards", "Flashcards", "Key terms and facts for every topic, in Leitner boxes.", "#/flashcards", fDue + " due · " + fNew + " new"],
+      ["code", "Code practice", "Python in the browser, checked against visible and hidden tests: Section B style, the programming booklet and the skeleton program's Section D.", "#/code", solvedN + " of " + probs.length + " solved"],
+      ["pen", "Exam-style questions", "Questions with mark schemes for every topic. Write your answer, then mark it honestly.", "#/exams", nE + " questions"],
+      ["target", "Extended-answer trainer", "Mark three example answers to a 6, 9 or 12-mark question, then compare with the examiner.", "#/levels", lvDone + " of " + lvQs.length + " done"],
+      ["trace", "Trace tables", "Hand-trace code and fill the table exactly as you would in the exam.", "#/traces", traceDone + " of " + traceIds.length + " done"],
+    ];
+    main.appendChild(h("h2", { class: "sub-h", text: "Ways to practise" }));
+    const ul = h("ul", { class: "modes" });
+    modes.forEach(([ico, t, d, href, stat]) => ul.appendChild(h("li", { html: '<a class="mode" href="' + href + '"><span class="mode-ico">' + icon(ico) + '</span><span class="mode-t"><b>' + t + "</b><span>" + d + '</span></span><span class="mode-s">' + stat + '</span><span class="chev"></span></a>' })));
+    main.appendChild(ul);
+    main.appendChild(h("p", { class: "small muted", style: "margin-top:14px", html: "Each topic's own quiz is on its page: open it from <a href='#/notes'>Notes</a>." }));
+  };
+
+  /** list of topics that have something (exam questions, traces) — used by the two index pages */
+  function topicIndex(main, count, href, extra) {
+    CS.sections.forEach((s) => {
+      const rows = s.topics.filter((t) => count(t.id) > 0);
+      if (!rows.length) return;
+      main.appendChild(h("h2", { class: "sub-h", style: "margin-top:22px", text: secLabel(s) + " " + s.title }));
+      const ul = h("ul", { class: "topic-rows" });
+      rows.forEach((t) => ul.appendChild(h("li", { html: '<span class="tr-t"><span class="mono">' + t.id + '</span><a href="' + href(t.id) + '">' + U.esc(t.title) + "</a></span>" + extra(t.id) })));
+      main.appendChild(ul);
+    });
+  }
+
+  CS.views.exams = function (main) {
+    document.title = "CS Revision · Exam-style questions";
+    main.appendChild(pageHead('<a href="#/practise">Practise</a> › Exam-style questions', "Exam-style questions", "Write your answer as you would in the exam, then reveal the mark scheme and tick each point you hit. Pick a topic."));
+    topicIndex(
+      main,
+      (id) => (CS.exams[id] || []).length,
+      (id) => "#/exam/" + id,
+      (id) => {
+        const qs = CS.exams[id];
+        const marks = qs.reduce((a, q) => a + (q.marks || 0), 0);
+        return '<span class="muted small">' + qs.length + " question" + (qs.length === 1 ? "" : "s") + " · " + marks + " marks</span>" + (CS.progress.topic(id).examDone ? '<span class="pill ok">attempted</span>' : "");
+      }
+    );
+  };
+
+  CS.views.traces = function (main) {
+    document.title = "CS Revision · Trace tables";
+    main.appendChild(pageHead('<a href="#/practise">Practise</a> › Trace tables', "Trace tables", "Hand-trace the code and fill the table exactly as you would in the exam. Every cell is checked."));
+    topicIndex(
+      main,
+      (id) => (CS.tracesByTopic[id] || []).length,
+      (id) => "#/trace/" + id,
+      (id) => {
+        const list = CS.tracesByTopic[id];
+        const done = list.filter((t) => {
+          const r = CS.store.get("trace." + t, null);
+          return r && r.total && r.ok === r.total;
+        }).length;
+        return '<span class="muted small">' + list.length + " challenge" + (list.length === 1 ? "" : "s") + "</span>" + (done ? '<span class="pill ' + (done === list.length ? "ok" : "warn") + '">' + done + " of " + list.length + " done</span>" : "");
+      }
+    );
+  };
 
   /* ---------------- TOOLS ---------------- */
   CS.views.tools = function (main) {
     document.title = "CS Revision · Interactive tools";
-    main.appendChild(h("div", { class: "topic-head", html: '<div class="crumbs"><a href="#/">Home</a> › Tools</div><h1>Interactive tools</h1><p class="muted">Visualisers, simulators and calculators. Each one also appears inside the topic page it belongs to.</p>' }));
+    main.appendChild(pageHead("", "Interactive tools", "Visualisers, simulators and calculators. Each one also appears inside the notes page it belongs to."));
     const bySection = {};
     Object.values(CS.tools).forEach((t) => (bySection[t.section || "misc"] = bySection[t.section || "misc"] || []).push(t));
     const order = CS.sections.map((s) => s.id).concat(["misc"]);
@@ -581,9 +840,9 @@
       const list = bySection[sid];
       if (!list) return;
       const sec = CS.sectionById(sid);
-      main.appendChild(h("h2", { text: sec ? sec.id + " · " + sec.title : "Other tools", style: "margin:1.4em 0 0.6em" }));
+      main.appendChild(h("h2", { class: "sub-h", text: sec ? secLabel(sec) + " " + sec.title : "Other tools", style: "margin:1.6em 0 0.6em" }));
       const grid = h("div", { class: "grid cols-3" });
-      list.sort((a, b) => a.title.localeCompare(b.title)).forEach((t) => grid.appendChild(h("a", { class: "action-card", href: "#/tool/" + t.id, html: '<div class="ico">' + (t.icon || "🧰") + '</div><div class="t">' + U.esc(t.title) + '</div><div class="d">' + U.esc(t.desc || "") + "</div>" })));
+      list.sort((a, b) => a.title.localeCompare(b.title)).forEach((t) => grid.appendChild(h("a", { class: "action-card", href: "#/tool/" + t.id, html: (t.topic ? '<div class="k">' + U.esc(t.topic) + "</div>" : "") + '<div class="t">' + U.esc(t.title) + '</div><div class="d">' + U.esc(t.desc || "") + "</div>" })));
       main.appendChild(grid);
     });
     if (!Object.keys(CS.tools).length) main.appendChild(h("p", { class: "muted", text: "No tools registered yet." }));
@@ -592,9 +851,9 @@
   CS.views.tool = function (main, arg) {
     const id = arg[0];
     const tool = CS.tools[id];
-    main.classList.add("wide", "tool-page");
+    main.classList.add("tool-page");
     document.title = "CS Revision · " + (tool ? tool.title : "Tool");
-    main.appendChild(h("div", { class: "topic-head", html: '<div class="crumbs"><a href="#/">Home</a> › <a href="#/tools">Tools</a></div><h1>' + (tool ? U.esc(tool.title) : "Unknown tool") + "</h1>" + (tool && tool.desc ? '<p class="muted">' + U.esc(tool.desc) + "</p>" : "") + (tool && tool.topic ? '<p class="small">Belongs to topic <a href="#/topic/' + U.esc(tool.topic) + '">' + U.esc(tool.topic) + "</a></p>" : "") }));
+    main.appendChild(pageHead('<a href="#/tools">Tools</a> › ' + (tool ? U.esc(tool.title) : "Unknown"), tool ? U.esc(tool.title) : "Unknown tool", tool && tool.desc ? U.esc(tool.desc) : "", tool && tool.topic && CS.topicMeta(tool.topic) ? '<div class="head-links"><a href="#/topic/' + U.esc(tool.topic) + '">Notes: ' + U.esc(tool.topic + " " + CS.topicMeta(tool.topic).title) + "</a></div>" : ""));
     const holder = h("div");
     main.appendChild(holder);
     CS.mountTool(holder, id, {}, false);
@@ -608,12 +867,18 @@
   /* ---------------- CHECKLIST ---------------- */
   CS.views.checklist = function (main) {
     document.title = "CS Revision · Specification checklist";
-    main.appendChild(h("div", { class: "topic-head", html: '<div class="crumbs"><a href="#/">Home</a> › Checklist</div><h1>Specification checklist</h1><p class="muted">Every AQA 7517 content point, mapped to the page that covers it. Tick what you can confidently do — ticks are saved on this device.</p>' }));
-    let totalPts = 0,
-      done = 0;
+    main.appendChild(pageHead('<a href="#/progress">Progress</a> › Spec checklist', "Specification checklist", "Every AQA 7517 content point, mapped to the page that covers it. Tick what you can confidently do."));
+    let totalPts = 0;
     const allUl = [];
+    const summaryText = () => {
+      let d = 0;
+      allUl.forEach((ul) => ul.querySelectorAll("input:checked").forEach(() => d++));
+      return d + " of " + totalPts + " specification points ticked (" + Math.round((d / Math.max(1, totalPts)) * 100) + "%)";
+    };
+    const summary = h("div", { class: "pill accent", style: "font-size:0.9rem;padding:6px 14px;margin-bottom:16px" });
+    main.appendChild(summary);
     CS.sections.forEach((s) => {
-      const sec = h("section", { class: "card", style: "margin-bottom:14px;--sc:var(--s" + s.id + ")" });
+      const sec = h("section", { class: "card", style: "margin-bottom:14px" });
       sec.appendChild(h("h2", { style: "margin:0 0 8px;font-size:1.2rem", text: (s.spec ? s.spec + " " : "") + s.title }));
       s.topics.forEach((t) => {
         const pts = t.specPoints || [];
@@ -624,14 +889,12 @@
           totalPts++;
           const key = "checklist." + p.id;
           const isDone = CS.store.get(key, false);
-          if (isDone) done++;
           const cb = h("input", { type: "checkbox", id: "ck-" + p.id });
           cb.checked = isDone;
           const li = h("li", { class: isDone ? "done" : "" }, [cb, h("label", { for: "ck-" + p.id, html: '<span class="sp">' + U.esc(p.id) + "</span> " + U.esc(p.text) })]);
           cb.addEventListener("change", () => {
             CS.store.set(key, cb.checked);
             li.classList.toggle("done", cb.checked);
-            updateSidebarProgress();
             summary.textContent = summaryText();
           });
           ul.appendChild(li);
@@ -641,13 +904,7 @@
       });
       main.appendChild(sec);
     });
-    const summaryText = () => {
-      let d = 0;
-      allUl.forEach((ul) => ul.querySelectorAll("input:checked").forEach(() => d++));
-      return d + " of " + totalPts + " specification points ticked (" + Math.round((d / Math.max(1, totalPts)) * 100) + "%)";
-    };
-    const summary = h("div", { class: "pill accent", text: summaryText(), style: "font-size:0.9rem;padding:6px 14px" });
-    main.insertBefore(summary, main.children[1]);
+    summary.textContent = summaryText();
   };
 
   /* ---------------- PROGRESS / SETTINGS ---------------- */
@@ -657,11 +914,11 @@
     const standalone = (window.matchMedia && window.matchMedia("(display-mode: standalone)").matches) || navigator.standalone;
     const ios = /iphone|ipad|ipod/i.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
     let body;
-    if (standalone) body = "<p class='small' style='margin:0'>✅ You're using the installed app. It works offline: everything is saved on this device.</p>";
+    if (standalone) body = "<p class='small' style='margin:0'>You're using the installed app. It works offline: everything is saved on this device.</p>";
     else if (!/^https?:$/.test(location.protocol)) body = "<p class='small muted' style='margin:0'>Installing only works on the live website (not when the page is opened as a file).</p>";
     else if (ios) body = "<ol class='small' style='margin:0;padding-left:1.2em'><li>Open this site in <b>Safari</b>.</li><li>Tap the <b>Share</b> button (the square with an arrow).</li><li>Choose <b>Add to Home Screen</b>, then <b>Add</b>.</li></ol><p class='small muted' style='margin:8px 0 0'>It opens full screen from its own icon and works offline. Open it at least once a week: iOS can clear saved progress from web apps that haven't been used for a while.</p>";
     else body = "<p class='small' style='margin:0 0 8px'>Add the site to your home screen or desktop. It opens in its own window and works offline.</p>";
-    card.innerHTML = "<h3 style='margin-top:0'>📲 Install as an app</h3>" + body;
+    card.innerHTML = "<h3 style='margin-top:0'>Install as an app</h3>" + body;
     if (!standalone && !ios && /^https?:$/.test(location.protocol)) {
       const btn = h("button", { type: "button", class: "btn primary", text: "Install app" });
       btn.addEventListener("click", async () => {
@@ -677,8 +934,8 @@
 
   CS.views.progress = function (main) {
     document.title = "CS Revision · Progress";
-    main.appendChild(h("div", { class: "topic-head", html: '<div class="crumbs"><a href="#/">Home</a> › Progress</div><h1>Progress &amp; settings</h1>' }));
-    (CS.settingsCards || []).forEach((make) => main.appendChild(make())); // e.g. accounts (sync.js)
+    main.appendChild(pageHead("", "Progress &amp; settings", "", '<div class="head-links"><a href="#/checklist">Spec checklist</a><a href="#/glossary">Glossary</a></div>'));
+    (CS.settingsCards || []).forEach((make) => main.appendChild(make())); // e.g. accounts (sync.js), countdowns
     main.appendChild(installCard());
     const table = h("div", { class: "table-wrap" });
     let html = "<table><thead><tr><th>Topic</th><th>Read</th><th>Quiz best</th><th>Attempts</th><th>Checklist</th><th>Overall</th></tr></thead><tbody>";
@@ -697,7 +954,7 @@
     const card = h("div", { class: "card", style: "margin-top:16px" });
     card.innerHTML = "<h3 style='margin-top:0'>Export, import or reset</h3><p class='small muted'>Progress is stored in this browser's localStorage. Export a backup before clearing your browser data or switching devices.</p>";
     const row = h("div", { class: "row" });
-    const exportBtn = h("button", { class: "btn", type: "button", text: "⬇ Export progress (JSON)" });
+    const exportBtn = h("button", { class: "btn", type: "button", text: "Export progress (JSON)" });
     exportBtn.addEventListener("click", () => {
       const blob = new Blob([CS.store.exportJSON()], { type: "application/json" });
       const a = document.createElement("a");
@@ -708,7 +965,7 @@
       a.remove();
     });
     const importInput = h("input", { type: "file", accept: "application/json", style: "display:none" });
-    const importBtn = h("button", { class: "btn", type: "button", text: "⬆ Import progress" });
+    const importBtn = h("button", { class: "btn", type: "button", text: "Import progress" });
     importBtn.addEventListener("click", () => importInput.click());
     importInput.addEventListener("change", () => {
       const f = importInput.files[0];
@@ -727,19 +984,17 @@
           CS.prefs.apply();
           CS.toast("Progress imported");
           route();
-          updateSidebarProgress();
         } catch (e) {
           alert("That file is not valid progress JSON.");
         }
       };
       r.readAsText(f);
     });
-    const resetBtn = h("button", { class: "btn danger", type: "button", text: "🗑 Reset all progress" });
+    const resetBtn = h("button", { class: "btn danger", type: "button", text: "Reset all progress" });
     resetBtn.addEventListener("click", () => {
       if (confirm("Delete all saved progress, quiz scores, flashcard boxes and checklist ticks on this device?")) {
         CS.store.reset();
         CS.prefs.apply();
-        updateSidebarProgress();
         CS.toast("Progress reset");
         route();
       }
@@ -790,7 +1045,7 @@
   /* ---------------- GLOSSARY ---------------- */
   CS.views.glossary = function (main) {
     document.title = "CS Revision · Glossary";
-    main.appendChild(h("div", { class: "topic-head", html: '<div class="crumbs"><a href="#/">Home</a> › Glossary</div><h1>Glossary</h1><p class="muted">Every key term from every page, in mark-scheme wording.</p>' }));
+    main.appendChild(pageHead('<a href="#/notes">Notes</a> › Glossary', "Glossary", "Every key term from every page, in mark-scheme wording."));
     const terms = [];
     CS.allTopicIds().forEach((id) => {
       const t = CS.topics[id];
@@ -803,7 +1058,7 @@
       t.keyterms.forEach((k) => terms.push(Object.assign({ topic: id }, k)));
     });
     terms.sort((a, b) => a.term.localeCompare(b.term));
-    const filter = h("input", { type: "search", placeholder: "Filter terms…", style: "margin-bottom:12px" });
+    const filter = h("input", { type: "search", placeholder: "Filter terms…", "aria-label": "Filter terms", style: "margin-bottom:12px;max-width:420px" });
     main.appendChild(filter);
     const list = h("div");
     main.appendChild(list);

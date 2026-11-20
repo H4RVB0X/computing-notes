@@ -53,7 +53,7 @@ Once accounts are switched on (below), people who are signed in send reports str
 The sign-in and sync code is already in the site (`site/js/sync.js`). It stays switched off until `apiKey` in `config.js` is filled in.
 
 **What it does**
-- A **Sign in with Google** button on the Progress page, plus a status chip in the sidebar.
+- A **Sign in with Google** button on the Progress page, plus a status chip in the top bar.
 - Progress stays in the browser, so the site still works offline and signed out. When signed in, a copy is kept in Firestore (one document per person) and merged with every device you use. Merging takes the best score, the furthest reading, all checklist ticks, the flashcard state with the most reviews, and the newest change for My mistakes.
 - Text (exam answers, code drafts) from the device you're on wins unless it's empty.
 - **Delete my cloud data** button. Settings such as theme and text size stay per device.

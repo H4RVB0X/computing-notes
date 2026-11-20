@@ -4,7 +4,7 @@ An interactive revision site covering the whole AQA A-Level Computer Science spe
 
 **Live site: [h4rvb0x.github.io/computing-notes](https://h4rvb0x.github.io/computing-notes/)**
 
-![Dashboard with exam countdowns, progress and revision suggestions](docs/images/dashboard.png)
+![Home page: exam countdowns, the topic to continue, what is due today and progress by paper](docs/images/dashboard.png)
 
 ## At a glance
 
@@ -29,11 +29,12 @@ An interactive revision site covering the whole AQA A-Level Computer Science spe
 - **Mixed mocks, a spec checklist, search and a glossary.**
 
 **Around it**
+- **Built around what to do next.** Home shows the topic to continue, what is due today and progress for each paper. Notes lays out the whole spec as a syllabus with read/in-progress marks. Every topic is a hub with tabs for its notes, quiz, exam questions, flashcards, trace tables and code problems, and Practise gathers every way to test yourself.
 - **Exam countdowns** for both papers, plus your own: mocks, the NEA deadline, other subjects.
 - **Accounts with live sync.** Sign in with Google, and progress on your phone appears on your laptop within seconds.
 - **Installable app.** Add to Home Screen; the whole site works offline, including code practice after its first use.
 - **Report a mistake** on every question and page. It goes to a Google Form, so no account is needed.
-- **Dark mode, a mobile layout, adjustable text size, per-page progress reset** and a "don't save on this device" mode for shared PCs.
+- **Dark mode, a phone layout with a bottom tab bar, adjustable text size, per-page progress reset** and a "don't save on this device" mode for shared PCs.
 
 <p>
   <img src="docs/images/code-practice.png" width="49%" alt="Code practice: a Caesar cipher solution passing all seven tests">

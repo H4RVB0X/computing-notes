@@ -323,24 +323,24 @@
 
   /* ---------------- directives ---------------- */
   const CALLOUTS = {
-    definition: { icon: "📘", label: "Definition" },
-    example: { icon: "🧮", label: "Worked example" },
-    trap: { icon: "⚠️", label: "Marks are lost here" },
-    tip: { icon: "💡", label: "Tip" },
-    challenge: { icon: "🎯", label: "Challenge" },
-    exam: { icon: "📝", label: "Exam technique" },
-    note: { icon: "ℹ️", label: "Note" },
-    warning: { icon: "⚠️", label: "Careful" },
-    why: { icon: "🤔", label: "Why?" },
-    history: { icon: "🕰️", label: "Background" },
-    link: { icon: "🔗", label: "Connection" },
-    maths: { icon: "∑", label: "Maths link" },
+    definition: { label: "Definition" },
+    example: { label: "Worked example" },
+    trap: { label: "Marks are lost here" },
+    tip: { label: "Tip" },
+    challenge: { label: "Challenge" },
+    exam: { label: "Exam technique" },
+    note: { label: "Note" },
+    warning: { label: "Careful" },
+    why: { label: "Why?" },
+    history: { label: "Background" },
+    link: { label: "Connection" },
+    maths: { label: "Maths link" },
   };
 
   function renderDirective(type, title, buf, ctx) {
     switch (type) {
       case "quick": {
-        return '<div class="quick-block" data-quick="1"><div class="quick-head"><span class="quick-icon">⚡</span><span>' + esc(title || "Quick view") + '</span></div><div class="quick-body">' + parseBlocks(buf, ctx) + "</div></div>";
+        return '<div class="quick-block" data-quick="1"><div class="quick-head"><span>' + esc(title || "Quick view") + '</span></div><div class="quick-body">' + parseBlocks(buf, ctx) + "</div></div>";
       }
       case "objectives": {
         const inner = parseBlocks(buf, ctx).replace(/<ul>/g, '<ul class="objectives-list">');
@@ -414,8 +414,8 @@
         return '<div class="spec-box"><div class="spec-box-title">AQA spec says</div>' + parseBlocks(buf, ctx) + "</div>";
       }
       default: {
-        const c = CALLOUTS[type] || { icon: "•", label: type };
-        return '<aside class="callout callout-' + esc(type) + '"><div class="callout-head"><span class="callout-icon" aria-hidden="true">' + c.icon + '</span><span class="callout-label">' + (title ? inline(title, ctx) : esc(c.label)) + '</span></div><div class="callout-body">' + parseBlocks(buf, ctx) + "</div></aside>";
+        const c = CALLOUTS[type] || { label: type };
+        return '<aside class="callout callout-' + esc(type) + '"><div class="callout-head"><span class="callout-label">' + (title ? inline(title, ctx) : esc(c.label)) + '</span></div><div class="callout-body">' + parseBlocks(buf, ctx) + "</div></aside>";
       }
     }
   }

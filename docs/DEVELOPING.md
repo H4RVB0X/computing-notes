@@ -46,17 +46,34 @@ is saved in the browser's localStorage for that file; use **Progress & settings 
 
 Keyboard: `/` focuses search · in flashcards `space` flips, `1` = not yet, `2` = got it.
 
+## Layout and routes
+
+A top bar with five areas (on phones, a bottom tab bar with Home, Notes, Practise, Search and You). Routes are hash-based, so the site works from `file://`.
+
+| Area | Routes |
+|---|---|
+| **Home**: continue card, what's due today, new topics, progress by paper | `#/` |
+| **Notes**: the whole spec as a syllabus with read/in-progress marks and filters | `#/notes`, `#/section/<id>`, `#/glossary` |
+| **Topic hub**: contents tree, topic header and tabs | `#/topic/<id>` (Notes tab), `#/quiz/<id>`, `#/exam/<id>`, `#/flashcards/<id>`, `#/trace/<id>`, `#/problems/<id>` (Code tab) |
+| **Practise**: what's due, then every way to practise | `#/practise`, `#/mock`, `#/mistakes`, `#/flashcards`, `#/code`, `#/exams`, `#/levels`, `#/traces` |
+| **Tools** | `#/tools`, `#/tool/<id>` |
+| **Progress**: account, countdowns, install, breakdown, export/import, display | `#/progress`, `#/checklist` |
+
+Any route listed in `HUB_TABS` in `app.js` is drawn inside the topic hub when its first argument is a topic id: the router builds the hub, then hands the tab's own view the panel to draw into. The hub header replaces that view's own breadcrumb and title (see `.hub-panel > .topic-head` in `style.css`).
+
+Icons are one line-icon set (`CS.icon(name)` in `core.js`), not emoji.
+
 ## How it is organised
 
 ```
 site/
-├── index.html              the app shell (sidebar, header, routing)
+├── index.html              the app shell (top bar, phone tab bar, page container)
 ├── css/style.css           all styling, light + dark themes
 ├── js/                     engine (no content in here)
 │   ├── core.js             registries, localStorage, progress tracking, utilities
 │   ├── markdown.js         the Markdown + directive renderer used for notes
 │   ├── highlight.js        syntax highlighting (Python, AQA pseudocode, Haskell, SQL, assembly…)
-│   ├── app.js              router and page views (dashboard, topic, tools, checklist, glossary…)
+│   ├── app.js              router and page views (Home, Notes, the topic hub, Practise, tools, progress, checklist, glossary…)
 │   ├── quiz.js             quizzes, exam-style self-marking, mixed mock mode
 │   ├── flashcards.js       Leitner spaced repetition
 │   ├── trace.js            trace-table challenges
@@ -65,13 +82,13 @@ site/
 │   ├── code.js             code practice pages, test checking, the small code editor
 │   ├── py-worker.js        Web Worker that runs Python with Pyodide (same test rules as check_problems.py)
 │   ├── sync.js             optional Google sign-in + Firestore sync, and the progress merge rules
-│   ├── countdown.js        exam countdowns on the dashboard (AQA dates in config.js, plus your own)
+│   ├── countdown.js        exam countdowns on Home (AQA dates in config.js, plus your own)
 │   ├── config.js           settings: report form, exam dates, Firebase project (see docs/SETUP.md)
 │   └── search.js           site-wide search
 ├── sw.js                   service worker: saves the site for offline use (network first)
 ├── manifest.webmanifest    makes the site installable; icons in icons/
 ├── content/
-│   ├── sections.js         THE SITE MAP: sections → pages → AQA spec points (drives sidebar, checklist, COVERAGE.md)
+│   ├── sections.js         THE SITE MAP: sections → pages → AQA spec points (drives Notes, the contents tree, checklist, COVERAGE.md)
 │   ├── manifest.js         auto-generated list of files to load (python3 scripts/build_manifest.py)
 │   ├── topics/<id>.md.js   notes for each page, written in Markdown inside a JS comment
 │   ├── quizzes/<id>.js     quiz questions
@@ -88,7 +105,7 @@ docs/                       CONTENT_SPEC.md (authoring guide), this file, SETUP.
 .github/workflows/pages.yml checks the site, then deploys site/ to GitHub Pages
 ```
 
-Page ids are the numbers you see in the sidebar (`1.1` … `14.2`, `R.1` … `R.3`, `P.1` … `P.6`).
+Page ids are the numbers you see on the Notes page (`1.1` … `14.2`, `R.1` … `R.3`, `P.1` … `P.6`).
 
 ## Adding or editing notes
 

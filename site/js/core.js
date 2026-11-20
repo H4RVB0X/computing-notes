@@ -404,4 +404,29 @@
       CS.prefs.apply();
     },
   };
+  /* ---------- line icons (one consistent set instead of emoji) ---------- */
+  const ICONS = {
+    home: '<path d="M3 9.5 10 4l7 5.5V17H3z"/>',
+    book: '<path d="M3 4.5h4.5A2.5 2.5 0 0 1 10 7v9.5A1.5 1.5 0 0 0 8.5 15H3zM17 4.5h-4.5A2.5 2.5 0 0 0 10 7v9.5a1.5 1.5 0 0 1 1.5-1.5H17z"/>',
+    target: '<circle cx="10" cy="10" r="7"/><circle cx="10" cy="10" r="3.5"/><circle cx="10" cy="10" r=".9" fill="currentColor"/>',
+    search: '<circle cx="9" cy="9" r="5.5"/><path d="m13.2 13.2 3.8 3.8"/>',
+    user: '<circle cx="10" cy="7" r="3.2"/><path d="M3.8 17a6.2 6.2 0 0 1 12.4 0"/>',
+    cloud: '<path d="M6 15.5h8.5a3.5 3.5 0 0 0 .3-7A5 5 0 0 0 5 9.6a3 3 0 0 0 1 5.9z"/>',
+    sync: '<path d="M4 9a5.5 5.5 0 0 1 10-2.5M16 11a5.5 5.5 0 0 1-10 2.5"/><path d="M14.5 3v3.7h-3.7M5.5 17v-3.7h3.7"/>',
+    alert: '<path d="M10 3.5 2.8 16h14.4z"/><path d="M10 8.5v3.5"/><circle cx="10" cy="14" r=".6" fill="currentColor"/>',
+    clock: '<circle cx="10" cy="10" r="7"/><path d="M10 6v4l2.5 2"/>',
+    cards: '<rect x="3" y="6" width="10.5" height="11" rx="1.5"/><path d="M6.5 3.5H16a1 1 0 0 1 1 1V14"/>',
+    dice: '<rect x="3" y="3" width="14" height="14" rx="2.5"/><circle cx="7" cy="7" r=".9" fill="currentColor"/><circle cx="13" cy="13" r=".9" fill="currentColor"/><circle cx="10" cy="10" r=".9" fill="currentColor"/>',
+    repeat: '<path d="M4 9a5.5 5.5 0 0 1 10-2.5M16 11a5.5 5.5 0 0 1-10 2.5"/><path d="M14.5 3v3.7h-3.7M5.5 17v-3.7h3.7"/>',
+    code: '<path d="M7 6 3 10l4 4M13 6l4 4-4 4"/>',
+    pen: '<path d="m4 16 1-4 8-8 3 3-8 8z"/><path d="m11.5 5.5 3 3"/>',
+    trace: '<rect x="3" y="4" width="14" height="12" rx="1.5"/><path d="M3 8h14M8 8v8"/>',
+    quiz: '<circle cx="10" cy="10" r="7"/><path d="M8 8a2 2 0 1 1 2.8 1.8c-.5.3-.8.7-.8 1.3v.4"/><circle cx="10" cy="13.8" r=".6" fill="currentColor"/>',
+    tools: '<path d="M12.5 3.2a4 4 0 0 0-3.6 5.3L3.3 14.1l2.6 2.6 5.6-5.6a4 4 0 0 0 5.3-3.6l-2.4 1.6-2.2-.6-.6-2.2z"/>',
+    check: '<rect x="3" y="3" width="14" height="14" rx="2.5"/><path d="m6.5 10.2 2.3 2.3 4.7-5"/>',
+  };
+  /** inline SVG line icon, e.g. CS.icon("cards") */
+  CS.icon = function (name, cls) {
+    return '<svg class="ico' + (cls ? " " + cls : "") + '" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + (ICONS[name] || "") + "</svg>";
+  };
 })();

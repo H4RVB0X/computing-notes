@@ -11,7 +11,7 @@
   function mount(el, ch) {
     el.innerHTML = "";
     const frame = h("div", { class: "tool-frame" });
-    frame.appendChild(h("div", { class: "tool-frame-head" }, [h("span", { text: "🔍 Trace challenge: " + (ch.title || ch.id) }), h("span", { class: "muted small", text: ch.rows.length + " rows × " + ch.columns.length + " columns" })]));
+    frame.appendChild(h("div", { class: "tool-frame-head" }, [h("span", { text: "Trace challenge: " + (ch.title || ch.id) }), h("span", { class: "muted small", text: ch.rows.length + " rows × " + ch.columns.length + " columns" })]));
     const body = h("div", { class: "tool-frame-body" });
     if (ch.intro) body.insertAdjacentHTML("beforeend", CS.markdown.render(ch.intro, {}));
     const fig = h("div");
